@@ -1,0 +1,14 @@
+/**
+ * @file protobuf-c-utilities.h
+ * @author your name (you@domain.com)
+ * @brief 
+ * @version 0.1
+ * @date 2024-07-11
+ * 
+ * @copyright Copyright (c) 2024
+ * 
+ */
+#ifndef _PROTOBUF_C_UTILITIES_H_
+#define _PROTOBUF_C_UTILITIES_H_
+
+#endif /* _PROTOBUF_C_UTILITIES_H_ */

@@ -1,0 +1,45 @@
+---
+IndentWidth: 4
+AlignConsecutiveAssignments:
+  Enabled: true
+  AcrossEmptyLines: false
+  AcrossComments: false
+  AlignCompound: true
+  PadOperators: true
+AlignConsecutiveBitFields:
+  Enabled: true
+  AcrossEmptyLines: true
+  AcrossComments: true
+AlignConsecutiveDeclarations:
+  Enabled: true
+  AcrossEmptyLines: false
+  AcrossComments: false
+AlignConsecutiveMacros:
+  Enabled: true
+  AcrossEmptyLines: false
+  AcrossComments: true
+AlignEscapedNewlines: Left
+AlignTrailingComments:
+  Kind: Always
+AlignArrayOfStructures: Left
+ColumnLimit: 140
+---
+Language: Cpp
+DerivePointerAlignment: false
+PointerAlignment: Left
+BreakBeforeBraces: Linux
+SeparateDefinitionBlocks: Always
+AllowShortEnumsOnASingleLine: false
+AlwaysBreakAfterReturnType: TopLevelDefinitions
+BinPackParameters: false
+---
+Language: JavaScript
+BasedOnStyle: LLVM
+ColumnLimit: 100
+---
+Language: Proto
+BasedOnStyle: Google
+---
+Language: CSharp
+BasedOnStyle: LLVM
+ColumnLimit: 100

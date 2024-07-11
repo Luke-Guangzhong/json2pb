@@ -1,0 +1,18 @@
+/**
+ * @file main.c
+ * @author your name (you@domain.com)
+ * @brief 
+ * @version 0.1
+ * @date 2024-07-11
+ * 
+ * @copyright Copyright (c) 2024
+ * 
+ */
+
+#include <stdio.h>
+
+int main(int argc, char const *argv[])
+{
+    printf("Hello, world!\n");
+    return 0;
+}
