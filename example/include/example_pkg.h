@@ -1,8 +1,7 @@
 /**
  * @file example_pkg.h
- * @author your name (you@domain.com)
+ * @author luguangzhong (luke_guangzhong@petalmail.com)
  * @brief
- * @version 0.1
  * @date 2024-07-11
  *
  * @copyright Copyright (c) 2024

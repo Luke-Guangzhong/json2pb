@@ -1,3 +1,13 @@
+/**
+ * @file utilities.c
+ * @author luguangzhong (luke_guangzhong@petalmail.com)
+ * @brief
+ * @date 2024-07-11
+ *
+ * @copyright Copyright (c) 2024
+ *
+ */
+
 #include "utilities.h"
 #include "common.h"
 

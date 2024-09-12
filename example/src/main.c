@@ -1,13 +1,13 @@
 /**
  * @file main.c
- * @author your name (you@domain.com)
+ * @author luguangzhong (luke_guangzhong@petalmail.com)
  * @brief
- * @version 0.1
  * @date 2024-07-11
  *
  * @copyright Copyright (c) 2024
  *
  */
+
 #include "cjson/cJSON.h"
 #include "cjson2pb-c.h"
 #include "common.h"

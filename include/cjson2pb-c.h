@@ -1,15 +1,15 @@
 /**
- * @file protobuf-c-utilities.h
- * @author your name (you@domain.com)
+ * @file cjson2pb-c.h
+ * @author luguangzhong (luke_guangzhong@petalmail.com)
  * @brief
- * @version 0.1
  * @date 2024-07-11
  *
  * @copyright Copyright (c) 2024
  *
  */
-#ifndef _PROTOBUF_C_UTILITIES_H_
-#define _PROTOBUF_C_UTILITIES_H_
+
+#ifndef _CJSON_2_PROTOBUF_H_
+#define _CJSON_2_PROTOBUF_H_
 
 #include <stdbool.h>
 
