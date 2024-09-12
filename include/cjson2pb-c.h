@@ -166,7 +166,13 @@ RtnCode cvt_single_bytes(ProtobufCBinaryData* const field, const cJSON* const it
 RtnCode cvt_single_enum(int* const field, const ProtobufCEnumDescriptor* const enum_desc, const cJSON* const item, StringEnumCallback string_enum) NONNULL(1, 2, 3);
 RtnCode cvt_single_message(ProtobufCMessage* const msg, const cJSON* const item, MsgConvertorCallback msg_convertor) NONNULL(1, 2);
 
+uint32_t cvt_cjson_2_pb_number(const cJSON* const restrict root, ProtobufCMessage* const restrict msg, const char* const restrict field_name);
+uint32_t cvt_cjson_2_pb_string(const cJSON* const restrict root, ProtobufCMessage* const restrict msg, const char* const restrict field_name);
+uint32_t cvt_cjson_2_pb_message(const cJSON* const restrict root, ProtobufCMessage* const restrict msg, const char* const restrict field_name, MsgConvertorCallback const msg_convertor);
+uint32_t cvt_cjson_2_pb_enum(const cJSON* const restrict root, ProtobufCMessage* const restrict msg, const char* const restrict field_name, StringEnumCallback const string_enum);
+uint32_t cvt_cjson_2_pb_byte(const cJSON* const restrict root, ProtobufCMessage* const restrict msg, const char* const restrict field_name, const ByteMode mode);
+
 #undef ALL_NONNULL
 #undef NONNULL
 
-#endif /* _PROTOBUF_C_UTILITIES_H_ */
+#endif /* _CJSON_2_PROTOBUF_H_ */
