@@ -22,7 +22,7 @@ AlignEscapedNewlines: Left
 AlignTrailingComments:
   Kind: Always
 AlignArrayOfStructures: Left
-ColumnLimit: 140
+ColumnLimit: 240
 ---
 Language: Cpp
 DerivePointerAlignment: false

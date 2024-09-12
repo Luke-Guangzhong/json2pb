@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+option go_package = "../verify/go;example";
+
+enum SignatureAlgorithm {
+    none       = 0;
+    dsa        = 1;
+    ecdsa      = 2;
+    ecdsa_sk   = 3;
+    ed25519    = 4;
+    ed25519_sk = 5;
+    rsa        = 6;
+}
+
+message Publisher {
+    string name        = 1;
+    string email       = 2;
+    string description = 3;
+}
+
+message Contributer {
+    int32  id            = 1;
+    string name          = 2;
+    string email         = 3;
+    bool   recent_active = 4;
+}
+
+message Device {
+    string          mac             = 1;
+    repeated sint32 rssi            = 2;
+    double          longitude       = 3;
+    double          latitude        = 4;
+    float           length          = 5;
+    float           width           = 6;
+    float           height          = 7;
+    double          weight          = 8;
+    int64           altitude        = 9;
+    double          battery         = 10;
+    uint64          rx_bytes        = 11;
+    uint64          tx_bytes        = 12;
+    sint64          noise_level     = 13;
+    repeated int32  signal_strength = 14;
+    repeated string parts_supplier  = 15;
+}
+
+message example {
+    reserved 8;
+    reserved "uploader";
+    string                      mac                 = 1;
+    uint32                      timestamp           = 2;
+    bytes                       exec_file           = 3;
+    repeated bytes              lib_file            = 4;
+    SignatureAlgorithm          algorithm           = 5;
+    repeated SignatureAlgorithm supported_algorithm = 6;
+    Publisher                   publisher           = 7;
+    repeated Contributer        contributer         = 9;
+    repeated Device             device              = 10;
+    sfixed32                    sea                 = 11;
+}

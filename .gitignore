@@ -54,6 +54,7 @@ dkms.conf
 .*
 !.gitignore
 !.gitattributes
+!.gitkeep
 !.clang-format
 !.cz.*
 !.pre-commit-config.yaml
@@ -70,3 +71,5 @@ cmake-*
 *_pb2.py
 
 toolchain-*
+
+__pycache__/

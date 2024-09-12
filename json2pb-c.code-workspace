@@ -8,20 +8,32 @@
         "clang-format.styele": "google",
         "editor.formatOnSaveMode": "file",
         "C_Cpp.clang_format_fallbackStyle": "LLVM",
-        "C_Cpp.clang_format_path": "/usr/bin/clang-format",
         "C_Cpp.formatting": "clangFormat",
         "editor.formatOnPaste": true,
         "editor.formatOnSave": true,
         "editor.formatOnType": true,
         "clang-format.style": "{ BasedOnStyle: google, IndentWidth: 4, AlignConsecutiveAssignments: true, AlignConsecutiveDeclarations: true, AlignTrailingComments: true, ColumnLimit: 0 }",
         "files.associations": {
-            "*.toml": "rust",
             ".clang-format": "yaml",
+            "*.toml": "rust",
             "protobuf-c.h": "c",
             "stddef.h": "c",
             "base64.h": "c",
-            "log.h": "c"
-        }
+            "log.h": "c",
+            "stdbool.h": "c",
+            "protobuf-c-utilities.h": "c",
+            "cjson.h": "c",
+            "utilities.h": "c",
+            "example_pkg.h": "c",
+            "example.pb-c.h": "c",
+            "stdint.h": "c",
+            "stdio.h": "c",
+            "single-value-conversion.h": "c",
+            "algorithm": "c",
+            "cjson2pb-c.h": "c"
+        },
+        "editor.fontSize": 12,
+        "terminal.integrated.fontSize": 12
     },
     "extensions": {
         "recommendations": [
