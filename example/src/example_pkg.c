@@ -14,7 +14,7 @@
 #include <string.h>
 
 #include "cjson2pb-c.h"
-#include "example.pb-c.h"
+#include "example_pb-c.h"
 #include "example_pkg.h"
 
 uint32_t
@@ -22,7 +22,7 @@ convert_cjson_to_example_msg(Example* const example, const cJSON* const root)
 {
     assert(example != NULL && root != NULL && example->base.descriptor == &example__descriptor);
 
-    cvt_cjson_2_proto_c_field(cJSON_GetObjectItem(root, "exec_file"), (ProtobufCMessage*)example, "exec_file", NULL, NULL, BYTE_MODE_HEX);
+    cvt_cjson_2_proto_c_field(cJSON_GetObjectItem(root, "exec_file"), (ProtobufCMessage*)example, "exec_file", NULL, NULL, NULL, BYTE_MODE_HEX);
 
     return;
 }
@@ -58,8 +58,8 @@ convert_cjson_to_device_msg(Device* const device, const cJSON* const root)
 {
     assert(device != NULL && root != NULL && device->base.descriptor == &device__descriptor);
 
-    cvt_cjson_2_proto_c_field(cJSON_GetObjectItem(root, "rssi"), (ProtobufCMessage*)device, "rssi", NULL, NULL, BYTE_MODE_FILE_PATH);
-    cvt_cjson_2_proto_c_field(cJSON_GetObjectItem(root, "signal_strength"), (ProtobufCMessage*)device, "signal_strength", NULL, NULL, BYTE_MODE_FILE_PATH);
+    cvt_cjson_2_proto_c_field(cJSON_GetObjectItem(root, "rssi"), (ProtobufCMessage*)device, "rssi", NULL, NULL, NULL, BYTE_MODE_FILE_PATH);
+    cvt_cjson_2_proto_c_field(cJSON_GetObjectItem(root, "signal_strength"), (ProtobufCMessage*)device, "signal_strength", NULL, NULL, NULL, BYTE_MODE_FILE_PATH);
 
     return 0;
 }
