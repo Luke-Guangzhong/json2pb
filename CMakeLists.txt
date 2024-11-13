@@ -14,6 +14,8 @@ message("c_CMAKE_BINARY_DIR:          " ${CMAKE_BINARY_DIR} )
 message("c_CMAKE_CURRENT_SOURCE_DIR:  " ${CMAKE_CURRENT_SOURCE_DIR} )
 message("c_CMAKE_SOURCE_DIR:          " ${CMAKE_SOURCE_DIR} )
 
+option(ENABLE_EXAMPLES "Build examples" OFF)
+
 include(ExternalProject)
 
 ExternalProject_Add(libcjson
@@ -40,4 +42,6 @@ target_include_directories(cjson2protobuf-c PUBLIC include ${CMAKE_BINARY_DIR}/i
 target_link_directories(cjson2protobuf-c PUBLIC ${CMAKE_BINARY_DIR}/lib /usr/local/lib)
 target_link_libraries(cjson2protobuf-c protobuf protobuf-c cjson trower-base64)
 
-add_subdirectory(example)
+if (ENABLE_EXAMPLES)
+    add_subdirectory(example)
+endif(ENABLE_EXAMPLES)

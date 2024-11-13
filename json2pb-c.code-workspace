@@ -30,7 +30,9 @@
             "stdio.h": "c",
             "single-value-conversion.h": "c",
             "algorithm": "c",
-            "cjson2pb-c.h": "c"
+            "cjson2pb-c.h": "c",
+            "stdlib.h": "c",
+            "string.h": "c"
         },
         "editor.fontSize": 12,
         "terminal.integrated.fontSize": 12

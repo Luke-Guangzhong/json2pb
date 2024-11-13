@@ -8,6 +8,10 @@
  *
  */
 
+#ifndef _GNU_SOURCE
+#define _GUN_SOURCE
+#endif
+
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -185,7 +189,7 @@ cvt_single_double(double* field, const cJSON* item)
 }
 
 RtnCode
-cvt_single_bool(bool* const field, const cJSON* const item, StringEnumCallback string_enum)
+cvt_single_bool(bool* const field, const cJSON* const item, StringBoolCallback string_bool)
 {
     assert(field != NULL && item != NULL);
 
@@ -193,8 +197,8 @@ cvt_single_bool(bool* const field, const cJSON* const item, StringEnumCallback s
         *field = true;
     } else if (cJSON_IsFalse(item)) {
         *field = false;
-    } else if (cJSON_GetStringValue(item) != NULL && string_enum != NULL) {
-        *field = string_enum(cJSON_GetStringValue(item)); /* TODO: unsafe, need to check return value of string_enum is valid */
+    } else if (cJSON_GetStringValue(item) != NULL && string_bool != NULL) {
+        *field = string_bool(cJSON_GetStringValue(item)); /* TODO: unsafe, need to check return value of string_bool is valid */
     } else if (cJSON_IsNumber(item)) {
         *field = cJSON_GetNumberValue(item) == 0 ? false : true;
     } else {
@@ -269,7 +273,7 @@ cvt_single_enum(int* const field, const ProtobufCEnumDescriptor* const enum_desc
         if (NULL == string_enum) {
             *field = default_string_enum_conversion(enum_desc, cJSON_GetStringValue(item));
         } else {
-            *field = string_enum(cJSON_GetStringValue(item)); /* TODO: unsafe, need to check return value of string_enum is valid */
+            *field = string_enum(enum_desc, cJSON_GetStringValue(item)); /* TODO: unsafe, need to check return value of string_enum is valid */
         }
     } else {
         return E_UNACCEPTABLE_JSON_TYPE;

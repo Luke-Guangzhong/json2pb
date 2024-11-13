@@ -32,7 +32,7 @@ static uint32_t __cvt_uint32_t__(ProtobufCMessage* msg, const ProtobufCFieldDesc
 static uint32_t __cvt_uint64_t__(ProtobufCMessage* msg, const ProtobufCFieldDescriptor* field_desc, const cJSON* item) __attribute__((__nonnull__));
 static uint32_t __cvt_float__(ProtobufCMessage* msg, const ProtobufCFieldDescriptor* field_desc, const cJSON* item) __attribute__((__nonnull__));
 static uint32_t __cvt_double__(ProtobufCMessage* msg, const ProtobufCFieldDescriptor* field_desc, const cJSON* item) __attribute__((__nonnull__));
-static uint32_t __cvt_bool__(ProtobufCMessage* msg, const ProtobufCFieldDescriptor* field_desc, const cJSON* item, StringEnumCallback string_enum) __attribute__((__nonnull__(1, 2, 3)));
+static uint32_t __cvt_bool__(ProtobufCMessage* msg, const ProtobufCFieldDescriptor* field_desc, const cJSON* item, StringBoolCallback string_bool) __attribute__((__nonnull__(1, 2, 3)));
 static uint32_t __cvt_string__(ProtobufCMessage* const msg, const ProtobufCFieldDescriptor* const field_desc, const cJSON* const item) __attribute__((__nonnull__));
 static uint32_t __cvt_bytes__(ProtobufCMessage* const msg, const ProtobufCFieldDescriptor* const field_desc, const cJSON* const item, const ByteMode mode) __attribute__((__nonnull__));
 static uint32_t __cvt_enum__(ProtobufCMessage* msg, const ProtobufCFieldDescriptor* field_desc, const cJSON* item, StringEnumCallback string_enum) __attribute__((__nonnull__(1, 2, 3)));
@@ -278,7 +278,7 @@ __cvt_double__(ProtobufCMessage* msg, const ProtobufCFieldDescriptor* field_desc
 }
 
 static uint32_t
-__cvt_bool__(ProtobufCMessage* msg, const ProtobufCFieldDescriptor* field_desc, const cJSON* item, StringEnumCallback string_enum)
+__cvt_bool__(ProtobufCMessage* msg, const ProtobufCFieldDescriptor* field_desc, const cJSON* item, StringBoolCallback string_bool)
 {
     assert(msg != NULL && field_desc != NULL && item != NULL && msg->descriptor != NULL && field_desc->type == PROTOBUF_C_TYPE_BOOL);
 
@@ -292,7 +292,7 @@ __cvt_bool__(ProtobufCMessage* msg, const ProtobufCFieldDescriptor* field_desc, 
             const cJSON*   element = NULL;
             cJSON_ArrayForEach(element, item)
             {
-                cvt_single_bool(&array[index], element, string_enum);
+                cvt_single_bool(&array[index], element, string_bool);
                 index++;
             }
 
@@ -311,7 +311,7 @@ __cvt_bool__(ProtobufCMessage* msg, const ProtobufCFieldDescriptor* field_desc, 
         }
     } else {
         bool* field_ptr = (bool*)((void*)msg + field_desc->offset);
-        return cvt_single_bool(field_ptr, item, string_enum);
+        return cvt_single_bool(field_ptr, item, string_bool);
     }
 }
 
@@ -485,7 +485,8 @@ __cvt_pb_msg__(ProtobufCMessage* msg, const ProtobufCFieldDescriptor* field_desc
 /* External Functions */
 
 uint32_t
-cvt_cjson_2_proto_c_field(const cJSON* restrict root, ProtobufCMessage* restrict msg, const char* restrict field_name, StringEnumCallback const string_enum, MsgConvertorCallback const msg_convertor, const ByteMode mode)
+cvt_cjson_2_proto_c_field(
+    const cJSON* restrict root, ProtobufCMessage* restrict msg, const char* restrict field_name, StringEnumCallback const string_enum, StringBoolCallback const string_bool, MsgConvertorCallback const msg_convertor, const ByteMode mode)
 {
     if (NULL == root || NULL == msg || NULL == field_name) {
         return E_INVALID_ARG;
@@ -538,7 +539,7 @@ cvt_cjson_2_proto_c_field(const cJSON* restrict root, ProtobufCMessage* restrict
         rtn = __cvt_pb_msg__(msg, field_desc, root, msg_convertor);
         break;
     case PROTOBUF_C_TYPE_BOOL:
-        rtn = __cvt_bool__(msg, field_desc, root, string_enum);
+        rtn = __cvt_bool__(msg, field_desc, root, string_bool);
         break;
     case PROTOBUF_C_TYPE_BYTES:
         rtn = __cvt_bytes__(msg, field_desc, root, mode);

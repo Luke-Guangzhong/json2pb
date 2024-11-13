@@ -8,6 +8,10 @@
  *
  */
 
+#ifndef _GNU_SOURCE
+#define _GUN_SOURCE
+#endif
+
 #include <stdio.h>
 
 #include "cjson2pb-c.h"
@@ -35,7 +39,7 @@ default_msg_convertor(ProtobufCMessage* const msg, const cJSON* const item)
 
     for (int index = 0; index < n_fields; index++) {
         field_desc = msg_desc->fields + index;
-        cvt_cjson_2_proto_c_field(cJSON_GetObjectItem(item, field_desc->name), msg, field_desc->name, NULL, NULL, BYTE_MODE_FILE_PATH);
+        cvt_cjson_2_proto_c_field(cJSON_GetObjectItem(item, field_desc->name), msg, field_desc->name, NULL, NULL, NULL, BYTE_MODE_FILE_PATH);
     }
 
     return 0;

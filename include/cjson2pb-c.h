@@ -90,8 +90,19 @@ static char*   rtn_code_desc_list[] = {JSON_EXCEPTION_LIST(ONLY_DESC), PROTOBUF_
 /**
  * @brief Callback function to convert string to enum
  *
+ * @param[in] enum_desc ProtobufCEnumDescriptor of the enum
+ * @param[in] str string to be converted
+ * @return valid enum value (for now, we don't check. You can call `int_range_lookup` to check it)
  */
-typedef int (*StringEnumCallback)(const char* const str);
+typedef int (*StringEnumCallback)(const ProtobufCEnumDescriptor* const enum_desc, const char* const str);
+
+/**
+ * @brief Callback function to convert string to bool
+ *
+ * @param[in] str string to be converted
+ * @return true or false
+ */
+typedef bool (*StringBoolCallback)(const char* const str);
 
 /**
  * @brief Callback function to convert cJSON object to Protobuf Message
@@ -121,12 +132,17 @@ typedef RtnCode (*MsgConvertorCallback)(ProtobufCMessage* const msg, const cJSON
  * @param[in] msg Protobuf Message which should be initialized
  * @param[in] field_name field name in Protobuf Message
  * @param[in] string_enum callback function to convert string to enum
+ * @param[in] string_bool callback function to convert string to bool
  * @param[in] msg_convertor callback function to convert message to message type field
  * @return
  */
-uint32_t
-cvt_cjson_2_proto_c_field(const cJSON* const restrict root, ProtobufCMessage* const restrict msg, const char* const restrict field_name, StringEnumCallback const string_enum, MsgConvertorCallback const msg_convertor, const ByteMode mode)
-    NONNULL(1, 2, 3);
+uint32_t cvt_cjson_2_proto_c_field(const cJSON* const restrict root,
+                                   ProtobufCMessage* const restrict msg,
+                                   const char* const restrict field_name,
+                                   StringEnumCallback const   string_enum,
+                                   StringBoolCallback const   string_bool,
+                                   MsgConvertorCallback const msg_convertor,
+                                   const ByteMode             mode) NONNULL(1, 2, 3);
 
 /**
  * @brief
@@ -160,7 +176,7 @@ RtnCode cvt_single_uint32_t(uint32_t* field, const cJSON* item) ALL_NONNULL;
 RtnCode cvt_single_uint64_t(uint64_t* field, const cJSON* item) ALL_NONNULL;
 RtnCode cvt_single_float(float* field, const cJSON* item) ALL_NONNULL;
 RtnCode cvt_single_double(double* field, const cJSON* item) ALL_NONNULL;
-RtnCode cvt_single_bool(bool* const field, const cJSON* const item, StringEnumCallback string_enum) NONNULL(1, 2);
+RtnCode cvt_single_bool(bool* const field, const cJSON* const item, StringBoolCallback string_bool) NONNULL(1, 2);
 RtnCode cvt_single_string(char** field, const cJSON* item) ALL_NONNULL;
 RtnCode cvt_single_bytes(ProtobufCBinaryData* const field, const cJSON* const item, const ByteMode mode) ALL_NONNULL;
 RtnCode cvt_single_enum(int* const field, const ProtobufCEnumDescriptor* const enum_desc, const cJSON* const item, StringEnumCallback string_enum) NONNULL(1, 2, 3);
@@ -171,6 +187,10 @@ uint32_t cvt_cjson_2_pb_string(const cJSON* const restrict root, ProtobufCMessag
 uint32_t cvt_cjson_2_pb_message(const cJSON* const restrict root, ProtobufCMessage* const restrict msg, const char* const restrict field_name, MsgConvertorCallback const msg_convertor);
 uint32_t cvt_cjson_2_pb_enum(const cJSON* const restrict root, ProtobufCMessage* const restrict msg, const char* const restrict field_name, StringEnumCallback const string_enum);
 uint32_t cvt_cjson_2_pb_byte(const cJSON* const restrict root, ProtobufCMessage* const restrict msg, const char* const restrict field_name, const ByteMode mode);
+uint32_t cvt_cjson_2_pb_bool(const cJSON* const restrict root, ProtobufCMessage* const restrict msg, const char* const restrict field_name, StringBoolCallback const string_bool);
+
+int                       int_range_lookup(unsigned n_ranges, const ProtobufCIntRange* ranges, int value);
+const ProtobufCEnumValue* protobuf_c_enum_descriptor_get_value_by_name_case_insensitive(const ProtobufCEnumDescriptor* desc, const char* name);
 
 #undef ALL_NONNULL
 #undef NONNULL
