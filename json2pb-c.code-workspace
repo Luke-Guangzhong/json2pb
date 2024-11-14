@@ -34,8 +34,8 @@
             "stdlib.h": "c",
             "string.h": "c"
         },
-        "editor.fontSize": 12,
-        "terminal.integrated.fontSize": 12
+        "editor.fontSize": 14,
+        "terminal.integrated.fontSize": 14
     },
     "extensions": {
         "recommendations": [

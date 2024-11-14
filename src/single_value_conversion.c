@@ -344,7 +344,14 @@ util_cvt_hex_to_bytes(const char* const hex_str, uint8_t** const bytes, size_t* 
 static RtnCode
 util_cvt_base64_to_bytes(const char* const base64_str, uint8_t** const bytes, size_t* const bytes_len)
 {
-    return E_UNKNOWN;
+    assert(base64_str != NULL && bytes != NULL && bytes_len != NULL);
+
+    *bytes = b64_decode_with_alloc(base64_str, strlen(base64_str), bytes_len);
+    if (NULL == *bytes) {
+        return E_INVALID_BASE64;
+    }
+
+    return E_SUCCESS;
 }
 
 static RtnCode

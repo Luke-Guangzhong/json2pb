@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "cjson2pb-c.h"
 
 int

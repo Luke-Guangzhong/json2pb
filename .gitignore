@@ -73,3 +73,7 @@ cmake-*
 toolchain-*
 
 __pycache__/
+
+*.bin
+*.hex
+*.64
