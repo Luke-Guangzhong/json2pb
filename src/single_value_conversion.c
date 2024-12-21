@@ -13,6 +13,7 @@
 #endif
 
 #include <errno.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,7 +34,7 @@ cvt_single_int32_t(int32_t* const field, const cJSON* const item)
 
     if (cJSON_IsNumber(item)) {
         const double num_value = cJSON_GetNumberValue(item);
-        if (num_value < INT32_MIN || num_value > INT32_MAX) {
+        if (isnan(num_value) || num_value < INT32_MIN || num_value > INT32_MAX) {
             return E_TYPE_OVERFLOW;
         }
         *field = (int32_t)num_value;
@@ -63,7 +64,7 @@ cvt_single_int64_t(int64_t* const field, const cJSON* const item)
 
     if (cJSON_IsNumber(item)) {
         const double num_value = cJSON_GetNumberValue(item);
-        if (num_value < INT64_MIN || num_value > INT64_MAX) {
+        if (isnan(num_value) || num_value < INT64_MIN || num_value > INT64_MAX) {
             return E_TYPE_OVERFLOW;
         }
         *field = (int64_t)num_value;
@@ -93,7 +94,7 @@ cvt_single_uint32_t(uint32_t* field, const cJSON* item)
 
     if (cJSON_IsNumber(item)) {
         const double num_value = cJSON_GetNumberValue(item);
-        if (num_value < 0 || num_value > UINT32_MAX) {
+        if (isnan(num_value) || num_value < 0 || num_value > UINT32_MAX) {
             return E_TYPE_OVERFLOW;
         }
         *field = (uint32_t)num_value;
@@ -123,7 +124,7 @@ cvt_single_uint64_t(uint64_t* field, const cJSON* item)
 
     if (cJSON_IsNumber(item)) {
         const double num_value = cJSON_GetNumberValue(item);
-        if (num_value < 0 || num_value > UINT64_MAX) {
+        if (isnan(num_value) || num_value < 0 || num_value > UINT64_MAX) {
             return E_TYPE_OVERFLOW;
         }
         *field = (uint64_t)num_value;
@@ -268,12 +269,20 @@ cvt_single_enum(int* const field, const ProtobufCEnumDescriptor* const enum_desc
     assert(field != NULL && item != NULL && enum_desc != NULL);
 
     if (cJSON_IsNumber(item)) {
-        *field = cJSON_GetNumberValue(item); /* TODO: check if the value is valid */
+        const double num_value = cJSON_GetNumberValue(item);
+        if (isnan(num_value) || int_range_lookup(enum_desc->n_value_ranges, enum_desc->value_ranges, (int)num_value) < 0) {
+            return E_INVALID_ENUM;
+        }
+        *field = cJSON_GetNumberValue(item);
     } else if (cJSON_GetStringValue(item) != NULL) {
         if (NULL == string_enum) {
             *field = default_string_enum_conversion(enum_desc, cJSON_GetStringValue(item));
         } else {
-            *field = string_enum(enum_desc, cJSON_GetStringValue(item)); /* TODO: unsafe, need to check return value of string_enum is valid */
+            uint64_t enum_value = string_enum(enum_desc, cJSON_GetStringValue(item));
+            if (int_range_lookup(enum_desc->n_value_ranges, enum_desc->value_ranges, (int)enum_value) < 0) {
+                return E_INVALID_ENUM;
+            }
+            *field = enum_value;
         }
     } else {
         return E_UNACCEPTABLE_JSON_TYPE;

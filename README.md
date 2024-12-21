@@ -19,10 +19,11 @@ This is a tool to convert JSON to Protocol Buffer C code.
 | `bool`                      | `number`,`string`     |
 | `bytes`                     | `string`              |
 | `message`                   | `object`              |
+| `enum`                      | `number`,`string`     |
 
 note: we use strtoxxx functions to convert string to integer and float types.
 
-If protobuf has `repeated`, accpet non-empty `array` in JSON. If JSON field is `null`, don't set it in protobuf.
+If protobuf has `repeated`, accpet non-empty `array` in JSON. If array is empty or  JSON field is `null`, we will not set it in protobuf.
 
 If there is null value in array while corresponding protobuf field is `repeated`, the tool will keep the null value.
 
@@ -56,17 +57,17 @@ name_list: "Eve"
 > 
 > User should choose one of these modes according to their needs. Default is filepath.
 
-under hex and base64 mode, if error occrued, we drop all string
+under hex and base64 mode, if error occrued, we drop all bytes.
 
-Converting a string to enum, user should provide a function corresponding the function signature `int (*StringEnumCallback)(const char* const str)`
+Converting a string to enum, user should provide a function corresponding the function signature `int (*StringEnumCallback)(const ProtobufCEnumDescriptor* const enum_desc, const char* const str)`
 
-Converting a object to message, user should provide a function corresponding the function signature `int (*MsgConvertorCallback)(ProtobufCMessage* const msg, const cJSON* const root)`
+Converting an object to message, user should provide a function corresponding the function signature `RtnCode (*MsgConvertorCallback)(ProtobufCMessage* const msg, const cJSON* const root)`
 
 for boolean value:
 
 1. accept `true` and `false` in JSON.
 2. accept number non-zero as true and `0` as false in JSON.
-3. accept string enum and string enum callback function
+3. accept string enum and string bool callback function with signature `bool (*StringBoolCallback)(const char* const str);`
 
 for string:
 
@@ -79,7 +80,7 @@ cjson use double to store number, so if the protobuf field is uint64, suggest to
 Default action
 
 1. JSON key is match with Protobuf field name case sensitive.
-2. If JSON value is string for Protobuf enum, only match the name in protobuf
+2. If JSON value is string for Protobuf enum, only match the name in protobuf case-insensitive
 3. string enum callback can be also provided for boolean value in protobuf
 4. if conversion error occured, ignore and keep running
 

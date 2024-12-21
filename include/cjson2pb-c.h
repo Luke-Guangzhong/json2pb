@@ -115,7 +115,26 @@ uint32_t cvt_cjson_2_pb_enum(const cJSON* const restrict root, ProtobufCMessage*
 uint32_t cvt_cjson_2_pb_byte(const cJSON* const restrict root, ProtobufCMessage* const restrict msg, const char* const restrict field_name, const ByteMode mode);
 uint32_t cvt_cjson_2_pb_bool(const cJSON* const restrict root, ProtobufCMessage* const restrict msg, const char* const restrict field_name, StringBoolCallback const string_bool);
 
-int                       int_range_lookup(unsigned n_ranges, const ProtobufCIntRange* ranges, int value);
+/**
+ * @brief for enum value, it help to check if the value is in the range of the enum.
+ *
+ * @param n_ranges n_value_ranges in the ProtobufCEnumDescriptor
+ * @param ranges value_ranges in the ProtobufCEnumDescriptor
+ * @param value value to be checked
+ * @return int
+ * @return >0 if the value is in the range of the enum.(which is the index of the range in the ProtobufCEnumDescriptor)
+ * @return -1 if the value is not in the range of the enum.
+ */
+int int_range_lookup(unsigned n_ranges, const ProtobufCIntRange* ranges, int value);
+
+/**
+ * @brief the protobuf_c_enum_descriptor_get_value_by_name's case-sensitive version.
+ *
+ * @param desc enum descriptor
+ * @param name name of the enum value
+ * @return const ProtobufCEnumValue*
+ * @retval NULL if the name is not found in the enum descriptor.
+ */
 const ProtobufCEnumValue* protobuf_c_enum_descriptor_get_value_by_name_case_insensitive(const ProtobufCEnumDescriptor* desc, const char* name);
 
 #undef ALL_NONNULL

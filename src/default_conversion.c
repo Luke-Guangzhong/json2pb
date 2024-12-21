@@ -13,6 +13,7 @@
 #endif
 
 #include <stdio.h>
+#include <string.h>
 
 #include "cjson2pb-c.h"
 
@@ -20,12 +21,18 @@ int
 default_string_enum_conversion(const ProtobufCEnumDescriptor* const enum_desc, const char* const str)
 {
     assert(str != NULL && enum_desc != NULL);
-    const ProtobufCEnumValue* const enum_value = protobuf_c_enum_descriptor_get_value_by_name(enum_desc, str);
-    if (NULL == enum_value) {
-        return 0;
-    } else {
+    const ProtobufCEnumValue* const enum_value = protobuf_c_enum_descriptor_get_value_by_name_case_insensitive(enum_desc, str);
+    if (NULL != enum_value) {
         return enum_value->value;
     }
+
+    char*   endptr = NULL;
+    int32_t value  = strtol(str, &endptr, 0);
+    if (endptr != str && *endptr == '\0' && int_range_lookup(enum_desc->n_value_ranges, enum_desc->value_ranges, value) >= 0) {
+        return value;
+    }
+
+    return 0;
 }
 
 int
