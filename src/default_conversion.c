@@ -18,7 +18,7 @@
 #include "cjson2pb-c.h"
 
 int
-default_string_enum_conversion(const ProtobufCEnumDescriptor* const enum_desc, const char* const str)
+default_string_enum_convertor(const ProtobufCEnumDescriptor* const enum_desc, const char* const str)
 {
     assert(str != NULL && enum_desc != NULL);
     const ProtobufCEnumValue* const enum_value = protobuf_c_enum_descriptor_get_value_by_name_case_insensitive(enum_desc, str);

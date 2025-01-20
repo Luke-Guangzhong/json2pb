@@ -276,7 +276,7 @@ cvt_single_enum(int* const field, const ProtobufCEnumDescriptor* const enum_desc
         *field = cJSON_GetNumberValue(item);
     } else if (cJSON_GetStringValue(item) != NULL) {
         if (NULL == string_enum) {
-            *field = default_string_enum_conversion(enum_desc, cJSON_GetStringValue(item));
+            *field = default_string_enum_convertor(enum_desc, cJSON_GetStringValue(item));
         } else {
             uint64_t enum_value = string_enum(enum_desc, cJSON_GetStringValue(item));
             if (int_range_lookup(enum_desc->n_value_ranges, enum_desc->value_ranges, (int)enum_value) < 0) {

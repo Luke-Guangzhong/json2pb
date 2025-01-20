@@ -93,7 +93,7 @@ const char* json_2_proto_c_version(void);
  */
 const char* json_2_protoc_dependencies(void);
 
-int default_string_enum_conversion(const ProtobufCEnumDescriptor* const enum_desc, const char* const str);
+int default_string_enum_convertor(const ProtobufCEnumDescriptor* const enum_desc, const char* const str);
 int default_msg_convertor(ProtobufCMessage* const msg, const cJSON* const item);
 
 RtnCode cvt_single_int32_t(int32_t* const field, const cJSON* const item) ALL_NONNULL;
