@@ -1,31 +1,31 @@
-This is a tool to convert JSON to Protocol Buffer C code.
+这是一个将 JSON 转换为 Protocol Buffer 的工具。
 
-# Conversion Rules
+# 转换规则
 
-1. In this library, converting from JSON to Protobuf will follow the Protobuf schema. Fields in JSON that do not have a corresponding field in Protobuf will be ignored.
+1. 在该库中，从 JSON 到 Protobuf 的转换将遵循 Protobuf 的模式。JSON 中没有对应 Protobuf 字段的字段将被忽略。
 
-2. **Conversion Type**
+2. **转换类型**
 
-| Protobuf Type                 | Acceptable JSON Types |
-| ----------------------------- | --------------------- |
-| `double`                      | `number`, `string`    |
-| `float`                       | `number`, `string`    |
-| `int32`, `sint32`, `sfixed32` | `number`, `string`    |
-| `int64`, `sint64`, `sfixed64` | `number`, `string`    |
-| `uint32`, `fixed32`           | `number`, `string`    |
-| `uint64`, `fixed64`           | `number`, `string`    |
-| `string`                      | `string`              |
-| `bool`                        | `number`, `string`    |
-| `bytes`                       | `string`              |
-| `message`                     | `object`              |
-| `enum`                        | `number`, `string`    |
+| Protobuf 类型                   | 可接受的 JSON 类型       |
+| ----------------------------- | ------------------ |
+| `double`                      | `number`, `string` |
+| `float`                       | `number`, `string` |
+| `int32`, `sint32`, `sfixed32` | `number`, `string` |
+| `int64`, `sint64`, `sfixed64` | `number`, `string` |
+| `uint32`, `fixed32`           | `number`, `string` |
+| `uint64`, `fixed64`           | `number`, `string` |
+| `string`                      | `string`           |
+| `bool`                        | `number`, `string` |
+| `bytes`                       | `string`           |
+| `message`                     | `object`           |
+| `enum`                        | `number`, `string` |
 
-**Note:** We use `strtoxxx` functions to convert strings to integer and float types.
+**注意：** 我们使用 `strtoxxx` 函数将字符串转换为整数和浮点数类型。
 
-- If Protobuf has `repeated`, it accepts non-empty `array` in JSON. If the array is empty or the JSON field is `null`, it will not be set in Protobuf.
-- If there is a `null` value in an array while the corresponding Protobuf field is `repeated`, the tool will keep the `null` value.
+- 如果 Protobuf 中有 `repeated`，则接受 JSON 中的非空 `array`。如果数组为空或 JSON 字段为 `null`，则不会在 Protobuf 中设置该字段。
+- 如果数组中有 `null` 值，而对应的 Protobuf 字段是 `repeated`，工具将保留 `null` 值。
 
-**Example:**
+**示例：**
 
 ```json
 {
@@ -36,7 +36,7 @@ This is a tool to convert JSON to Protocol Buffer C code.
 ```
 
 ```shell
-# parsed protobuf message
+# 解析后的 protobuf 消息
 strength: 0
 strength: 0
 name_list: "Alice"
@@ -44,60 +44,58 @@ name_list: "Bob"
 name_list: "Charlie"
 name_list: "(null)"
 name_list: "Eve"
-# no age
+# 没有 age 字段
 ```
 
-> PS: About bytes type, there are three modes to convert JSON to Protobuf: base64, hex, and filepath.
+> PS： 关于 bytes 类型，有三种模式可以将 JSON 转换为 Protobuf：base64、hex 和 filepath。
 > 
-> - base64: The JSON string is a base64 encoded string.
-> - hex: The JSON string is a hex encoded string with space delimiter. Prefix `0x` is not accepted. Example: "00 ff "
-> - filepath: The JSON string is a filepath. The tool will read the file content and convert it to bytes.
+> + base64： JSON 字符串是 base64 编码的字符串。
+> + hex： JSON 字符串是十六进制编码的字符串，使用空格分隔。不接受 0x 前缀。例如："00 ff "
+> + filepath： JSON 字符串是文件路径。工具将读取文件内容并将其转换为字节。
 > 
-> The user should choose one of these modes according to their needs. The default mode is filepath.
+> 用户应根据需要选择其中一种模式。默认模式为 filepath。
 
-Under `hex` and `base64` modes, if an error occurs, all bytes are dropped.
+在 `hex` 和 `base64` 模式下，如果发生错误，所有字节将被丢弃。
 
-Converting a string to an enum requires a function with the signature:
+将字符串转换为枚举时，需要提供一个函数，其签名为：
 
 ```c
 int (*StringEnumCallback)(const ProtobufCEnumDescriptor* const enum_desc, const char* const str);
 ```
 
-Converting an object to a message requires a function with the signature:
+将对象转换为消息(*message*)时，需要提供一个函数，其签名为：
 
 ```c
 RtnCode (*MsgConvertorCallback)(ProtobufCMessage* const msg, const cJSON* const root);
 ```
 
-# Boolean Values
+# 布尔值
 
-Accept true and false in JSON.
-
-Accept non-zero numbers as true and 0 as false in JSON.
-
-Accept string enum and string bool callback function with the signature:
+1. 接受 JSON 中的 true 和 false。
+2. 接受非零数字作为 true，0 作为 false。
+3. 接受字符串枚举和字符串布尔回调函数，其签名为：
 
 ```c
 bool (*StringBoolCallback)(const char* const str);
 ```
 
-# Strings
+# 字符串
 
-Must be null-terminated.
+必须以 null 结尾。
 
-# uint64
+# uin64
 
-Since `cJSON` uses `double` to store numbers, if the Protobuf field is `uint64`, it is recommended to use a string to store the number in JSON.
+由于 cJSON 使用 double 存储数字，如果 Protobuf 字段是 uint64，建议在 JSON 中使用字符串存储数字。该库会将其转换为 uint64 数据。
 
-# Default Actions
+# 默认行为
 
-1. JSON key matches Protobuf field name case-sensitive.
-2. If JSON value is a string for Protobuf enum, it only matches the name in Protobuf case-insensitive.
-3. String enum callback can also be provided for boolean values in Protobuf.
-4. If a conversion error occurs, ignore it and keep running.
+1. JSON 键与 Protobuf 字段名称区分大小写匹配。
+2. 如果 JSON 值是 Protobuf 枚举的字符串，则仅在不区分大小写的情况下匹配 Protobuf 中的名称。
+3. 字符串枚举回调也可以用于 Protobuf 中的布尔值。
+4. 如果转换发生错误，忽略并继续运行。
 
-# Dependencies
+# 依赖项
 
-1. `cJSON` library for JSON parsing.
-2. `protoc-c` compiler for generating C code from Protobuf schema.
-3. `trower-base64` library for base64 encoding and decoding.
+1. cJSON 库用于解析 JSON。
+2. protoc-c 编译器用于从 Protobuf 模式生成 C 代码。
+3. trower-base64 库用于 base64 编码和解码。
