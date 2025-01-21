@@ -1,39 +1,37 @@
-json2pb-c
-
 This is a tool to convert JSON to Protocol Buffer C code.
+
+# Conversion Rules
 
 1. In this library, converting from JSON to Protobuf will follow the Protobuf schema. Fields in JSON that do not have a corresponding field in Protobuf will be ignored.
 
-2. Conversion Type
+2. **Conversion Type**
 
+| Protobuf Type                 | Acceptable JSON Types |
+| ----------------------------- | --------------------- |
+| `double`                      | `number`, `string`    |
+| `float`                       | `number`, `string`    |
+| `int32`, `sint32`, `sfixed32` | `number`, `string`    |
+| `int64`, `sint64`, `sfixed64` | `number`, `string`    |
+| `uint32`, `fixed32`           | `number`, `string`    |
+| `uint64`, `fixed64`           | `number`, `string`    |
+| `string`                      | `string`              |
+| `bool`                        | `number`, `string`    |
+| `bytes`                       | `string`              |
+| `message`                     | `object`              |
+| `enum`                        | `number`, `string`    |
 
-| Protobuf Type               | Acceptable JSON Types |
-| --------------------------- | --------------------- |
-| `double`                    | `number`,`string`     |
-| `float`                     | `number`,`string`     |
-| `int32`,`sint32`,`sfixed32` | `number`,`string`     |
-| `int64`,`sint64`,`sfixed64` | `number`,`string`     |
-| `uint32`,`fixed32`          | `number`,`string`     |
-| `uint64`,`fixed64`          | `number`,`string`     |
-| `string`                    | `string`              |
-| `bool`                      | `number`,`string`     |
-| `bytes`                     | `string`              |
-| `message`                   | `object`              |
-| `enum`                      | `number`,`string`     |
+**Note:** We use `strtoxxx` functions to convert strings to integer and float types.
 
-note: we use strtoxxx functions to convert string to integer and float types.
+- If Protobuf has `repeated`, it accepts non-empty `array` in JSON. If the array is empty or the JSON field is `null`, it will not be set in Protobuf.
+- If there is a `null` value in an array while the corresponding Protobuf field is `repeated`, the tool will keep the `null` value.
 
-If protobuf has `repeated`, accpet non-empty `array` in JSON. If array is empty or  JSON field is `null`, we will not set it in protobuf.
-
-If there is null value in array while corresponding protobuf field is `repeated`, the tool will keep the null value.
-
-for exmaple:
+**Example:**
 
 ```json
 {
-    "strength":[null,null],
-    "name_list":["Alice","Bob","Charlie",null,"Eve"],
-    "age":null
+    "strength": [null, null],
+    "name_list": ["Alice", "Bob", "Charlie", null, "Eve"],
+    "age": null
 }
 ```
 
@@ -49,43 +47,57 @@ name_list: "Eve"
 # no age
 ```
 
-> PS: About `bytes` type, there are three mode to convert JSON to Protobuf: base64, hex, and filepath. 
+> PS: About bytes type, there are three modes to convert JSON to Protobuf: base64, hex, and filepath.
 > 
-> - base64: the JSON string is a base64 encoded string.
-> - hex: the JSON string is a hex encoded string with space delimiter. Prefix `0x` is not accepted. Example: "00 ff "
-> - filepath: the JSON string is a filepath. The tool will read the file content and convert it to bytes.
+> - base64: The JSON string is a base64 encoded string.
+> - hex: The JSON string is a hex encoded string with space delimiter. Prefix `0x` is not accepted. Example: "00 ff "
+> - filepath: The JSON string is a filepath. The tool will read the file content and convert it to bytes.
 > 
-> User should choose one of these modes according to their needs. Default is filepath.
+> The user should choose one of these modes according to their needs. The default mode is filepath.
 
-under hex and base64 mode, if error occrued, we drop all bytes.
+Under `hex` and `base64` modes, if an error occurs, all bytes are dropped.
 
-Converting a string to enum, user should provide a function corresponding the function signature `int (*StringEnumCallback)(const ProtobufCEnumDescriptor* const enum_desc, const char* const str)`
+Converting a string to an enum requires a function with the signature:
 
-Converting an object to message, user should provide a function corresponding the function signature `RtnCode (*MsgConvertorCallback)(ProtobufCMessage* const msg, const cJSON* const root)`
+```c
+int (*StringEnumCallback)(const ProtobufCEnumDescriptor* const enum_desc, const char* const str);
+```
 
-for boolean value:
+Converting an object to a message requires a function with the signature:
 
-1. accept `true` and `false` in JSON.
-2. accept number non-zero as true and `0` as false in JSON.
-3. accept string enum and string bool callback function with signature `bool (*StringBoolCallback)(const char* const str);`
+```c
+RtnCode (*MsgConvertorCallback)(ProtobufCMessage* const msg, const cJSON* const root);
+```
 
-for string:
+# Boolean Values
 
-1. must null-terminated
+Accept true and false in JSON.
 
-for uint64:
+Accept non-zero numbers as true and 0 as false in JSON.
 
-cjson use double to store number, so if the protobuf field is uint64, suggest to use string to store the number in json.
+Accept string enum and string bool callback function with the signature:
 
-Default action
+```c
+bool (*StringBoolCallback)(const char* const str);
+```
 
-1. JSON key is match with Protobuf field name case sensitive.
-2. If JSON value is string for Protobuf enum, only match the name in protobuf case-insensitive
-3. string enum callback can be also provided for boolean value in protobuf
-4. if conversion error occured, ignore and keep running
+# Strings
 
-3. Dependencies
+Must be null-terminated.
 
-- `cJSON` library for JSON parsing.
-- `protoc-c` compiler for generating C code from Protobuf schema.
-- `trower-base64` library for base64 encoding and decoding.
+# uint64
+
+Since `cJSON` uses `double` to store numbers, if the Protobuf field is `uint64`, it is recommended to use a string to store the number in JSON.
+
+# Default Actions
+
+1. JSON key matches Protobuf field name case-sensitive.
+2. If JSON value is a string for Protobuf enum, it only matches the name in Protobuf case-insensitive.
+3. String enum callback can also be provided for boolean values in Protobuf.
+4. If a conversion error occurs, ignore it and keep running.
+
+# Dependencies
+
+1. `cJSON` library for JSON parsing.
+2. `protoc-c` compiler for generating C code from Protobuf schema.
+3. `trower-base64` library for base64 encoding and decoding.
