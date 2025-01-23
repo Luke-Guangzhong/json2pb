@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+message Device {
+    reserved 16;
+    reserved "test", "label";
+    string          mac             = 1;
+    repeated sint32 rssi            = 2;
+    double          longitude       = 3;
+    double          latitude        = 4;
+    float           length          = 5;
+    float           width           = 6 [deprecated = true];
+    float           height          = 7;
+    double          weight          = 8;
+    int64           altitude        = 9;
+    double          battery         = 10;
+    uint64          rx_bytes        = 11;
+    uint64          tx_bytes        = 12;
+    sint64          noise_level     = 13;
+    repeated int32  signal_strength = 14;
+    repeated string parts_supplier  = 15;
+}
