@@ -48,8 +48,6 @@ set_target_properties(libcimplog PROPERTIES
 )
 add_dependencies(libcimplog cimplog)
 
-
-
 set(PROTOC_C_EXECUTABLE protoc-c)
 
 set(PROTO_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/protobuf)
@@ -69,7 +67,6 @@ execute_process(
     ERROR_VARIABLE error
 )
 
-
 file(GLOB PROTO_H_FILES ${PROTO_OUTPUT_SRC_DIR}/*.pb-c.h)
 
 execute_process(
@@ -80,6 +77,8 @@ execute_process(
     ERROR_VARIABLE error
 )
 
+option(DEBUG_BUT_NOT_ASSERT "Enable debug but not assert" OFF)
+
 aux_source_directory(src/libjson2pb LIB_SRC_LIST)
 
 add_library(SHARED_LIBRARY SHARED ${LIB_SRC_LIST})
@@ -87,6 +86,9 @@ set_target_properties(SHARED_LIBRARY PROPERTIES POSITION_INDEPENDENT_CODE ON OUT
 target_include_directories(SHARED_LIBRARY PUBLIC include ${CMAKE_CURRENT_BINARY_DIR}/include)
 target_link_directories(SHARED_LIBRARY PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/lib )
 target_link_libraries(SHARED_LIBRARY protobuf protobuf-c cjson trower-base64 cjson_utils)
+if(DEBUG_BUT_NOT_ASSERT)
+    target_compile_definitions(SHARED_LIBRARY PUBLIC REMOVE_ASSERT)
+endif()
 
 aux_source_directory(src EXE_SRC_LIST)
 aux_source_directory(${CMAKE_CURRENT_BINARY_DIR}/src BUILD_SRC_LIST)
@@ -96,4 +98,6 @@ set_target_properties(TEST_EXE PROPERTIES POSITION_INDEPENDENT_CODE ON OUTPUT_NA
 target_include_directories(TEST_EXE PUBLIC include ${CMAKE_CURRENT_BINARY_DIR}/include)
 target_link_directories(TEST_EXE PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/lib ${LIBRARY_OUTPUT_PATH})
 target_link_libraries(TEST_EXE SHARED_LIBRARY libcimplog.a)
-
+if(DEBUG_BUT_NOT_ASSERT)
+    target_compile_definitions(SHARED_LIBRARY PUBLIC REMOVE_ASSERT)
+endif()

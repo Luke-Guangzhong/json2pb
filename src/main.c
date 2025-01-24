@@ -27,17 +27,24 @@ main()
     device__init(device);
 
     DEBUG("json_str: %s\n", json_str);
-    j2p_expt* e = cvt_cjson_2_proto_c_field(NULL, (ProtobufCMessage*)device, NULL, NULL);
+    j2p_expt* e = cvt_cjson_2_proto_c_field(root, (ProtobufCMessage*)device, cJSON_GetObjectItem(root, "width"), "width");
     if (e != NULL) {
-        ERROR("convert failed (%s) on json \"%s\"\n", e->msg->message, e->where);
+        ERROR("convert failed (%s)\n\tconverting json path \"%s\"\n", e->msg->message, e->where);
     }
 
     size_t sizeOne = device__get_packed_size(device);
-    byte*  pb_data = (byte*)calloc(1, sizeOne);
+    DEBUG("sizeOne: %ld\n", sizeOne);
+    byte* pb_data = (byte*)calloc(1, sizeOne);
     assert(pb_data != NULL);
 
     size_t sizeTwo = device__pack(device, pb_data);
     assert(sizeTwo == sizeOne);
+
+    INFO("pb_data: \"");
+    for (size_t i = 0; i < sizeOne; i++) {
+        printf("%02x ", pb_data[i]);
+    }
+    printf("\"\n");
 
     cJSON_Delete(root);
     device__free_unpacked(device, NULL);
