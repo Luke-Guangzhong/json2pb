@@ -67,6 +67,14 @@ execute_process(
     ERROR_VARIABLE error
 )
 
+execute_process(
+    COMMAND protoc ${MSG_PROTO_FILES} --python_out=${PROJECT_SOURCE_DIR}/python -I ${PROTO_SRC_DIR}
+    WORKING_DIRECTORY ${PROTO_SRC_DIR}
+    RESULT_VARIABLE result
+    OUTPUT_VARIABLE output
+    ERROR_VARIABLE error
+)
+
 file(GLOB PROTO_H_FILES ${PROTO_OUTPUT_SRC_DIR}/*.pb-c.h)
 
 execute_process(

@@ -23,6 +23,7 @@ cvt_single_int32_t(const cJSON* const root, const cJSON* const item, int32_t* co
     assert(NULL != item);
     assert(NULL != field);
 
+#if 0
     {
         char* root_str = cJSON_Print(root);
         if (NULL == root_str) {
@@ -38,6 +39,7 @@ cvt_single_int32_t(const cJSON* const root, const cJSON* const item, int32_t* co
             printf("cvt_single_int32_t: item_str = %s\n", item_str);
         }
     }
+#endif
 
     if (cJSON_IsNumber(item)) {
         const double num_value = cJSON_GetNumberValue(item);
@@ -55,6 +57,8 @@ cvt_single_int32_t(const cJSON* const root, const cJSON* const item, int32_t* co
             JSON2PB_THROW_EXCEPTION(JSON2PB_VALUE_OVERFLOW);
         }
         *field = (int32_t)num_value;
+    } else if (cJSON_IsNull(item)) {
+        JSON2PB_THROW_EXCEPTION(JSON2PB_NULL_VALUE);
     } else {
         JSON2PB_THROW_EXCEPTION(JSON2PB_UNACCEPTABLE_JSON_TYPE);
     }

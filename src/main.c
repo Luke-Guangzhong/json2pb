@@ -8,11 +8,13 @@
  * @copyright Copyright (c) 2025
  *
  */
+#include <stdbool.h>
+
 #include "common.h"
 #include "device.pb-c.h"
 #include "json2pb.h"
 
-static const char* json_str = "{\"width\":7.2}";
+static const char* json_str = "{\"rssi\":[-65,-70,-72,null]}";
 
 int
 main()
@@ -26,10 +28,10 @@ main()
 
     device__init(device);
 
-    DEBUG("json_str: %s\n", json_str);
-    j2p_expt* e = cvt_cjson_2_proto_c_field(root, (ProtobufCMessage*)device, cJSON_GetObjectItem(root, "width"), "width");
+    j2p_expt* e = cvt_cjson_2_proto_c_field(root, (ProtobufCMessage*)device, cJSON_GetObjectItem(root, "rssi"), "rssi");
     if (e != NULL) {
         ERROR("convert failed (%s)\n\tconverting json path \"%s\"\n", e->msg->message, e->where);
+        FREE_JSON2PB_EXCEPTION(e);
     }
 
     size_t sizeOne = device__get_packed_size(device);
@@ -42,7 +44,10 @@ main()
 
     INFO("pb_data: \"");
     for (size_t i = 0; i < sizeOne; i++) {
-        printf("%02x ", pb_data[i]);
+        printf("%02x", pb_data[i]);
+        if (i % 16 == 15) {
+            printf("\n");
+        }
     }
     printf("\"\n");
 

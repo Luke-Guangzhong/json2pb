@@ -26,6 +26,7 @@ const j2p_expt_msg j2p_expt_msg_list[] = {
     {JSON2PB_VALUE_OVERFLOW,           "json value overflow"                                   },
     {JSON2PB_UNACCEPTABLE_JSON_TYPE,   "unacceptable json type"                                },
     {JSON2PB_INVALID_NUMBER_STRING,    "invalid number string"                                 },
+    {JSON2PB_EMPTY_ARRAY,              "empty array in json"                                   },
     {JSON2PB_JSON_GENERAL,             "general error in json"                                 },
     {JSON2PB_UNINITIALIZED,            "protobuf message not initialized"                      },
     {JSON2PB_FIELD_NOT_FOUND,          "specified field not found in protobuf message"         },
@@ -35,6 +36,7 @@ const j2p_expt_msg j2p_expt_msg_list[] = {
     {JSON2PB_INVALID_ARG,              "pass invalid argument to function"                     },
     {JSON2PB_INCORRECT_EXCEPTION_TYPE, "throw an unknown exception type or this one"           },
     {JSON2PB_CODE_GENERAL,             "general error in coding"                               },
+    {JSON2PB_MEM_ALLOC_FAILED,         "memory allocation failed"                              },
     {JSON2PB_OS_GENERAL,               "general error in operating system"                     },
 };
 
@@ -154,8 +156,12 @@ gen_json2pb_exception(const cJSON* root, const cJSON* item, const j2p_expt_t typ
 void
 free_json2pb_exception(j2p_expt* e)
 {
+    if (NULL == e) {
+        return;
+    }
     free(e->where);
     free(e);
+    return;
 }
 
 static j2p_expt*
@@ -178,35 +184,62 @@ __cvt_int32_t__(const cJSON* restrict root, ProtobufCMessage* restrict msg, cons
     }
 
     if (is_repeated) {
-#if 0
         if (!cJSON_IsArray(item)) {
-            return E_UNACCEPTABLE_JSON_TYPE;
+            JSON2PB_THROW_EXCEPTION(JSON2PB_UNACCEPTABLE_JSON_TYPE);
         }
         if (cJSON_GetArraySize(item) > 0) {
-            uint32_t       rtn_code = E_SUCCESS;
-            uint64_t       index    = 0;
-            const cJSON*   element  = NULL;
-            const uint64_t length   = cJSON_GetArraySize(item);
-            int32_t* const array    = (int32_t*)calloc(length, sizeof(int32_t));
+            uint64_t       index      = 0;
+            const cJSON*   element    = NULL;
+            const cJSON*   json_array = item;
+            const uint64_t length     = cJSON_GetArraySize(json_array);
+            j2p_expt*      rtn        = NULL;
+            int32_t* const array      = (int32_t*)calloc(length, sizeof(int32_t));
             if (NULL == array) {
-                return E_MEM_ALLOC;
+                JSON2PB_THROW_EXCEPTION(JSON2PB_MEM_ALLOC_FAILED);
             }
 
             cJSON_ArrayForEach(element, item)
             {
-                rtn_code |= cvt_single_int32_t(&array[index], element);
+                rtn = cvt_single_int32_t(root, element, &array[index]);
+                if (rtn != NULL) {
+                    if (rtn->msg->type == JSON2PB_NULL_VALUE) {
+                        FREE_JSON2PB_EXCEPTION(rtn);
+                        continue;
+                    }
+                    break;
+                }
                 index++;
             }
 
-            /* TODO: check if array is valid, if not, free it and retrun an error code here */
+            if (rtn != NULL) { /* fatel error occurred */
+                free(array);
+                j2p_expt_t type = rtn->msg->type;
+                FREE_JSON2PB_EXCEPTION(rtn);
+                cJSON* item = cJSON_GetArrayItem(json_array, index);
+                JSON2PB_THROW_EXCEPTION(type);
+            }
 
-            *(int32_t**)((void*)msg + field_desc->offset)          = array;
-            *(size_t*)((void*)msg + field_desc->quantifier_offset) = length;
-            return rtn_code;
+            if (index == 0) { /* no valid element found */
+                free(array);
+                FREE_JSON2PB_EXCEPTION(rtn);
+                JSON2PB_THROW_EXCEPTION(JSON2PB_EMPTY_ARRAY);
+            }
+
+            int32_t** field_ptr = (int32_t**)((void*)msg + field_desc->offset);
+            *field_ptr          = (int32_t*)calloc(index, sizeof(int32_t));
+            if (NULL == (*field_ptr)) {
+                free(array);
+                JSON2PB_THROW_EXCEPTION(JSON2PB_MEM_ALLOC_FAILED);
+            }
+
+            memcpy((*field_ptr), array, index * sizeof(int32_t));
+            *(size_t*)((void*)msg + field_desc->quantifier_offset) = index;
+
+            free(array);
+            return NULL;
         } else {
-            return E_EMPTY_ARRAY;
+            JSON2PB_THROW_EXCEPTION(JSON2PB_EMPTY_ARRAY);
         }
-#endif
     } else {
         if (is_oneof) {
             if ((*(int32_t*)((void*)msg + field_desc->quantifier_offset)) != 0) {
