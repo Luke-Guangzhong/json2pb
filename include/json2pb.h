@@ -11,7 +11,7 @@
 #pragma once
 
 #include "cjson/cJSON.h"
-#include "protobuf-c/protobuf-c.h"
+#include <protobuf-c/protobuf-c.h>
 
 typedef enum json2pb_exception_type {
     JSON2PB_SUCCESS = 0,

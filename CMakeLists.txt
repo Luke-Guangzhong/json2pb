@@ -8,6 +8,12 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 add_compile_options(-std=gnu17)
 add_compile_definitions(_GNU_SOURCE)
 
+if(APPLE)
+    include_directories(/usr/local/include)
+    link_directories(/usr/local/lib)
+    message(STATUS "Detected macOS, added /usr/local/include to include path.")
+endif()
+
 message("c_PROJECT_SOURCE_DIR:        " ${PROJECT_SOURCE_DIR} )
 message("c_CMAKE_CURRENT_BINARY_DIR:  " ${CMAKE_CURRENT_BINARY_DIR})
 message("c_CMAKE_BINARY_DIR:          " ${CMAKE_BINARY_DIR} )
