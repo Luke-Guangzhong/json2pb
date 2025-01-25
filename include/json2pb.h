@@ -49,12 +49,26 @@ typedef struct json2pb_exception {
     const j2p_expt_msg* msg;
 } j2p_expt;
 
+/**
+ * @brief Generate a json2pb exception.
+ *
+ * @param[in] root JSON root object.
+ * @param[in] item Current item converting to protobuf message.
+ * @param[in] type Exception type
+ * @return j2p_expt* pointer to the generated exception.
+ * @retval NULL if exception is not generated.
+ */
 j2p_expt* gen_json2pb_exception(const cJSON* root, const cJSON* item, const j2p_expt_t type);
 
 #ifndef JSON2PB_THROW_EXCEPTION
 #define JSON2PB_THROW_EXCEPTION(e) return gen_json2pb_exception(root, item, e)
 #endif
 
+/**
+ * @brief Free a json2pb exception structure.
+ *
+ * @param e
+ */
 void free_json2pb_exception(j2p_expt* e);
 
 #ifndef FREE_JSON2PB_EXCEPTION

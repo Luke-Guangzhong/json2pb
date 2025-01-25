@@ -15,7 +15,7 @@ message Device {
     }
 
     double          weight          = 8;
-    int64           altitude        = 9;
+    repeated int64  altitude        = 9;
     double          battery         = 10 [deprecated = true];
     uint64          rx_bytes        = 11;
     uint64          tx_bytes        = 12;
