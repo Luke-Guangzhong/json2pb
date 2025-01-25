@@ -18,7 +18,7 @@ message Device {
     repeated int64  altitude        = 9;
     double          battery         = 10 [deprecated = true];
     uint64          rx_bytes        = 11;
-    uint64          tx_bytes        = 12;
+    uint32          tx_bytes        = 12;
     sint64          noise_level     = 13;
     repeated int32  signal_strength = 14;
     repeated string parts_supplier  = 15;

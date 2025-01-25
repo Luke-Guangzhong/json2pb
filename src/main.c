@@ -14,7 +14,7 @@
 #include "device.pb-c.h"
 #include "json2pb.h"
 
-static const char* json_str = "{\"altitude\":[-65,-70,-72,null]}";
+static const char* json_str = "{\"tx_bytes\":56}";
 
 int
 main()
@@ -28,7 +28,7 @@ main()
 
     device__init(device);
 
-    j2p_expt* e = cvt_cjson_2_proto_c_field(root, (ProtobufCMessage*)device, cJSON_GetObjectItem(root, "altitude"), "altitude");
+    j2p_expt* e = cvt_cjson_2_proto_c_field(root, (ProtobufCMessage*)device, cJSON_GetObjectItem(root, "tx_bytes"), "tx_bytes");
     if (e != NULL) {
         if (e->msg->type != JSON2PB_SUCCESS) {
             ERROR("convert failed (%s)\n\tconverting json path \"%s\"\n", e->msg->message, e->where);
