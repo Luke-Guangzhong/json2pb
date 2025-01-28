@@ -34,7 +34,7 @@ def analysis_hex(file_path, msg):
 
 def main():
     msg = device_pb2.Device()
-    analysis_hex(file_path="/home/luke/Projects/json-pb-convertor/tmp/pb.hex", msg=msg)
+    analysis_hex(file_path="/home/luke/project/json2pb/tmp/pb.hex", msg=msg)
 
 
 if __name__ == "__main__":
