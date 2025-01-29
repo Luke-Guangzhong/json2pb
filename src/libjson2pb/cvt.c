@@ -176,3 +176,34 @@ cvt_single_float(const cJSON* const root, const cJSON* const item, float* const 
 
     JSON2PB_THROW_EXCEPTION(JSON2PB_SUCCESS);
 }
+
+j2p_expt*
+cvt_single_double(const cJSON* const root, const cJSON* const item, double* const field)
+{
+    assert(NULL != root);
+    assert(NULL != item);
+    assert(NULL != field);
+
+    if (cJSON_IsNumber(item)) {
+        const double num_value = cJSON_GetNumberValue(item);
+        if (isinf(num_value) || isnan(num_value)) {
+            JSON2PB_THROW_EXCEPTION(JSON2PB_VALUE_OVERFLOW);
+        }
+        printf("num_value=%f\n", num_value);
+        *field = (double)num_value;
+    } else if (NULL != cJSON_GetStringValue(item)) {
+        errno                  = 0;
+        char*        endptr    = NULL;
+        const double num_value = strtod(cJSON_GetStringValue(item), &endptr);
+        if (errno != 0 || *endptr != '\0') {
+            JSON2PB_THROW_EXCEPTION(JSON2PB_INVALID_NUMBER_STRING);
+        }
+        *field = (double)num_value;
+    } else if (cJSON_IsNull(item)) {
+        JSON2PB_THROW_EXCEPTION(JSON2PB_NULL_VALUE);
+    } else {
+        JSON2PB_THROW_EXCEPTION(JSON2PB_UNACCEPTABLE_JSON_TYPE);
+    }
+
+    JSON2PB_THROW_EXCEPTION(JSON2PB_SUCCESS);
+}

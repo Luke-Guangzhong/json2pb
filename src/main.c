@@ -14,7 +14,7 @@
 #include "device.pb-c.h"
 #include "json2pb.h"
 
-static const char* json_str = "{\"length\":1.5}";
+static const char* json_str = "{\"weight\":[1.5,3.2]}";
 
 int
 main()
@@ -28,7 +28,7 @@ main()
 
     device__init(device);
 
-    j2p_expt* e = cvt_cjson_2_proto_c_field(root, (ProtobufCMessage*)device, cJSON_GetObjectItem(root, "length"), "length");
+    j2p_expt* e = cvt_cjson_2_proto_c_field(root, (ProtobufCMessage*)device, cJSON_GetObjectItem(root, "weight"), "weight");
     if (e != NULL) {
         if (e->msg->type != JSON2PB_SUCCESS) {
             ERROR("convert failed (%s)\n\tconverting json path \"%s\"\n", e->msg->message, e->where);

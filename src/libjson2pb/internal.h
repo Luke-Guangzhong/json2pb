@@ -22,3 +22,5 @@ j2p_expt* cvt_single_uint32_t(const cJSON* const root, const cJSON* const item, 
 j2p_expt* cvt_single_uint64_t(const cJSON* const root, const cJSON* const item, uint64_t* const field);
 
 j2p_expt* cvt_single_float(const cJSON* const root, const cJSON* const item, float* const field);
+
+j2p_expt* cvt_single_double(const cJSON* const root, const cJSON* const item, double* const field);
