@@ -189,7 +189,6 @@ cvt_single_double(const cJSON* const root, const cJSON* const item, double* cons
         if (isinf(num_value) || isnan(num_value)) {
             JSON2PB_THROW_EXCEPTION(JSON2PB_VALUE_OVERFLOW);
         }
-        printf("num_value=%f\n", num_value);
         *field = (double)num_value;
     } else if (NULL != cJSON_GetStringValue(item)) {
         errno                  = 0;
