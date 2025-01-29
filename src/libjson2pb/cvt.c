@@ -206,3 +206,21 @@ cvt_single_double(const cJSON* const root, const cJSON* const item, double* cons
 
     JSON2PB_THROW_EXCEPTION(JSON2PB_SUCCESS);
 }
+
+j2p_expt*
+cvt_single_string(const cJSON* const root, const cJSON* const item, char** const field)
+{
+    assert(NULL != root);
+    assert(NULL != item);
+    assert(NULL != field);
+
+    if (cJSON_GetStringValue(item) != NULL) {
+        asprintf(field, "%s", cJSON_GetStringValue(item));
+    } else if (cJSON_IsNull(item)) {
+        JSON2PB_THROW_EXCEPTION(JSON2PB_NULL_VALUE);
+    } else {
+        JSON2PB_THROW_EXCEPTION(JSON2PB_UNACCEPTABLE_JSON_TYPE);
+    }
+
+    JSON2PB_THROW_EXCEPTION(JSON2PB_SUCCESS);
+}
