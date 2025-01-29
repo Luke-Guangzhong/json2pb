@@ -212,12 +212,8 @@ __cvt_int32_t__(const cJSON* restrict root, ProtobufCMessage* restrict msg, cons
                 index++;
             }
 
-            if (rtn != NULL) { /* fatel error occurred */
-                free(array);
-                j2p_expt_t type = rtn->msg->type;
-                FREE_JSON2PB_EXCEPTION(rtn);
-                cJSON* item = cJSON_GetArrayItem(json_array, index);
-                JSON2PB_THROW_EXCEPTION(type);
+            if (rtn->msg->type != JSON2PB_SUCCESS) { /* fatel error occurred */
+                return rtn;
             }
 
             if (index == 0) { /* no valid element found */
