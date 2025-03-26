@@ -79,4 +79,6 @@ void free_json2pb_exception(j2p_expt* e);
     } while (false)
 #endif
 
-j2p_expt* cvt_cjson_2_proto_c_field(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const char* restrict field_name);
+typedef bool (*StringBoolCallback)(const char* const str);
+
+j2p_expt* cvt_cjson_2_proto_c_field(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const char* restrict field_name, StringBoolCallback string_bool_cb);
