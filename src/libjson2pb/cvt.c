@@ -215,7 +215,9 @@ cvt_single_string(const cJSON* const root, const cJSON* const item, char** const
     assert(NULL != field);
 
     if (cJSON_GetStringValue(item) != NULL) {
-        asprintf(field, "%s", cJSON_GetStringValue(item));
+        if (asprintf(field, "%s", cJSON_GetStringValue(item)) < 0) {
+            JSON2PB_THROW_EXCEPTION(JSON2PB_MEM_ALLOC_FAILED);
+        }
     } else if (cJSON_IsNull(item)) {
         JSON2PB_THROW_EXCEPTION(JSON2PB_NULL_VALUE);
     } else {
