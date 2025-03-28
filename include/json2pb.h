@@ -10,7 +10,7 @@
  */
 #pragma once
 
-#include "cjson/cJSON.h"
+#include <cjson/cJSON.h>
 #include <protobuf-c/protobuf-c.h>
 
 typedef enum json2pb_exception_type {
@@ -39,7 +39,7 @@ typedef enum json2pb_exception_type {
 
 typedef struct json2pb_exception_msg {
     const j2p_expt_t type;
-    const char*      message;
+    const char*      desc;
 } j2p_expt_msg;
 
 extern const j2p_expt_msg j2p_expt_msg_list[];
@@ -48,6 +48,8 @@ typedef struct json2pb_exception {
     char*               where;
     const j2p_expt_msg* msg;
 } j2p_expt;
+
+typedef bool (*string_bool_convertor)(const char* str);
 
 /**
  * @brief Generate a json2pb exception.
@@ -79,4 +81,4 @@ void free_json2pb_exception(j2p_expt* e);
     } while (false)
 #endif
 
-j2p_expt* cvt_cjson_2_proto_c_field(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const char* restrict field_name);
+j2p_expt* cvt_cjson_2_proto_c_field(const cJSON* restrict root, ProtobufCMessage* const msg, const cJSON* restrict item, const char* const field_name, const string_bool_convertor bool_cvt);

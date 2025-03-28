@@ -28,10 +28,10 @@ main()
 
     device__init(device);
 
-    j2p_expt* e = cvt_cjson_2_proto_c_field(root, (ProtobufCMessage*)device, cJSON_GetObjectItem(root, "parts_supplier"), "parts_supplier");
+    j2p_expt* e = cvt_cjson_2_proto_c_field(root, (ProtobufCMessage*)device, cJSON_GetObjectItem(root, "parts_supplier"), "parts_supplier", NULL);
     if (e != NULL) {
         if (e->msg->type != JSON2PB_SUCCESS) {
-            ERROR("convert failed (%s)\n\tconverting json path \"%s\"\n", e->msg->message, e->where);
+            ERROR("convert failed (%s)\n\tconverting json path \"%s\"\n", e->msg->desc, e->where);
         }
         FREE_JSON2PB_EXCEPTION(e);
     } else {
