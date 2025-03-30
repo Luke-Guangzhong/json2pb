@@ -12,6 +12,7 @@
 
 #include <cjson/cJSON.h>
 #include <protobuf-c/protobuf-c.h>
+#include <stdbool.h>
 
 typedef enum json2pb_exception_type {
     JSON2PB_SUCCESS = 0,
@@ -49,7 +50,7 @@ typedef struct json2pb_exception {
     const j2p_expt_msg* msg;
 } j2p_expt;
 
-typedef bool (*string_bool_convertor)(const char* str);
+typedef bool (*string_bool_convertor)(const char* const str);
 
 /**
  * @brief Generate a json2pb exception.

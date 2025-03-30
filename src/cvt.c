@@ -226,3 +226,33 @@ cvt_single_string(const cJSON* const root, const cJSON* const item, char** const
 
     JSON2PB_THROW_EXCEPTION(JSON2PB_SUCCESS);
 }
+
+j2p_expt*
+cvt_single_bool(const cJSON* const root, const cJSON* const item, bool* const field, const string_bool_convertor bool_cvt)
+{
+    assert(NULL != root);
+    assert(NULL != item);
+    assert(NULL != field);
+
+    if (cJSON_IsBool(item)) {
+        *field = cJSON_IsTrue(item) ? true : false;
+    } else if (cJSON_IsNumber(item)) {
+        const double num_value = cJSON_GetNumberValue(item);
+        if (isinf(num_value) || isnan(num_value)) {
+            JSON2PB_THROW_EXCEPTION(JSON2PB_VALUE_OVERFLOW);
+        }
+        *field = num_value == 0 ? false : true;
+    } else if (NULL != cJSON_GetStringValue(item)) {
+        if (NULL != bool_cvt) {
+            *field = bool_cvt(cJSON_GetStringValue(item));
+        } else {
+            *field = default_string_bool_convertor(cJSON_GetStringValue(item));
+        }
+    } else if (cJSON_IsNull(item)) {
+        JSON2PB_THROW_EXCEPTION(JSON2PB_NULL_VALUE);
+    } else {
+        JSON2PB_THROW_EXCEPTION(JSON2PB_UNACCEPTABLE_JSON_TYPE);
+    }
+
+    JSON2PB_THROW_EXCEPTION(JSON2PB_SUCCESS);
+}

@@ -8,3 +8,11 @@
  * @copyright Copyright (c) 2025
  *
  */
+#include "internal.h"
+
+bool
+default_string_bool_convertor(const char* const str)
+{
+    assert(NULL != str);
+    return true;
+}

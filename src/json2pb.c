@@ -787,7 +787,7 @@ __cvt_bool__(const cJSON* restrict root, ProtobufCMessage* restrict msg, const c
     assert(field_desc != NULL);
     assert(item != NULL);
     assert(msg->descriptor != NULL);
-    assert(field_desc->type == PROTOBUF_C_TYPE_FLOAT);
+    assert(field_desc->type == PROTOBUF_C_TYPE_BOOL);
 
     const bool is_repeated   = (field_desc->label == PROTOBUF_C_LABEL_REPEATED);
     const bool is_oneof      = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_ONEOF);
@@ -802,7 +802,56 @@ __cvt_bool__(const cJSON* restrict root, ProtobufCMessage* restrict msg, const c
             JSON2PB_THROW_EXCEPTION(JSON2PB_UNACCEPTABLE_JSON_TYPE);
         }
         if (cJSON_GetArraySize(item) > 0) {
+            uint64_t       index      = 0;
+            const cJSON*   element    = NULL;
+            const cJSON*   json_array = item;
+            const uint64_t length     = cJSON_GetArraySize(json_array);
+            j2p_expt*      rtn        = NULL;
+            bool* const    array      = (bool*)calloc(length, sizeof(double));
+            if (NULL == array) {
+                JSON2PB_THROW_EXCEPTION(JSON2PB_MEM_ALLOC_FAILED);
+            }
 
+            cJSON_ArrayForEach(element, item)
+            {
+                rtn = cvt_single_bool(root, element, &array[index], bool_cvt);
+                if (rtn != NULL) {
+                    if (rtn->msg->type == JSON2PB_NULL_VALUE) {
+                        FREE_JSON2PB_EXCEPTION(rtn);
+                        continue;
+                    }
+                    if (rtn->msg->type != JSON2PB_SUCCESS) {
+                        break;
+                    }
+                } else {
+                    exit(EXIT_FAILURE);
+                }
+                index++;
+            }
+
+            if (rtn->msg->type != JSON2PB_SUCCESS) { /* error occurred */
+                free(array);
+                return rtn;
+            }
+
+            if (index == 0) { /* no valid element found */
+                free(array);
+                FREE_JSON2PB_EXCEPTION(rtn);
+                JSON2PB_THROW_EXCEPTION(JSON2PB_EMPTY_ARRAY);
+            }
+
+            bool** field_ptr = (bool**)((void*)msg + field_desc->offset);
+            *field_ptr       = (bool*)calloc(index, sizeof(bool));
+            if (NULL == (*field_ptr)) {
+                free(array);
+                JSON2PB_THROW_EXCEPTION(JSON2PB_MEM_ALLOC_FAILED);
+            }
+
+            memcpy((*field_ptr), array, index * sizeof(bool));
+            *(size_t*)((void*)msg + field_desc->quantifier_offset) = index;
+
+            free(array);
+            JSON2PB_THROW_EXCEPTION(JSON2PB_SUCCESS);
         } else {
             JSON2PB_THROW_EXCEPTION(JSON2PB_EMPTY_ARRAY);
         }
@@ -814,5 +863,7 @@ __cvt_bool__(const cJSON* restrict root, ProtobufCMessage* restrict msg, const c
                 (*(int32_t*)((void*)msg + field_desc->quantifier_offset)) = field_desc->id;
             }
         }
+        bool* field_ptr = (bool*)((void*)msg + field_desc->offset);
+        return cvt_single_bool(root, item, field_ptr, bool_cvt);
     }
 }
