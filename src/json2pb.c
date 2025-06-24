@@ -40,16 +40,16 @@ const j2p_expt_msg j2p_expt_msg_list[] = {
     {JSON2PB_OS_GENERAL,               "general error in operating system"                     },
 };
 
-static j2p_expt* cvt_int32_t(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
-static j2p_expt* cvt_int64_t(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
-static j2p_expt* cvt_uint32_t(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
-static j2p_expt* cvt_uint64_t(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
-static j2p_expt* cvt_float(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
-static j2p_expt* cvt_double(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
-static j2p_expt* cvt_string(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
-static j2p_expt* cvt_bool(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc, const string_bool_convertor bool_cvt);
+static j2p_expt_t cvt_int32_t(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
+static j2p_expt_t cvt_int64_t(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
+static j2p_expt_t cvt_uint32_t(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
+static j2p_expt_t cvt_uint64_t(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
+static j2p_expt_t cvt_float(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
+static j2p_expt_t cvt_double(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
+static j2p_expt_t cvt_string(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
+static j2p_expt_t cvt_bool(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc, const string_bool_convertor bool_cvt);
 
-j2p_expt*
+j2p_expt_t
 cvt_cjson_2_proto_c_field(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const char* restrict field_name, const string_bool_convertor bool_cvt)
 {
     assert(root != NULL);
@@ -58,23 +58,23 @@ cvt_cjson_2_proto_c_field(const cJSON* restrict root, ProtobufCMessage* restrict
     assert(field_name != NULL);
 
     if (NULL == root || NULL == msg || NULL == item || NULL == field_name) {
-        JSON2PB_THROW_EXCEPTION(JSON2PB_INVALID_ARG);
+        return JSON2PB_INVALID_ARG;
     }
 
     if (NULL == msg->descriptor) {
-        JSON2PB_THROW_EXCEPTION(JSON2PB_UNINITIALIZED);
+        return JSON2PB_UNINITIALIZED;
     }
 
     if (cJSON_IsNull(item)) {
-        JSON2PB_THROW_EXCEPTION(JSON2PB_NULL_VALUE);
+        return JSON2PB_NULL_VALUE;
     }
 
     const ProtobufCFieldDescriptor* field_desc = protobuf_c_message_descriptor_get_field_by_name(msg->descriptor, field_name);
     if (NULL == field_desc) {
-        JSON2PB_THROW_EXCEPTION(JSON2PB_FIELD_NOT_FOUND);
+        return JSON2PB_FIELD_NOT_FOUND;
     }
 
-    j2p_expt* rtn = NULL;
+    j2p_expt_t rtn = JSON2PB_SUCCESS;
 
     switch (field_desc->type) {
     case PROTOBUF_C_TYPE_INT32:
@@ -85,83 +85,46 @@ cvt_cjson_2_proto_c_field(const cJSON* restrict root, ProtobufCMessage* restrict
     case PROTOBUF_C_TYPE_INT64:
     case PROTOBUF_C_TYPE_SINT64:
     case PROTOBUF_C_TYPE_SFIXED64:
-        rtn = cvt_int64_t(root, msg, item, field_desc);
+        // rtn = cvt_int64_t(root, msg, item, field_desc);
         break;
     case PROTOBUF_C_TYPE_UINT32:
     case PROTOBUF_C_TYPE_FIXED32:
-        rtn = cvt_uint32_t(root, msg, item, field_desc);
+        // rtn = cvt_uint32_t(root, msg, item, field_desc);
         break;
     case PROTOBUF_C_TYPE_UINT64:
     case PROTOBUF_C_TYPE_FIXED64:
-        rtn = cvt_uint64_t(root, msg, item, field_desc);
+        // rtn = cvt_uint64_t(root, msg, item, field_desc);
         break;
     case PROTOBUF_C_TYPE_FLOAT:
-        rtn = cvt_float(root, msg, item, field_desc);
+        // rtn = cvt_float(root, msg, item, field_desc);
         break;
     case PROTOBUF_C_TYPE_DOUBLE:
-        rtn = cvt_double(root, msg, item, field_desc);
+        // rtn = cvt_double(root, msg, item, field_desc);
         break;
     case PROTOBUF_C_TYPE_STRING:
-        rtn = cvt_string(root, msg, item, field_desc);
+        // rtn = cvt_string(root, msg, item, field_desc);
         break;
     case PROTOBUF_C_TYPE_MESSAGE:
-#if 0    
-    rtn = __cvt_pb_msg__(msg, field_desc, root, msg_convertor);
-#endif
+        // rtn = __cvt_pb_msg__(msg, field_desc, root, msg_convertor);
         break;
     case PROTOBUF_C_TYPE_BOOL:
-        rtn = cvt_bool(root, msg, item, field_desc, bool_cvt);
+        // rtn = cvt_bool(root, msg, item, field_desc, bool_cvt);
         break;
     case PROTOBUF_C_TYPE_BYTES:
-#if 0    
-    rtn = __cvt_bytes__(msg, field_desc, root, mode);
-#endif
+        // rtn = __cvt_bytes__(msg, field_desc, root, mode);
         break;
     case PROTOBUF_C_TYPE_ENUM:
-#if 0    
-    rtn = __cvt_enum__(msg, field_desc, root, string_enum);
-#endif
+        // rtn = __cvt_enum__(msg, field_desc, root, string_enum);
         break;
     default:
-        printf("field %s cannot processed in json for now\n", field_desc->name);
+        // printf("field %s cannot processed in json for now\n", field_desc->name);
         break;
     }
 
     return rtn;
 }
 
-j2p_expt*
-gen_json2pb_exception(const cJSON* root, const cJSON* item, const j2p_expt_t type)
-{
-    j2p_expt* e = (j2p_expt*)calloc(1, sizeof(j2p_expt));
-    if (NULL == e) {
-        fprintf(stderr, "FATAL: Memory allocation failed in gen_json2pb_exception\n");
-        return NULL;
-    }
-    if (JSON2PB_SUCCESS != type) {
-        e->where = cJSONUtils_FindPointerFromObjectTo(root, item);
-    }
-
-    if (type <= JSON2PB_OS_GENERAL) {
-        e->msg = &j2p_expt_msg_list[type];
-    } else {
-        e->msg = &j2p_expt_msg_list[JSON2PB_INCORRECT_EXCEPTION_TYPE];
-    }
-    return e;
-}
-
-void
-free_json2pb_exception(j2p_expt* e)
-{
-    if (NULL == e) {
-        return;
-    }
-    free(e->where);
-    free(e);
-    return;
-}
-
-static j2p_expt*
+static j2p_expt_t
 cvt_int32_t(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc)
 {
     assert(msg != NULL);
@@ -175,39 +138,32 @@ cvt_int32_t(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJ
     const bool is_deprecated = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_DEPRECATED);
 
     if (is_deprecated) {
-        JSON2PB_THROW_EXCEPTION(JSON2PB_FIELD_IS_DEPRECATED);
+        return JSON2PB_FIELD_IS_DEPRECATED;
     }
 
     if (is_repeated) {
         if (!cJSON_IsArray(item)) {
-            JSON2PB_THROW_EXCEPTION(JSON2PB_UNACCEPTABLE_JSON_TYPE);
+            return JSON2PB_UNACCEPTABLE_JSON_TYPE;
         }
         if (cJSON_GetArraySize(item) > 0) {
-            uint64_t       index      = 0;
+            uint64_t       count      = 0;
             const cJSON*   element    = NULL;
             const cJSON*   json_array = item;
             const uint64_t length     = cJSON_GetArraySize(json_array);
-            j2p_expt*      rtn        = NULL;
+            j2p_expt_t     rtn        = JSON2PB_SUCCESS;
             int32_t* const array      = (int32_t*)calloc(length, sizeof(int32_t));
             if (NULL == array) {
-                JSON2PB_THROW_EXCEPTION(JSON2PB_MEM_ALLOC_FAILED);
+                exit(EXIT_FAILURE);
             }
 
             cJSON_ArrayForEach(element, item)
             {
-                rtn = cvt_single_int32_t(root, element, &array[index]);
-                if (rtn != NULL) {
-                    if (rtn->msg->type == JSON2PB_NULL_VALUE) {
-                        FREE_JSON2PB_EXCEPTION(rtn);
-                        continue;
-                    }
-                    if (rtn->msg->type != JSON2PB_SUCCESS) {
-                        break;
-                    }
+                rtn = cvt_single_int32_t(root, element, &array[count]);
+                if (rtn != EXIT_SUCCESS) {
+                    printf("[EXCEPTION]: %s %s\n", )
                 } else {
-                    exit(EXIT_FAILURE);
+                    count++;
                 }
-                index++;
             }
 
             if (rtn->msg->type != JSON2PB_SUCCESS) { /* error occurred */
@@ -215,655 +171,36 @@ cvt_int32_t(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJ
                 return rtn;
             }
 
-            if (index == 0) { /* no valid element found */
+            if (count == 0) { /* no valid element found */
                 free(array);
                 FREE_JSON2PB_EXCEPTION(rtn);
                 JSON2PB_THROW_EXCEPTION(JSON2PB_EMPTY_ARRAY);
             }
 
             int32_t** field_ptr = (int32_t**)((void*)msg + field_desc->offset);
-            *field_ptr          = (int32_t*)calloc(index, sizeof(int32_t));
+            *field_ptr          = (int32_t*)calloc(count, sizeof(int32_t));
             if (NULL == (*field_ptr)) {
                 free(array);
                 JSON2PB_THROW_EXCEPTION(JSON2PB_MEM_ALLOC_FAILED);
             }
 
-            memcpy((*field_ptr), array, index * sizeof(int32_t));
-            *(size_t*)((void*)msg + field_desc->quantifier_offset) = index;
+            memcpy((*field_ptr), array, count * sizeof(int32_t));
+            *(size_t*)((void*)msg + field_desc->quantifier_offset) = count;
 
             free(array);
             JSON2PB_THROW_EXCEPTION(JSON2PB_SUCCESS);
         } else {
-            JSON2PB_THROW_EXCEPTION(JSON2PB_EMPTY_ARRAY);
+            return JSON2PB_EMPTY_ARRAY;
         }
     } else {
         if (is_oneof) {
             if ((*(int32_t*)((void*)msg + field_desc->quantifier_offset)) != 0) {
-                JSON2PB_THROW_EXCEPTION(JSON2PB_ONEOF_ALREADY_SET);
+                return JSON2PB_ONEOF_ALREADY_SET;
             } else {
                 (*(int32_t*)((void*)msg + field_desc->quantifier_offset)) = field_desc->id;
             }
         }
         int32_t* field_ptr = (int32_t*)((void*)msg + field_desc->offset);
         return cvt_single_int32_t(root, item, field_ptr);
-    }
-}
-
-static j2p_expt*
-cvt_int64_t(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc)
-{
-    assert(msg != NULL);
-    assert(field_desc != NULL);
-    assert(item != NULL);
-    assert(msg->descriptor != NULL);
-    assert(field_desc->type == PROTOBUF_C_TYPE_INT64 || field_desc->type == PROTOBUF_C_TYPE_SINT64 || field_desc->type == PROTOBUF_C_TYPE_SFIXED64);
-
-    const bool is_repeated   = (field_desc->label == PROTOBUF_C_LABEL_REPEATED);
-    const bool is_oneof      = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_ONEOF);
-    const bool is_deprecated = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_DEPRECATED);
-
-    if (is_deprecated) {
-        JSON2PB_THROW_EXCEPTION(JSON2PB_FIELD_IS_DEPRECATED);
-    }
-
-    if (is_repeated) {
-        if (!cJSON_IsArray(item)) {
-            JSON2PB_THROW_EXCEPTION(JSON2PB_UNACCEPTABLE_JSON_TYPE);
-        }
-        if (cJSON_GetArraySize(item) > 0) {
-            uint64_t       index      = 0;
-            const cJSON*   element    = NULL;
-            const cJSON*   json_array = item;
-            const uint64_t length     = cJSON_GetArraySize(json_array);
-            j2p_expt*      rtn        = NULL;
-            int64_t* const array      = (int64_t*)calloc(length, sizeof(int64_t));
-            if (NULL == array) {
-                JSON2PB_THROW_EXCEPTION(JSON2PB_MEM_ALLOC_FAILED);
-            }
-
-            cJSON_ArrayForEach(element, item)
-            {
-                rtn = cvt_single_int64_t(root, element, &array[index]);
-                if (rtn != NULL) {
-                    if (rtn->msg->type == JSON2PB_NULL_VALUE) {
-                        FREE_JSON2PB_EXCEPTION(rtn);
-                        continue;
-                    }
-                    if (rtn->msg->type != JSON2PB_SUCCESS) {
-                        break;
-                    }
-                } else {
-                    exit(EXIT_FAILURE);
-                }
-                index++;
-            }
-
-            if (rtn->msg->type != JSON2PB_SUCCESS) { /* error occurred */
-                free(array);
-                return rtn;
-            }
-
-            if (index == 0) { /* no valid element found */
-                free(array);
-                FREE_JSON2PB_EXCEPTION(rtn);
-                JSON2PB_THROW_EXCEPTION(JSON2PB_EMPTY_ARRAY);
-            }
-
-            int64_t** field_ptr = (int64_t**)((void*)msg + field_desc->offset);
-            *field_ptr          = (int64_t*)calloc(index, sizeof(int64_t));
-            if (NULL == (*field_ptr)) {
-                free(array);
-                JSON2PB_THROW_EXCEPTION(JSON2PB_MEM_ALLOC_FAILED);
-            }
-
-            memcpy((*field_ptr), array, index * sizeof(int64_t));
-            *(size_t*)((void*)msg + field_desc->quantifier_offset) = index;
-
-            free(array);
-            JSON2PB_THROW_EXCEPTION(JSON2PB_SUCCESS);
-        } else {
-            JSON2PB_THROW_EXCEPTION(JSON2PB_EMPTY_ARRAY);
-        }
-    } else {
-        if (is_oneof) {
-            if ((*(int32_t*)((void*)msg + field_desc->quantifier_offset)) != 0) {
-                JSON2PB_THROW_EXCEPTION(JSON2PB_ONEOF_ALREADY_SET);
-            } else {
-                (*(int32_t*)((void*)msg + field_desc->quantifier_offset)) = field_desc->id;
-            }
-        }
-        int64_t* field_ptr = (int64_t*)((void*)msg + field_desc->offset);
-        return cvt_single_int64_t(root, item, field_ptr);
-    }
-}
-
-static j2p_expt*
-cvt_uint32_t(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc)
-{
-    assert(msg != NULL);
-    assert(field_desc != NULL);
-    assert(item != NULL);
-    assert(msg->descriptor != NULL);
-    assert(field_desc->type == PROTOBUF_C_TYPE_UINT32 || field_desc->type == PROTOBUF_C_TYPE_FIXED32);
-
-    const bool is_repeated   = (field_desc->label == PROTOBUF_C_LABEL_REPEATED);
-    const bool is_oneof      = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_ONEOF);
-    const bool is_deprecated = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_DEPRECATED);
-
-    if (is_deprecated) {
-        JSON2PB_THROW_EXCEPTION(JSON2PB_FIELD_IS_DEPRECATED);
-    }
-
-    if (is_repeated) {
-        if (!cJSON_IsArray(item)) {
-            JSON2PB_THROW_EXCEPTION(JSON2PB_UNACCEPTABLE_JSON_TYPE);
-        }
-        if (cJSON_GetArraySize(item) > 0) {
-            uint64_t        index      = 0;
-            const cJSON*    element    = NULL;
-            const cJSON*    json_array = item;
-            const uint64_t  length     = cJSON_GetArraySize(json_array);
-            j2p_expt*       rtn        = NULL;
-            uint32_t* const array      = (uint32_t*)calloc(length, sizeof(uint32_t));
-            if (NULL == array) {
-                JSON2PB_THROW_EXCEPTION(JSON2PB_MEM_ALLOC_FAILED);
-            }
-
-            cJSON_ArrayForEach(element, item)
-            {
-                rtn = cvt_single_uint32_t(root, element, &array[index]);
-                if (rtn != NULL) {
-                    if (rtn->msg->type == JSON2PB_NULL_VALUE) {
-                        FREE_JSON2PB_EXCEPTION(rtn);
-                        continue;
-                    }
-                    if (rtn->msg->type != JSON2PB_SUCCESS) {
-                        break;
-                    }
-                } else {
-                    exit(EXIT_FAILURE);
-                }
-                index++;
-            }
-
-            if (rtn->msg->type != JSON2PB_SUCCESS) { /* error occurred */
-                free(array);
-                return rtn;
-            }
-
-            if (index == 0) { /* no valid element found */
-                free(array);
-                FREE_JSON2PB_EXCEPTION(rtn);
-                JSON2PB_THROW_EXCEPTION(JSON2PB_EMPTY_ARRAY);
-            }
-
-            uint32_t** field_ptr = (uint32_t**)((void*)msg + field_desc->offset);
-            *field_ptr           = (uint32_t*)calloc(index, sizeof(uint32_t));
-            if (NULL == (*field_ptr)) {
-                free(array);
-                JSON2PB_THROW_EXCEPTION(JSON2PB_MEM_ALLOC_FAILED);
-            }
-
-            memcpy((*field_ptr), array, index * sizeof(uint32_t));
-            *(size_t*)((void*)msg + field_desc->quantifier_offset) = index;
-
-            free(array);
-            JSON2PB_THROW_EXCEPTION(JSON2PB_SUCCESS);
-        } else {
-            JSON2PB_THROW_EXCEPTION(JSON2PB_EMPTY_ARRAY);
-        }
-    } else {
-        if (is_oneof) {
-            if ((*(int32_t*)((void*)msg + field_desc->quantifier_offset)) != 0) {
-                JSON2PB_THROW_EXCEPTION(JSON2PB_ONEOF_ALREADY_SET);
-            } else {
-                (*(int32_t*)((void*)msg + field_desc->quantifier_offset)) = field_desc->id;
-            }
-        }
-        uint32_t* field_ptr = (uint32_t*)((void*)msg + field_desc->offset);
-        return cvt_single_uint32_t(root, item, field_ptr);
-    }
-}
-
-static j2p_expt*
-cvt_uint64_t(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc)
-{
-    assert(msg != NULL);
-    assert(field_desc != NULL);
-    assert(item != NULL);
-    assert(msg->descriptor != NULL);
-    assert(field_desc->type == PROTOBUF_C_TYPE_UINT64 || field_desc->type == PROTOBUF_C_TYPE_FIXED64);
-
-    const bool is_repeated   = (field_desc->label == PROTOBUF_C_LABEL_REPEATED);
-    const bool is_oneof      = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_ONEOF);
-    const bool is_deprecated = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_DEPRECATED);
-
-    if (is_deprecated) {
-        JSON2PB_THROW_EXCEPTION(JSON2PB_FIELD_IS_DEPRECATED);
-    }
-
-    if (is_repeated) {
-        if (!cJSON_IsArray(item)) {
-            JSON2PB_THROW_EXCEPTION(JSON2PB_UNACCEPTABLE_JSON_TYPE);
-        }
-        if (cJSON_GetArraySize(item) > 0) {
-            uint64_t        index      = 0;
-            const cJSON*    element    = NULL;
-            const cJSON*    json_array = item;
-            const uint64_t  length     = cJSON_GetArraySize(json_array);
-            j2p_expt*       rtn        = NULL;
-            uint64_t* const array      = (uint64_t*)calloc(length, sizeof(uint64_t));
-            if (NULL == array) {
-                JSON2PB_THROW_EXCEPTION(JSON2PB_MEM_ALLOC_FAILED);
-            }
-
-            cJSON_ArrayForEach(element, item)
-            {
-                rtn = cvt_single_uint64_t(root, element, &array[index]);
-                if (rtn != NULL) {
-                    if (rtn->msg->type == JSON2PB_NULL_VALUE) {
-                        FREE_JSON2PB_EXCEPTION(rtn);
-                        continue;
-                    }
-                    if (rtn->msg->type != JSON2PB_SUCCESS) {
-                        break;
-                    }
-                } else {
-                    exit(EXIT_FAILURE);
-                }
-                index++;
-            }
-
-            if (rtn->msg->type != JSON2PB_SUCCESS) { /* error occurred */
-                free(array);
-                return rtn;
-            }
-
-            if (index == 0) { /* no valid element found */
-                free(array);
-                FREE_JSON2PB_EXCEPTION(rtn);
-                JSON2PB_THROW_EXCEPTION(JSON2PB_EMPTY_ARRAY);
-            }
-
-            uint64_t** field_ptr = (uint64_t**)((void*)msg + field_desc->offset);
-            *field_ptr           = (uint64_t*)calloc(index, sizeof(uint64_t));
-            if (NULL == (*field_ptr)) {
-                free(array);
-                JSON2PB_THROW_EXCEPTION(JSON2PB_MEM_ALLOC_FAILED);
-            }
-
-            memcpy((*field_ptr), array, index * sizeof(uint64_t));
-            *(size_t*)((void*)msg + field_desc->quantifier_offset) = index;
-
-            free(array);
-            JSON2PB_THROW_EXCEPTION(JSON2PB_SUCCESS);
-        } else {
-            JSON2PB_THROW_EXCEPTION(JSON2PB_EMPTY_ARRAY);
-        }
-    } else {
-        if (is_oneof) {
-            if ((*(int32_t*)((void*)msg + field_desc->quantifier_offset)) != 0) {
-                JSON2PB_THROW_EXCEPTION(JSON2PB_ONEOF_ALREADY_SET);
-            } else {
-                (*(int32_t*)((void*)msg + field_desc->quantifier_offset)) = field_desc->id;
-            }
-        }
-        uint64_t* field_ptr = (uint64_t*)((void*)msg + field_desc->offset);
-        return cvt_single_uint64_t(root, item, field_ptr);
-    }
-}
-
-static j2p_expt*
-cvt_float(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc)
-{
-    assert(msg != NULL);
-    assert(field_desc != NULL);
-    assert(item != NULL);
-    assert(msg->descriptor != NULL);
-    assert(field_desc->type == PROTOBUF_C_TYPE_FLOAT);
-
-    const bool is_repeated   = (field_desc->label == PROTOBUF_C_LABEL_REPEATED);
-    const bool is_oneof      = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_ONEOF);
-    const bool is_deprecated = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_DEPRECATED);
-
-    if (is_deprecated) {
-        JSON2PB_THROW_EXCEPTION(JSON2PB_FIELD_IS_DEPRECATED);
-    }
-
-    if (is_repeated) {
-        if (!cJSON_IsArray(item)) {
-            JSON2PB_THROW_EXCEPTION(JSON2PB_UNACCEPTABLE_JSON_TYPE);
-        }
-        if (cJSON_GetArraySize(item) > 0) {
-            uint64_t       index      = 0;
-            const cJSON*   element    = NULL;
-            const cJSON*   json_array = item;
-            const uint64_t length     = cJSON_GetArraySize(json_array);
-            j2p_expt*      rtn        = NULL;
-            float* const   array      = (float*)calloc(length, sizeof(float));
-            if (NULL == array) {
-                JSON2PB_THROW_EXCEPTION(JSON2PB_MEM_ALLOC_FAILED);
-            }
-
-            cJSON_ArrayForEach(element, item)
-            {
-                rtn = cvt_single_float(root, element, &array[index]);
-                if (rtn != NULL) {
-                    if (rtn->msg->type == JSON2PB_NULL_VALUE) {
-                        FREE_JSON2PB_EXCEPTION(rtn);
-                        continue;
-                    }
-                    if (rtn->msg->type != JSON2PB_SUCCESS) {
-                        break;
-                    }
-                } else {
-                    exit(EXIT_FAILURE);
-                }
-                index++;
-            }
-
-            if (rtn->msg->type != JSON2PB_SUCCESS) { /* error occurred */
-                free(array);
-                return rtn;
-            }
-
-            if (index == 0) { /* no valid element found */
-                free(array);
-                FREE_JSON2PB_EXCEPTION(rtn);
-                JSON2PB_THROW_EXCEPTION(JSON2PB_EMPTY_ARRAY);
-            }
-
-            float** field_ptr = (float**)((void*)msg + field_desc->offset);
-            *field_ptr        = (float*)calloc(index, sizeof(float));
-            if (NULL == (*field_ptr)) {
-                free(array);
-                JSON2PB_THROW_EXCEPTION(JSON2PB_MEM_ALLOC_FAILED);
-            }
-
-            memcpy((*field_ptr), array, index * sizeof(float));
-            *(size_t*)((void*)msg + field_desc->quantifier_offset) = index;
-
-            free(array);
-            JSON2PB_THROW_EXCEPTION(JSON2PB_SUCCESS);
-        } else {
-            JSON2PB_THROW_EXCEPTION(JSON2PB_EMPTY_ARRAY);
-        }
-    } else {
-        if (is_oneof) {
-            if ((*(int32_t*)((void*)msg + field_desc->quantifier_offset)) != 0) {
-                JSON2PB_THROW_EXCEPTION(JSON2PB_ONEOF_ALREADY_SET);
-            } else {
-                (*(int32_t*)((void*)msg + field_desc->quantifier_offset)) = field_desc->id;
-            }
-        }
-        float* field_ptr = (float*)((void*)msg + field_desc->offset);
-        return cvt_single_float(root, item, field_ptr);
-    }
-}
-
-static j2p_expt*
-cvt_double(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc)
-{
-    assert(msg != NULL);
-    assert(field_desc != NULL);
-    assert(item != NULL);
-    assert(msg->descriptor != NULL);
-    assert(field_desc->type == PROTOBUF_C_TYPE_DOUBLE);
-
-    const bool is_repeated   = (field_desc->label == PROTOBUF_C_LABEL_REPEATED);
-    const bool is_oneof      = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_ONEOF);
-    const bool is_deprecated = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_DEPRECATED);
-
-    if (is_deprecated) {
-        JSON2PB_THROW_EXCEPTION(JSON2PB_FIELD_IS_DEPRECATED);
-    }
-
-    if (is_repeated) {
-        if (!cJSON_IsArray(item)) {
-            JSON2PB_THROW_EXCEPTION(JSON2PB_UNACCEPTABLE_JSON_TYPE);
-        }
-        if (cJSON_GetArraySize(item) > 0) {
-            uint64_t       index      = 0;
-            const cJSON*   element    = NULL;
-            const cJSON*   json_array = item;
-            const uint64_t length     = cJSON_GetArraySize(json_array);
-            j2p_expt*      rtn        = NULL;
-            double* const  array      = (double*)calloc(length, sizeof(double));
-            if (NULL == array) {
-                JSON2PB_THROW_EXCEPTION(JSON2PB_MEM_ALLOC_FAILED);
-            }
-
-            cJSON_ArrayForEach(element, item)
-            {
-                rtn = cvt_single_double(root, element, &array[index]);
-                if (rtn != NULL) {
-                    if (rtn->msg->type == JSON2PB_NULL_VALUE) {
-                        FREE_JSON2PB_EXCEPTION(rtn);
-                        continue;
-                    }
-                    if (rtn->msg->type != JSON2PB_SUCCESS) {
-                        break;
-                    }
-                } else {
-                    exit(EXIT_FAILURE);
-                }
-                index++;
-            }
-
-            if (rtn->msg->type != JSON2PB_SUCCESS) { /* error occurred */
-                free(array);
-                return rtn;
-            }
-
-            if (index == 0) { /* no valid element found */
-                free(array);
-                FREE_JSON2PB_EXCEPTION(rtn);
-                JSON2PB_THROW_EXCEPTION(JSON2PB_EMPTY_ARRAY);
-            }
-
-            double** field_ptr = (double**)((void*)msg + field_desc->offset);
-            *field_ptr         = (double*)calloc(index, sizeof(double));
-            if (NULL == (*field_ptr)) {
-                free(array);
-                JSON2PB_THROW_EXCEPTION(JSON2PB_MEM_ALLOC_FAILED);
-            }
-
-            memcpy((*field_ptr), array, index * sizeof(double));
-            *(size_t*)((void*)msg + field_desc->quantifier_offset) = index;
-
-            free(array);
-            JSON2PB_THROW_EXCEPTION(JSON2PB_SUCCESS);
-        } else {
-            JSON2PB_THROW_EXCEPTION(JSON2PB_EMPTY_ARRAY);
-        }
-    } else {
-        if (is_oneof) {
-            if ((*(int32_t*)((void*)msg + field_desc->quantifier_offset)) != 0) {
-                JSON2PB_THROW_EXCEPTION(JSON2PB_ONEOF_ALREADY_SET);
-            } else {
-                (*(int32_t*)((void*)msg + field_desc->quantifier_offset)) = field_desc->id;
-            }
-        }
-        double* field_ptr = (double*)((void*)msg + field_desc->offset);
-        return cvt_single_double(root, item, field_ptr);
-    }
-}
-
-static j2p_expt*
-cvt_string(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc)
-{
-    assert(msg != NULL);
-    assert(field_desc != NULL);
-    assert(item != NULL);
-    assert(msg->descriptor != NULL);
-    assert(field_desc->type == PROTOBUF_C_TYPE_STRING);
-
-    const bool is_repeated   = (field_desc->label == PROTOBUF_C_LABEL_REPEATED);
-    const bool is_oneof      = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_ONEOF);
-    const bool is_deprecated = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_DEPRECATED);
-
-    if (is_deprecated) {
-        JSON2PB_THROW_EXCEPTION(JSON2PB_FIELD_IS_DEPRECATED);
-    }
-
-    if (is_repeated) {
-        if (!cJSON_IsArray(item)) {
-            JSON2PB_THROW_EXCEPTION(JSON2PB_UNACCEPTABLE_JSON_TYPE);
-        }
-        if (cJSON_GetArraySize(item) > 0) {
-            uint64_t       index      = 0;
-            const cJSON*   element    = NULL;
-            const cJSON*   json_array = item;
-            const uint64_t length     = cJSON_GetArraySize(json_array);
-            j2p_expt*      rtn        = NULL;
-            char** const   array      = (char**)calloc(length, sizeof(char*));
-            if (NULL == array) {
-                JSON2PB_THROW_EXCEPTION(JSON2PB_MEM_ALLOC_FAILED);
-            }
-
-            cJSON_ArrayForEach(element, item)
-            {
-                rtn = cvt_single_string(root, element, &array[index]);
-                if (rtn != NULL) {
-                    if (rtn->msg->type == JSON2PB_NULL_VALUE) {
-                        FREE_JSON2PB_EXCEPTION(rtn);
-                        continue;
-                    }
-                    if (rtn->msg->type != JSON2PB_SUCCESS) {
-                        break;
-                    }
-                } else {
-                    exit(EXIT_FAILURE);
-                }
-                index++;
-            }
-
-            if (rtn->msg->type != JSON2PB_SUCCESS) { /* error occurred */
-                for (size_t i = 0; i < index; i++) {
-                    free(array[i]);
-                }
-                free(array);
-                return rtn;
-            }
-
-            if (index == 0) { /* no valid element found */
-                free(array);
-                FREE_JSON2PB_EXCEPTION(rtn);
-                JSON2PB_THROW_EXCEPTION(JSON2PB_EMPTY_ARRAY);
-            }
-
-            char*** field_ptr = (char***)((void*)msg + field_desc->offset);
-            *field_ptr        = (char**)calloc(index, sizeof(char*));
-            if (NULL == (*field_ptr)) {
-                free(array);
-                JSON2PB_THROW_EXCEPTION(JSON2PB_MEM_ALLOC_FAILED);
-            }
-
-            memcpy((*field_ptr), array, index * sizeof(char*));
-            *(size_t*)((void*)msg + field_desc->quantifier_offset) = index;
-
-            free(array);
-            JSON2PB_THROW_EXCEPTION(JSON2PB_SUCCESS);
-        } else {
-            JSON2PB_THROW_EXCEPTION(JSON2PB_EMPTY_ARRAY);
-        }
-    } else {
-        if (is_oneof) {
-            if ((*(int32_t*)((void*)msg + field_desc->quantifier_offset)) != 0) {
-                JSON2PB_THROW_EXCEPTION(JSON2PB_ONEOF_ALREADY_SET);
-            } else {
-                (*(int32_t*)((void*)msg + field_desc->quantifier_offset)) = field_desc->id;
-            }
-        }
-        char** field_ptr = (char**)((void*)msg + field_desc->offset);
-        return cvt_single_string(root, item, field_ptr);
-    }
-}
-
-static j2p_expt*
-cvt_bool(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc, const string_bool_convertor bool_cvt)
-{
-    assert(msg != NULL);
-    assert(field_desc != NULL);
-    assert(item != NULL);
-    assert(msg->descriptor != NULL);
-    assert(field_desc->type == PROTOBUF_C_TYPE_BOOL);
-
-    const bool is_repeated   = (field_desc->label == PROTOBUF_C_LABEL_REPEATED);
-    const bool is_oneof      = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_ONEOF);
-    const bool is_deprecated = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_DEPRECATED);
-
-    if (is_deprecated) {
-        JSON2PB_THROW_EXCEPTION(JSON2PB_FIELD_IS_DEPRECATED);
-    }
-
-    if (is_repeated) {
-        if (!cJSON_IsArray(item)) {
-            JSON2PB_THROW_EXCEPTION(JSON2PB_UNACCEPTABLE_JSON_TYPE);
-        }
-        if (cJSON_GetArraySize(item) > 0) {
-            uint64_t       index      = 0;
-            const cJSON*   element    = NULL;
-            const cJSON*   json_array = item;
-            const uint64_t length     = cJSON_GetArraySize(json_array);
-            j2p_expt*      rtn        = NULL;
-            bool* const    array      = (bool*)calloc(length, sizeof(double));
-            if (NULL == array) {
-                JSON2PB_THROW_EXCEPTION(JSON2PB_MEM_ALLOC_FAILED);
-            }
-
-            cJSON_ArrayForEach(element, item)
-            {
-                rtn = cvt_single_bool(root, element, &array[index], bool_cvt);
-                if (rtn != NULL) {
-                    if (rtn->msg->type == JSON2PB_NULL_VALUE) {
-                        FREE_JSON2PB_EXCEPTION(rtn);
-                        continue;
-                    }
-                    if (rtn->msg->type != JSON2PB_SUCCESS) {
-                        break;
-                    }
-                } else {
-                    exit(EXIT_FAILURE);
-                }
-                index++;
-            }
-
-            if (rtn->msg->type != JSON2PB_SUCCESS) { /* error occurred */
-                free(array);
-                return rtn;
-            }
-
-            if (index == 0) { /* no valid element found */
-                free(array);
-                FREE_JSON2PB_EXCEPTION(rtn);
-                JSON2PB_THROW_EXCEPTION(JSON2PB_EMPTY_ARRAY);
-            }
-
-            bool** field_ptr = (bool**)((void*)msg + field_desc->offset);
-            *field_ptr       = (bool*)calloc(index, sizeof(bool));
-            if (NULL == (*field_ptr)) {
-                free(array);
-                JSON2PB_THROW_EXCEPTION(JSON2PB_MEM_ALLOC_FAILED);
-            }
-
-            memcpy((*field_ptr), array, index * sizeof(bool));
-            *(size_t*)((void*)msg + field_desc->quantifier_offset) = index;
-
-            free(array);
-            JSON2PB_THROW_EXCEPTION(JSON2PB_SUCCESS);
-        } else {
-            JSON2PB_THROW_EXCEPTION(JSON2PB_EMPTY_ARRAY);
-        }
-    } else {
-        if (is_oneof) {
-            if ((*(int32_t*)((void*)msg + field_desc->quantifier_offset)) != 0) {
-                JSON2PB_THROW_EXCEPTION(JSON2PB_ONEOF_ALREADY_SET);
-            } else {
-                (*(int32_t*)((void*)msg + field_desc->quantifier_offset)) = field_desc->id;
-            }
-        }
-        bool* field_ptr = (bool*)((void*)msg + field_desc->offset);
-        return cvt_single_bool(root, item, field_ptr, bool_cvt);
     }
 }

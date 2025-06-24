@@ -45,41 +45,8 @@ typedef struct json2pb_exception_msg {
 
 extern const j2p_expt_msg j2p_expt_msg_list[];
 
-typedef struct json2pb_exception {
-    char*               where;
-    const j2p_expt_msg* msg;
-} j2p_expt;
-
 typedef bool (*string_bool_convertor)(const char* const str);
 
-/**
- * @brief Generate a json2pb exception.
- *
- * @param[in] root JSON root object.
- * @param[in] item Current item converting to protobuf message.
- * @param[in] type Exception type
- * @return j2p_expt* pointer to the generated exception.
- * @retval NULL if exception is not generated.
- */
-j2p_expt* gen_json2pb_exception(const cJSON* root, const cJSON* item, const j2p_expt_t type);
+typedef int (*string_enum_convertor)(const char* const str);
 
-#ifndef JSON2PB_THROW_EXCEPTION
-#define JSON2PB_THROW_EXCEPTION(e) return gen_json2pb_exception(root, item, e)
-#endif
-
-/**
- * @brief Free a json2pb exception structure.
- *
- * @param e
- */
-void free_json2pb_exception(j2p_expt* e);
-
-#ifndef FREE_JSON2PB_EXCEPTION
-#define FREE_JSON2PB_EXCEPTION(e)  \
-    do {                           \
-        free_json2pb_exception(e); \
-        e = NULL;                  \
-    } while (false)
-#endif
-
-j2p_expt* cvt_cjson_2_proto_c_field(const cJSON* restrict root, ProtobufCMessage* const msg, const cJSON* restrict item, const char* const field_name, const string_bool_convertor bool_cvt);
+j2p_expt_t cvt_cjson_2_proto_c_field(const cJSON* restrict root, ProtobufCMessage* const msg, const cJSON* restrict item, const char* const field_name, const string_bool_convertor bool_cvt, const string_enum_convertor enum_cvt);

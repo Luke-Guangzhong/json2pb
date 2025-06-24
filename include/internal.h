@@ -9,6 +9,7 @@
  *
  */
 #pragma once
+
 #include <stdint.h>
 
 #include "json2pb.h"
