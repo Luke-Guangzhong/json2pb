@@ -27,6 +27,7 @@ const j2p_expt_msg j2p_expt_msg_list[] = {
     {JSON2PB_UNACCEPTABLE_JSON_TYPE,   "unacceptable json type"                                },
     {JSON2PB_INVALID_NUMBER_STRING,    "invalid number string"                                 },
     {JSON2PB_EMPTY_ARRAY,              "empty array in json"                                   },
+    {JSON2PB_NO_VALID_FOUND,           "all element in array are not valid for this field"     },
     {JSON2PB_JSON_GENERAL,             "general error in json"                                 },
     {JSON2PB_UNINITIALIZED,            "protobuf message not initialized"                      },
     {JSON2PB_FIELD_NOT_FOUND,          "specified field not found in protobuf message"         },
@@ -50,7 +51,7 @@ static j2p_expt_t cvt_string(const cJSON* restrict root, ProtobufCMessage* restr
 static j2p_expt_t cvt_bool(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc, const string_bool_convertor bool_cvt);
 
 j2p_expt_t
-cvt_cjson_2_proto_c_field(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const char* restrict field_name, const string_bool_convertor bool_cvt)
+cvt_cjson_2_proto_c_field(const cJSON* restrict root, ProtobufCMessage* const msg, const cJSON* restrict item, const char* const field_name, const string_bool_convertor bool_cvt, const string_enum_convertor enum_cvt)
 {
     assert(root != NULL);
     assert(msg != NULL);
@@ -125,7 +126,7 @@ cvt_cjson_2_proto_c_field(const cJSON* restrict root, ProtobufCMessage* restrict
 }
 
 static j2p_expt_t
-cvt_int32_t(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc)
+cvt_int32_t(const cJSON* const restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc)
 {
     assert(msg != NULL);
     assert(field_desc != NULL);
@@ -160,35 +161,28 @@ cvt_int32_t(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJ
             {
                 rtn = cvt_single_int32_t(root, element, &array[count]);
                 if (rtn != EXIT_SUCCESS) {
-                    printf("[EXCEPTION]: %s %s\n", )
+                    printf("[EXCEPTION]: %s %s\n", cJSONUtils_FindPointerFromObjectTo(root, element), j2p_expt_msg_list[rtn].desc);
                 } else {
                     count++;
                 }
             }
 
-            if (rtn->msg->type != JSON2PB_SUCCESS) { /* error occurred */
-                free(array);
-                return rtn;
-            }
-
             if (count == 0) { /* no valid element found */
                 free(array);
-                FREE_JSON2PB_EXCEPTION(rtn);
-                JSON2PB_THROW_EXCEPTION(JSON2PB_EMPTY_ARRAY);
+                return JSON2PB_NO_VALID_FOUND;
             }
 
             int32_t** field_ptr = (int32_t**)((void*)msg + field_desc->offset);
             *field_ptr          = (int32_t*)calloc(count, sizeof(int32_t));
             if (NULL == (*field_ptr)) {
-                free(array);
-                JSON2PB_THROW_EXCEPTION(JSON2PB_MEM_ALLOC_FAILED);
+                exit(EXIT_FAILURE);
             }
 
             memcpy((*field_ptr), array, count * sizeof(int32_t));
             *(size_t*)((void*)msg + field_desc->quantifier_offset) = count;
 
             free(array);
-            JSON2PB_THROW_EXCEPTION(JSON2PB_SUCCESS);
+            return JSON2PB_SUCCESS;
         } else {
             return JSON2PB_EMPTY_ARRAY;
         }
