@@ -40,14 +40,14 @@ const j2p_expt_msg j2p_expt_msg_list[] = {
     {JSON2PB_OS_GENERAL,               "general error in operating system"                     },
 };
 
-static j2p_expt* __cvt_int32_t__(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
-static j2p_expt* __cvt_int64_t__(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
-static j2p_expt* __cvt_uint32_t__(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
-static j2p_expt* __cvt_uint64_t__(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
-static j2p_expt* __cvt_float__(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
-static j2p_expt* __cvt_double__(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
-static j2p_expt* __cvt_string__(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
-static j2p_expt* __cvt_bool__(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc, const string_bool_convertor bool_cvt);
+static j2p_expt* cvt_int32_t(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
+static j2p_expt* cvt_int64_t(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
+static j2p_expt* cvt_uint32_t(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
+static j2p_expt* cvt_uint64_t(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
+static j2p_expt* cvt_float(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
+static j2p_expt* cvt_double(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
+static j2p_expt* cvt_string(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
+static j2p_expt* cvt_bool(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc, const string_bool_convertor bool_cvt);
 
 j2p_expt*
 cvt_cjson_2_proto_c_field(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const char* restrict field_name, const string_bool_convertor bool_cvt)
@@ -80,29 +80,29 @@ cvt_cjson_2_proto_c_field(const cJSON* restrict root, ProtobufCMessage* restrict
     case PROTOBUF_C_TYPE_INT32:
     case PROTOBUF_C_TYPE_SINT32:
     case PROTOBUF_C_TYPE_SFIXED32:
-        rtn = __cvt_int32_t__(root, msg, item, field_desc);
+        rtn = cvt_int32_t(root, msg, item, field_desc);
         break;
     case PROTOBUF_C_TYPE_INT64:
     case PROTOBUF_C_TYPE_SINT64:
     case PROTOBUF_C_TYPE_SFIXED64:
-        rtn = __cvt_int64_t__(root, msg, item, field_desc);
+        rtn = cvt_int64_t(root, msg, item, field_desc);
         break;
     case PROTOBUF_C_TYPE_UINT32:
     case PROTOBUF_C_TYPE_FIXED32:
-        rtn = __cvt_uint32_t__(root, msg, item, field_desc);
+        rtn = cvt_uint32_t(root, msg, item, field_desc);
         break;
     case PROTOBUF_C_TYPE_UINT64:
     case PROTOBUF_C_TYPE_FIXED64:
-        rtn = __cvt_uint64_t__(root, msg, item, field_desc);
+        rtn = cvt_uint64_t(root, msg, item, field_desc);
         break;
     case PROTOBUF_C_TYPE_FLOAT:
-        rtn = __cvt_float__(root, msg, item, field_desc);
+        rtn = cvt_float(root, msg, item, field_desc);
         break;
     case PROTOBUF_C_TYPE_DOUBLE:
-        rtn = __cvt_double__(root, msg, item, field_desc);
+        rtn = cvt_double(root, msg, item, field_desc);
         break;
     case PROTOBUF_C_TYPE_STRING:
-        rtn = __cvt_string__(root, msg, item, field_desc);
+        rtn = cvt_string(root, msg, item, field_desc);
         break;
     case PROTOBUF_C_TYPE_MESSAGE:
 #if 0    
@@ -110,7 +110,7 @@ cvt_cjson_2_proto_c_field(const cJSON* restrict root, ProtobufCMessage* restrict
 #endif
         break;
     case PROTOBUF_C_TYPE_BOOL:
-        rtn = __cvt_bool__(root, msg, item, field_desc, bool_cvt);
+        rtn = cvt_bool(root, msg, item, field_desc, bool_cvt);
         break;
     case PROTOBUF_C_TYPE_BYTES:
 #if 0    
@@ -162,7 +162,7 @@ free_json2pb_exception(j2p_expt* e)
 }
 
 static j2p_expt*
-__cvt_int32_t__(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc)
+cvt_int32_t(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc)
 {
     assert(msg != NULL);
     assert(field_desc != NULL);
@@ -250,7 +250,7 @@ __cvt_int32_t__(const cJSON* restrict root, ProtobufCMessage* restrict msg, cons
 }
 
 static j2p_expt*
-__cvt_int64_t__(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc)
+cvt_int64_t(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc)
 {
     assert(msg != NULL);
     assert(field_desc != NULL);
@@ -338,7 +338,7 @@ __cvt_int64_t__(const cJSON* restrict root, ProtobufCMessage* restrict msg, cons
 }
 
 static j2p_expt*
-__cvt_uint32_t__(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc)
+cvt_uint32_t(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc)
 {
     assert(msg != NULL);
     assert(field_desc != NULL);
@@ -426,7 +426,7 @@ __cvt_uint32_t__(const cJSON* restrict root, ProtobufCMessage* restrict msg, con
 }
 
 static j2p_expt*
-__cvt_uint64_t__(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc)
+cvt_uint64_t(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc)
 {
     assert(msg != NULL);
     assert(field_desc != NULL);
@@ -514,7 +514,7 @@ __cvt_uint64_t__(const cJSON* restrict root, ProtobufCMessage* restrict msg, con
 }
 
 static j2p_expt*
-__cvt_float__(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc)
+cvt_float(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc)
 {
     assert(msg != NULL);
     assert(field_desc != NULL);
@@ -602,7 +602,7 @@ __cvt_float__(const cJSON* restrict root, ProtobufCMessage* restrict msg, const 
 }
 
 static j2p_expt*
-__cvt_double__(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc)
+cvt_double(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc)
 {
     assert(msg != NULL);
     assert(field_desc != NULL);
@@ -690,7 +690,7 @@ __cvt_double__(const cJSON* restrict root, ProtobufCMessage* restrict msg, const
 }
 
 static j2p_expt*
-__cvt_string__(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc)
+cvt_string(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc)
 {
     assert(msg != NULL);
     assert(field_desc != NULL);
@@ -781,7 +781,7 @@ __cvt_string__(const cJSON* restrict root, ProtobufCMessage* restrict msg, const
 }
 
 static j2p_expt*
-__cvt_bool__(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc, const string_bool_convertor bool_cvt)
+cvt_bool(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc, const string_bool_convertor bool_cvt)
 {
     assert(msg != NULL);
     assert(field_desc != NULL);
