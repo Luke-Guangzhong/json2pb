@@ -1,76 +1,81 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.18)
+cmake_minimum_required(VERSION 3.18)
 
-PROJECT(
+project(
     json2pb-convertor
     VERSION 0.0.1
     LANGUAGES C)
 
-SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-SET(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
-ADD_COMPILE_OPTIONS(-std=gnu17)
-ADD_COMPILE_DEFINITIONS(_GNU_SOURCE)
+add_compile_options(-std=gnu17)
+add_compile_definitions(_GNU_SOURCE)
 
-IF(APPLE)
-    INCLUDE_DIRECTORIES(/usr/local/include)
-    LINK_DIRECTORIES(/usr/local/lib)
-    MESSAGE(STATUS "Detected macOS, added /usr/local/include to include path.")
-ENDIF()
+if(APPLE)
+    include_directories(/usr/local/include)
+    link_directories(/usr/local/lib)
+    message(STATUS "Detected macOS, added /usr/local/include to include path.")
+endif()
 
-MESSAGE(VERBOSE "PROJECT_SOURCE_DIR:        " ${PROJECT_SOURCE_DIR})
-MESSAGE(VERBOSE "CMAKE_CURRENT_BINARY_DIR:  " ${CMAKE_CURRENT_BINARY_DIR})
-MESSAGE(VERBOSE "CMAKE_BINARY_DIR:          " ${CMAKE_BINARY_DIR})
-MESSAGE(VERBOSE "CMAKE_CURRENT_SOURCE_DIR:  " ${CMAKE_CURRENT_SOURCE_DIR})
-MESSAGE(VERBOSE "CMAKE_SOURCE_DIR:          " ${CMAKE_SOURCE_DIR})
+message(VERBOSE "PROJECT_SOURCE_DIR:        " ${PROJECT_SOURCE_DIR})
+message(VERBOSE "CMAKE_CURRENT_BINARY_DIR:  " ${CMAKE_CURRENT_BINARY_DIR})
+message(VERBOSE "CMAKE_BINARY_DIR:          " ${CMAKE_BINARY_DIR})
+message(VERBOSE "CMAKE_CURRENT_SOURCE_DIR:  " ${CMAKE_CURRENT_SOURCE_DIR})
+message(VERBOSE "CMAKE_SOURCE_DIR:          " ${CMAKE_SOURCE_DIR})
 
-OPTION(ENABLE_TEST "Build Test" OFF)
-OPTION(DEBUG_BUT_NOT_ASSERT "Enable debug but not assert" OFF)
+option(ENABLE_TEST "Build Test" OFF)
+option(DEBUG_BUT_NOT_ASSERT "Enable debug but not assert" OFF)
 
-INCLUDE(ExternalProject)
+include(ExternalProject)
 
-EXTERNALPROJECT_ADD(
-    libcjson
+externalproject_add(
+    external-cjson
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/third-party/cJSON
     GIT_REPOSITORY git@gitee.com:third_party_2/cJSON.git
     GIT_TAG v1.7.18
-    CMAKE_ARGS +=
-               -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}
-               -DENABLE_CJSON_TEST=On
-               -DBUILD_SHARED_AND_STATIC_LIBS=On
-               -DENABLE_CJSON_UTILS=On)
-ADD_LIBRARY(libcJSON STATIC IMPORTED)
-ADD_DEPENDENCIES(libcJSON cJSON)
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}
+               -DENABLE_CJSON_TEST=ON
+               -DBUILD_SHARED_AND_STATIC_LIBS=ON
+               -DENABLE_CJSON_UTILS=ON)
+add_library(libcJSON STATIC IMPORTED)
+set_target_properties(libcJSON PROPERTIES IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/lib/libcjson.a)
+add_dependencies(libcJSON external-cjson)
+add_library(libcJSON_utils STATIC IMPORTED)
+set_target_properties(libcJSON_utils PROPERTIES IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/lib/libcjson_utils.a)
+add_dependencies(libcJSON_utils external-cjson)
 
-EXTERNALPROJECT_ADD(
-    libtrower-base64-local
+externalproject_add(
+    external-trower-base64
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/third-party/trower-base64
     GIT_REPOSITORY git@gitee.com:third_party_2/trower-base64.git
     GIT_TAG "v1.2.0"
     CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR} -DBUILD_TESTING=OFF)
-ADD_LIBRARY(libtrower-base64 STATIC IMPORTED)
-ADD_DEPENDENCIES(libtrower-base64 libtrower-base64-local)
+add_library(libtrower-base64 SHARED IMPORTED)
+set_target_properties(libtrower-base64 PROPERTIES IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/lib/libtrower-base64.so)
+add_dependencies(libtrower-base64 libtrower-base64-local)
 
-AUX_SOURCE_DIRECTORY(src LIB_SRC_LIST)
+aux_source_directory(src LIB_SRC_LIST)
 
-ADD_LIBRARY(SHARED_LIBRARY SHARED ${LIB_SRC_LIST})
-SET_TARGET_PROPERTIES(
+add_library(SHARED_LIBRARY SHARED ${LIB_SRC_LIST})
+set_target_properties(
     SHARED_LIBRARY
     PROPERTIES POSITION_INDEPENDENT_CODE ON
                OUTPUT_NAME "json2pb"
-               VERSION ${PROJECT_VERSION})
-TARGET_INCLUDE_DIRECTORIES(SHARED_LIBRARY PUBLIC include ${CMAKE_CURRENT_BINARY_DIR}/include)
-TARGET_LINK_DIRECTORIES(SHARED_LIBRARY PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/lib)
-TARGET_LINK_LIBRARIES(
+               VERSION ${PROJECT_VERSION}
+               PUBLIC_HEADER include/json2pb.h)
+target_include_directories(SHARED_LIBRARY PUBLIC include ${CMAKE_CURRENT_BINARY_DIR}/include)
+target_link_directories(SHARED_LIBRARY PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/lib)
+target_link_libraries(
     SHARED_LIBRARY
     protobuf
     protobuf-c
-    cjson
-    trower-base64
-    cjson_utils)
-IF(DEBUG_BUT_NOT_ASSERT)
-    TARGET_COMPILE_DEFINITIONS(SHARED_LIBRARY PUBLIC REMOVE_ASSERT)
-ENDIF()
+    libcJSON
+    libtrower-base64
+    libcJSON_utils)
+if(DEBUG_BUT_NOT_ASSERT)
+    target_compile_definitions(SHARED_LIBRARY PUBLIC REMOVE_ASSERT)
+endif()
 
-IF(ENABLE_TEST)
-    ADD_SUBDIRECTORY(test)
-ENDIF()
+if(ENABLE_TEST)
+    add_subdirectory(test)
+endif()
