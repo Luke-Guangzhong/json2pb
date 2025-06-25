@@ -9,17 +9,20 @@ message(VERBOSE "CMAKE_SOURCE_DIR:          " ${CMAKE_SOURCE_DIR})
 include(ExternalProject)
 
 externalproject_add(
-    cimplog
+    external-cimplog
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/third-party/cimplog
     GIT_REPOSITORY git@gitee.com:third_party_2/cimplog.git
     GIT_TAG "1.0.1"
     CMAKE_ARGS +=
                -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}
                -DBUILD_TESTING=OFF
-               -DLEVEL_DEFAULT=2)
+               -DLEVEL_DEFAULT=2
+               UPDATE_COMMAND ""
+    BUILD_ALWAYS OFF
+    EXCLUDE_FROM_ALL TRUE)
 add_library(libcimplog STATIC IMPORTED)
 set_target_properties(libcimplog PROPERTIES IMPORTED_LOCATION "${CMAKE_CURRENT_BINARY_DIR}/lib/libcimplog.a")
-add_dependencies(libcimplog cimplog)
+add_dependencies(libcimplog external-cimplog)
 
 set(PROTOC_C_EXECUTABLE protoc-c)
 
@@ -70,7 +73,5 @@ target_link_directories(
     PUBLIC
     ${CMAKE_CURRENT_BINARY_DIR}/lib
     ${LIBRARY_OUTPUT_PATH})
-target_link_libraries(TEST_EXE SHARED_LIBRARY libcimplog.a)
-if(DEBUG_BUT_NOT_ASSERT)
-    target_compile_definitions(SHARED_LIBRARY PUBLIC REMOVE_ASSERT)
-endif()
+target_link_libraries(TEST_EXE libjson2pb libcimplog.a)
+

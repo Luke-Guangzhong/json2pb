@@ -39,7 +39,7 @@ struct binary_data {
 #define LOG_COLOR_RED    "\033[31m"
 #define LOG_COLOR_NONE   "\033[0m"
 
-#define MODULE_NAME "BLANK"
+#define MODULE_NAME "JSON2PB-EXAMPLE"
 
 #ifdef NDEBUG /* set 1 before release */
 #define DEBUG

@@ -10,11 +10,14 @@
  */
 #include <stdbool.h>
 
+#include "cjson/cJSON.h"
+#include "cjson/cJSON_Utils.h"
+
 #include "common.h"
 #include "device.pb-c.h"
 #include "json2pb.h"
 
-static const char* json_str = "{\"parts_supplier\":[\"64777de20580\",\"John\"]}";
+static const char* json_str = "{\"signal_strength\":[{},\"test\",null]}";
 
 int
 main()
@@ -28,14 +31,9 @@ main()
 
     device__init(device);
 
-    j2p_expt* e = cvt_cjson_2_proto_c_field(root, (ProtobufCMessage*)device, cJSON_GetObjectItem(root, "parts_supplier"), "parts_supplier", NULL);
-    if (e != NULL) {
-        if (e->msg->type != JSON2PB_SUCCESS) {
-            ERROR("convert failed (%s)\n\tconverting json path \"%s\"\n", e->msg->desc, e->where);
-        }
-        FREE_JSON2PB_EXCEPTION(e);
-    } else {
-        exit(EXIT_FAILURE);
+    j2p_expt_t e = cvt_cjson_2_proto_c_field(root, (ProtobufCMessage*)device, cJSON_GetObjectItem(root, "signal_strength"), "signal_strength", NULL, NULL);
+    if (e != JSON2PB_SUCCESS) {
+        ERROR("convert failed (%s)\n\tconverting json path \"%s\"\n", j2p_expt_msg_list[e].desc, "signal_strength");
     }
 
     size_t sizeOne = device__get_packed_size(device);
