@@ -50,4 +50,9 @@ typedef bool (*string_bool_convertor)(const char* const str);
 
 typedef int (*string_enum_convertor)(const char* const str);
 
-j2p_expt_t cvt_cjson_2_proto_c_field(const cJSON* restrict root, ProtobufCMessage* const msg, const cJSON* restrict item, const char* const field_name, const string_bool_convertor bool_cvt, const string_enum_convertor enum_cvt);
+j2p_expt_t cvt_cjson_2_proto_c_field(const cJSON* restrict root,
+                                     ProtobufCMessage* const msg,
+                                     const cJSON* restrict item,
+                                     const char* const           field_name,
+                                     const string_bool_convertor bool_cvt,
+                                     const string_enum_convertor enum_cvt);

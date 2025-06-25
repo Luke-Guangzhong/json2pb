@@ -100,3 +100,8 @@ target_link_libraries(
 if(ENABLE_EXAMPLE)
     add_subdirectory(example)
 endif()
+
+IF(ENABLE_TEST)
+    enable_testing()
+    add_subdirectory(test)
+ENDIF()

@@ -41,17 +41,22 @@ const j2p_expt_msg j2p_expt_msg_list[] = {
     {JSON2PB_OS_GENERAL,               "general error in operating system"                     },
 };
 
-static j2p_expt_t cvt_int32_t(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
-static j2p_expt_t cvt_int64_t(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
-static j2p_expt_t cvt_uint32_t(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
-static j2p_expt_t cvt_uint64_t(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
-static j2p_expt_t cvt_float(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
-static j2p_expt_t cvt_double(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
-static j2p_expt_t cvt_string(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc);
-static j2p_expt_t cvt_bool(const cJSON* restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc, const string_bool_convertor bool_cvt);
+static j2p_expt_t cvt_int32_t(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
+static j2p_expt_t cvt_int64_t(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
+static j2p_expt_t cvt_uint32_t(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
+static j2p_expt_t cvt_uint64_t(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
+static j2p_expt_t cvt_float(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
+static j2p_expt_t cvt_double(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
+static j2p_expt_t cvt_string(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
+static j2p_expt_t cvt_bool(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, const string_bool_convertor bool_cvt);
 
 j2p_expt_t
-cvt_cjson_2_proto_c_field(const cJSON* restrict root, ProtobufCMessage* const msg, const cJSON* restrict item, const char* const field_name, const string_bool_convertor bool_cvt, const string_enum_convertor enum_cvt)
+cvt_cjson_2_proto_c_field(const cJSON*                root,
+                          ProtobufCMessage* const     msg,
+                          const cJSON*                item,
+                          const char* const           field_name,
+                          const string_bool_convertor bool_cvt,
+                          const string_enum_convertor enum_cvt)
 {
     assert(root != NULL);
     assert(msg != NULL);
@@ -118,7 +123,8 @@ cvt_cjson_2_proto_c_field(const cJSON* restrict root, ProtobufCMessage* const ms
         // rtn = __cvt_enum__(msg, field_desc, root, string_enum);
         break;
     default:
-        // printf("field %s cannot processed in json for now\n", field_desc->name);
+        // printf("field %s cannot processed in json for now\n",
+        // field_desc->name);
         break;
     }
 
@@ -126,13 +132,18 @@ cvt_cjson_2_proto_c_field(const cJSON* restrict root, ProtobufCMessage* const ms
 }
 
 static j2p_expt_t
-cvt_int32_t(const cJSON* const restrict root, ProtobufCMessage* restrict msg, const cJSON* restrict item, const ProtobufCFieldDescriptor* restrict field_desc)
+cvt_int32_t(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc)
 {
     assert(msg != NULL);
     assert(field_desc != NULL);
     assert(item != NULL);
     assert(msg->descriptor != NULL);
     assert(field_desc->type == PROTOBUF_C_TYPE_INT32 || field_desc->type == PROTOBUF_C_TYPE_SINT32 || field_desc->type == PROTOBUF_C_TYPE_SFIXED32);
+
+    if (NULL == msg || NULL == field_desc || NULL == item || NULL == msg->descriptor ||
+        !(field_desc->type != PROTOBUF_C_TYPE_INT32 || field_desc->type != PROTOBUF_C_TYPE_SINT32 || field_desc->type != PROTOBUF_C_TYPE_SFIXED32)) {
+        return JSON2PB_INVALID_ARG;
+    }
 
     const bool is_repeated   = (field_desc->label == PROTOBUF_C_LABEL_REPEATED);
     const bool is_oneof      = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_ONEOF);

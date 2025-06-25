@@ -1,4 +1,4 @@
----
+Language: Cpp
 IndentWidth: 4
 AlignConsecutiveAssignments:
   Enabled: true
@@ -22,9 +22,7 @@ AlignEscapedNewlines: Left
 AlignTrailingComments:
   Kind: Always
 AlignArrayOfStructures: Left
-ColumnLimit: 240
----
-Language: Cpp
+ColumnLimit: 180
 DerivePointerAlignment: false
 PointerAlignment: Left
 BreakBeforeBraces: Linux
@@ -32,14 +30,4 @@ SeparateDefinitionBlocks: Always
 AllowShortEnumsOnASingleLine: false
 AlwaysBreakAfterReturnType: TopLevelDefinitions
 BinPackParameters: false
----
-Language: JavaScript
-BasedOnStyle: LLVM
-ColumnLimit: 100
----
-Language: Proto
-BasedOnStyle: Google
----
-Language: CSharp
-BasedOnStyle: LLVM
-ColumnLimit: 100
+AllowAllParametersOfDeclarationOnNextLine: false
