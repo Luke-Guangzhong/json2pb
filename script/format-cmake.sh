@@ -4,8 +4,8 @@ set -euo pipefail
 IFS=$'\n\t'
 
 # === 配置部分 ===
-WORK_DIR="/home/luke/Projects/json-pb-convertor"
-IGNORE_LIST=("build" "bin" "doc" ".vscode" "script" "template" "tmp")  # 只忽略 WORK_DIR/下的一级目录
+WORK_DIR="/Users/luguangzhong/Project/json2pb"
+IGNORE_LIST=("build" "bin" "doc" ".vscode" "script" "template" "tmp" "cmake-build-debug")  # 只忽略 WORK_DIR/下的一级目录
 
 # === 工作开始 ===
 cd "$WORK_DIR" || {
