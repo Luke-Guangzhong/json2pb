@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+message TestMessage {
+    int32            f_int32            = 1;
+    sint32           f_sint32           = 2;
+    fixed32          f_fixed32          = 3;
+    repeated int32   f_repeated_int32   = 4;
+    repeated sint32  f_repeated_sint32  = 5;
+    repeated fixed32 f_repeated_fixed32 = 6;
+}

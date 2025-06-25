@@ -15,29 +15,35 @@
 #include <stdbool.h>
 
 typedef enum json2pb_exception_type {
-    JSON2PB_SUCCESS = 0,
+    J2P_EXPT_SUCCESS = 0,
 
-    JSON2PB_NULL_VALUE,
-    JSON2PB_VALUE_OVERFLOW,
-    JSON2PB_UNACCEPTABLE_JSON_TYPE,
-    JSON2PB_INVALID_NUMBER_STRING,
-    JSON2PB_EMPTY_ARRAY,
-    JSON2PB_NO_VALID_FOUND,
-    JSON2PB_JSON_GENERAL,
+    J2P_EXPT_NULL_VALUE,
+    J2P_EXPT_VALUE_OVERFLOW,
+    J2P_EXPT_UNACCEPTABLE_JSON_TYPE,
+    J2P_EXPT_INVALID_NUMBER_STRING,
+    J2P_EXPT_EMPTY_ARRAY,
+    J2P_EXPT_NO_VALID_FOUND,
+    J2P_EXPT_JSON_GENERAL,
 
-    JSON2PB_UNINITIALIZED,
-    JSON2PB_FIELD_NOT_FOUND,
-    JSON2PB_FIELD_IS_DEPRECATED,
-    JSON2PB_ONEOF_ALREADY_SET,
-    JSON2PB_PB_GENERAL,
+    J2P_EXPT_UNINITIALIZED,
+    J2P_EXPT_FIELD_NOT_FOUND,
+    J2P_EXPT_FIELD_IS_DEPRECATED,
+    J2P_EXPT_ONEOF_ALREADY_SET,
+    J2P_EXPT_PB_GENERAL,
 
-    JSON2PB_INVALID_ARG,
-    JSON2PB_INCORRECT_EXCEPTION_TYPE,
-    JSON2PB_CODE_GENERAL,
+    J2P_EXPT_INVALID_ARG,
+    J2P_EXPT_INCORRECT_EXCEPTION_TYPE,
+    J2P_EXPT_CODE_GENERAL,
 
-    JSON2PB_MEM_ALLOC_FAILED,
-    JSON2PB_OS_GENERAL,
+    J2P_EXPT_MEM_ALLOC_FAILED,
+    J2P_EXPT_OS_GENERAL,
 } j2p_expt_t;
+
+typedef enum json2pb_file_code {
+    J2P_FILE_PATH_STR,
+    J2P_FILE_BASE64_STR,
+    J2P_FILE_HEX_STR,
+} j2p_file_t;
 
 typedef struct json2pb_exception_msg {
     const j2p_expt_t type;
@@ -50,9 +56,12 @@ typedef bool (*string_bool_convertor)(const char* const str);
 
 typedef int (*string_enum_convertor)(const char* const str);
 
-j2p_expt_t cvt_cjson_2_proto_c_field(const cJSON* restrict root,
-                                     ProtobufCMessage* const msg,
-                                     const cJSON* restrict item,
-                                     const char* const           field_name,
-                                     const string_bool_convertor bool_cvt,
-                                     const string_enum_convertor enum_cvt);
+j2p_expt_t cvt_json_2_pb_field(const cJSON*                root,
+                               const cJSON*                item,
+                               ProtobufCMessage* const     msg,
+                               const char* const           field_name,
+                               const string_bool_convertor bool_cvt,
+                               const string_enum_convertor enum_cvt,
+                               const j2p_file_t            file_type);
+
+j2p_expt_t cvt_json_2_pb_number(const cJSON* const root, const cJSON* const item, ProtobufCMessage* const msg, const char* const field_name);

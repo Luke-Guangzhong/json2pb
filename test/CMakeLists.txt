@@ -1,7 +1,44 @@
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
-link_libraries(libjson2pb)
+set(PROTOC_C_EXECUTABLE protoc-c)
 
-add_executable(test_cvt_int32_t src/test_cvt_int32_t.c)
+set(PROTO_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/protobuf)
+set(PROTO_OUTPUT_SRC_DIR ${CMAKE_CURRENT_BINARY_DIR}/src)
+set(PROTO_OUTPUT_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/include)
+
+file(MAKE_DIRECTORY ${PROTO_OUTPUT_SRC_DIR})
+file(MAKE_DIRECTORY ${PROTO_OUTPUT_INCLUDE_DIR})
+
+file(GLOB MSG_PROTO_FILES ${PROTO_SRC_DIR}/*.proto)
+
+execute_process(
+    COMMAND protoc-c ${MSG_PROTO_FILES} --c_out=${PROTO_OUTPUT_SRC_DIR} -I ${PROTO_SRC_DIR}
+    WORKING_DIRECTORY ${PROTO_SRC_DIR}
+    RESULT_VARIABLE result
+    OUTPUT_VARIABLE output
+    ERROR_VARIABLE error)
+
+execute_process(
+    COMMAND protoc ${MSG_PROTO_FILES} --python_out=${PROJECT_SOURCE_DIR}/python -I ${PROTO_SRC_DIR}
+    WORKING_DIRECTORY ${PROTO_SRC_DIR}
+    RESULT_VARIABLE result
+    OUTPUT_VARIABLE output
+    ERROR_VARIABLE error)
+
+file(GLOB PROTO_H_FILES ${PROTO_OUTPUT_SRC_DIR}/*.pb-c.h)
+
+execute_process(
+    COMMAND mv ${PROTO_H_FILES} ${PROTO_OUTPUT_INCLUDE_DIR}
+    WORKING_DIRECTORY ${PROTO_OUTPUT_SRC_DIR}
+    RESULT_VARIABLE result
+    OUTPUT_VARIABLE output
+    ERROR_VARIABLE error)
+
+link_libraries(libjson2pb cunit)
+
+include_directories(${PROTO_OUTPUT_INCLUDE_DIR})
+aux_source_directory(${PROTO_OUTPUT_SRC_DIR} PROTOBUF_SOURCES)
+
+add_executable(test_cvt_int32_t src/test_cvt_int32_t.c ${PROTOBUF_SOURCES})
 
 add_test(NAME foo_tests COMMAND test_cvt_int32_t)

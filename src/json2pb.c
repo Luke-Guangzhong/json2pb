@@ -21,24 +21,24 @@
 #include "json2pb.h"
 
 const j2p_expt_msg j2p_expt_msg_list[] = {
-    {JSON2PB_SUCCESS,                  "success"                                               },
-    {JSON2PB_NULL_VALUE,               "null value in json"                                    },
-    {JSON2PB_VALUE_OVERFLOW,           "json value overflow"                                   },
-    {JSON2PB_UNACCEPTABLE_JSON_TYPE,   "unacceptable json type"                                },
-    {JSON2PB_INVALID_NUMBER_STRING,    "invalid number string"                                 },
-    {JSON2PB_EMPTY_ARRAY,              "empty array in json"                                   },
-    {JSON2PB_NO_VALID_FOUND,           "all element in array are not valid for this field"     },
-    {JSON2PB_JSON_GENERAL,             "general error in json"                                 },
-    {JSON2PB_UNINITIALIZED,            "protobuf message not initialized"                      },
-    {JSON2PB_FIELD_NOT_FOUND,          "specified field not found in protobuf message"         },
-    {JSON2PB_FIELD_IS_DEPRECATED,      "specified field already deprecated in protobuf message"},
-    {JSON2PB_ONEOF_ALREADY_SET,        "field with oneof already set in protobuf message"      },
-    {JSON2PB_PB_GENERAL,               "general error in protobuf message"                     },
-    {JSON2PB_INVALID_ARG,              "pass invalid argument to function"                     },
-    {JSON2PB_INCORRECT_EXCEPTION_TYPE, "throw an unknown exception type or this one"           },
-    {JSON2PB_CODE_GENERAL,             "general error in coding"                               },
-    {JSON2PB_MEM_ALLOC_FAILED,         "memory allocation failed"                              },
-    {JSON2PB_OS_GENERAL,               "general error in operating system"                     },
+    {J2P_EXPT_SUCCESS,                  "success"                                               },
+    {J2P_EXPT_NULL_VALUE,               "null value in json"                                    },
+    {J2P_EXPT_VALUE_OVERFLOW,           "json value overflow"                                   },
+    {J2P_EXPT_UNACCEPTABLE_JSON_TYPE,   "unacceptable json type"                                },
+    {J2P_EXPT_INVALID_NUMBER_STRING,    "invalid number string"                                 },
+    {J2P_EXPT_EMPTY_ARRAY,              "empty array in json"                                   },
+    {J2P_EXPT_NO_VALID_FOUND,           "all element in array are not valid for this field"     },
+    {J2P_EXPT_JSON_GENERAL,             "general error in json"                                 },
+    {J2P_EXPT_UNINITIALIZED,            "protobuf message not initialized"                      },
+    {J2P_EXPT_FIELD_NOT_FOUND,          "specified field not found in protobuf message"         },
+    {J2P_EXPT_FIELD_IS_DEPRECATED,      "specified field already deprecated in protobuf message"},
+    {J2P_EXPT_ONEOF_ALREADY_SET,        "field with oneof already set in protobuf message"      },
+    {J2P_EXPT_PB_GENERAL,               "general error in protobuf message"                     },
+    {J2P_EXPT_INVALID_ARG,              "pass invalid argument to function"                     },
+    {J2P_EXPT_INCORRECT_EXCEPTION_TYPE, "throw an unknown exception type or this one"           },
+    {J2P_EXPT_CODE_GENERAL,             "general error in coding"                               },
+    {J2P_EXPT_MEM_ALLOC_FAILED,         "memory allocation failed"                              },
+    {J2P_EXPT_OS_GENERAL,               "general error in operating system"                     },
 };
 
 static j2p_expt_t cvt_int32_t(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
@@ -51,12 +51,13 @@ static j2p_expt_t cvt_string(const cJSON* root, ProtobufCMessage* msg, const cJS
 static j2p_expt_t cvt_bool(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, const string_bool_convertor bool_cvt);
 
 j2p_expt_t
-cvt_cjson_2_proto_c_field(const cJSON*                root,
-                          ProtobufCMessage* const     msg,
-                          const cJSON*                item,
-                          const char* const           field_name,
-                          const string_bool_convertor bool_cvt,
-                          const string_enum_convertor enum_cvt)
+cvt_json_2_pb_field(const cJSON*                root,
+                    const cJSON*                item,
+                    ProtobufCMessage* const     msg,
+                    const char* const           field_name,
+                    const string_bool_convertor bool_cvt,
+                    const string_enum_convertor enum_cvt,
+                    const j2p_file_t            file_type)
 {
     assert(root != NULL);
     assert(msg != NULL);
@@ -64,23 +65,23 @@ cvt_cjson_2_proto_c_field(const cJSON*                root,
     assert(field_name != NULL);
 
     if (NULL == root || NULL == msg || NULL == item || NULL == field_name) {
-        return JSON2PB_INVALID_ARG;
+        return J2P_EXPT_INVALID_ARG;
     }
 
     if (NULL == msg->descriptor) {
-        return JSON2PB_UNINITIALIZED;
+        return J2P_EXPT_UNINITIALIZED;
     }
 
     if (cJSON_IsNull(item)) {
-        return JSON2PB_NULL_VALUE;
+        return J2P_EXPT_NULL_VALUE;
     }
 
     const ProtobufCFieldDescriptor* field_desc = protobuf_c_message_descriptor_get_field_by_name(msg->descriptor, field_name);
     if (NULL == field_desc) {
-        return JSON2PB_FIELD_NOT_FOUND;
+        return J2P_EXPT_FIELD_NOT_FOUND;
     }
 
-    j2p_expt_t rtn = JSON2PB_SUCCESS;
+    j2p_expt_t rtn = J2P_EXPT_SUCCESS;
 
     switch (field_desc->type) {
     case PROTOBUF_C_TYPE_INT32:
@@ -142,7 +143,7 @@ cvt_int32_t(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, c
 
     if (NULL == msg || NULL == field_desc || NULL == item || NULL == msg->descriptor ||
         !(field_desc->type != PROTOBUF_C_TYPE_INT32 || field_desc->type != PROTOBUF_C_TYPE_SINT32 || field_desc->type != PROTOBUF_C_TYPE_SFIXED32)) {
-        return JSON2PB_INVALID_ARG;
+        return J2P_EXPT_INVALID_ARG;
     }
 
     const bool is_repeated   = (field_desc->label == PROTOBUF_C_LABEL_REPEATED);
@@ -150,19 +151,19 @@ cvt_int32_t(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, c
     const bool is_deprecated = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_DEPRECATED);
 
     if (is_deprecated) {
-        return JSON2PB_FIELD_IS_DEPRECATED;
+        return J2P_EXPT_FIELD_IS_DEPRECATED;
     }
 
     if (is_repeated) {
         if (!cJSON_IsArray(item)) {
-            return JSON2PB_UNACCEPTABLE_JSON_TYPE;
+            return J2P_EXPT_UNACCEPTABLE_JSON_TYPE;
         }
         if (cJSON_GetArraySize(item) > 0) {
             uint64_t       count      = 0;
             const cJSON*   element    = NULL;
             const cJSON*   json_array = item;
             const uint64_t length     = cJSON_GetArraySize(json_array);
-            j2p_expt_t     rtn        = JSON2PB_SUCCESS;
+            j2p_expt_t     rtn        = J2P_EXPT_SUCCESS;
             int32_t* const array      = (int32_t*)calloc(length, sizeof(int32_t));
             if (NULL == array) {
                 exit(EXIT_FAILURE);
@@ -172,7 +173,9 @@ cvt_int32_t(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, c
             {
                 rtn = cvt_single_int32_t(root, element, &array[count]);
                 if (rtn != EXIT_SUCCESS) {
-                    printf("[EXCEPTION]: %s %s\n", cJSONUtils_FindPointerFromObjectTo(root, element), j2p_expt_msg_list[rtn].desc);
+                    char* path = cJSONUtils_FindPointerFromObjectTo(root, element);
+                    printf("[EXCEPTION]: %s %s\n", path, j2p_expt_msg_list[rtn].desc);
+                    free(path);
                 } else {
                     count++;
                 }
@@ -180,7 +183,7 @@ cvt_int32_t(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, c
 
             if (count == 0) { /* no valid element found */
                 free(array);
-                return JSON2PB_NO_VALID_FOUND;
+                return J2P_EXPT_NO_VALID_FOUND;
             }
 
             int32_t** field_ptr = (int32_t**)((void*)msg + field_desc->offset);
@@ -193,14 +196,14 @@ cvt_int32_t(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, c
             *(size_t*)((void*)msg + field_desc->quantifier_offset) = count;
 
             free(array);
-            return JSON2PB_SUCCESS;
+            return J2P_EXPT_SUCCESS;
         } else {
-            return JSON2PB_EMPTY_ARRAY;
+            return J2P_EXPT_EMPTY_ARRAY;
         }
     } else {
         if (is_oneof) {
             if ((*(int32_t*)((void*)msg + field_desc->quantifier_offset)) != 0) {
-                return JSON2PB_ONEOF_ALREADY_SET;
+                return J2P_EXPT_ONEOF_ALREADY_SET;
             } else {
                 (*(int32_t*)((void*)msg + field_desc->quantifier_offset)) = field_desc->id;
             }

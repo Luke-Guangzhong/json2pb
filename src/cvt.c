@@ -27,7 +27,7 @@ cvt_single_int32_t(const cJSON* const root, const cJSON* const item, int32_t* co
     if (cJSON_IsNumber(item)) {
         const double num_value = cJSON_GetNumberValue(item);
         if (isinf(num_value) || isnan(num_value) || num_value < INT32_MIN || num_value > INT32_MAX) {
-            return JSON2PB_VALUE_OVERFLOW;
+            return J2P_EXPT_VALUE_OVERFLOW;
         }
         *field = (int32_t)num_value;
     } else if (NULL != cJSON_GetStringValue(item)) {
@@ -35,16 +35,16 @@ cvt_single_int32_t(const cJSON* const root, const cJSON* const item, int32_t* co
         char*      endptr    = NULL;
         const long num_value = strtol(cJSON_GetStringValue(item), &endptr, 0);
         if (errno != 0 || *endptr != '\0') {
-            return JSON2PB_INVALID_NUMBER_STRING;
+            return J2P_EXPT_INVALID_NUMBER_STRING;
         } else if (num_value < INT32_MIN || num_value > INT32_MAX) {
-            return JSON2PB_VALUE_OVERFLOW;
+            return J2P_EXPT_VALUE_OVERFLOW;
         }
         *field = (int32_t)num_value;
     } else if (cJSON_IsNull(item)) {
-        return JSON2PB_NULL_VALUE;
+        return J2P_EXPT_NULL_VALUE;
     } else {
-        return JSON2PB_UNACCEPTABLE_JSON_TYPE;
+        return J2P_EXPT_UNACCEPTABLE_JSON_TYPE;
     }
 
-    return JSON2PB_SUCCESS;
+    return J2P_EXPT_SUCCESS;
 }

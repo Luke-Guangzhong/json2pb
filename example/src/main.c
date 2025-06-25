@@ -31,8 +31,8 @@ main()
 
     device__init(device);
 
-    j2p_expt_t e = cvt_cjson_2_proto_c_field(root, (ProtobufCMessage*)device, cJSON_GetObjectItem(root, "signal_strength"), "signal_strength", NULL, NULL);
-    if (e != JSON2PB_SUCCESS) {
+    j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "signal_strength"), (ProtobufCMessage*)device, "signal_strength", NULL, NULL, J2P_FILE_PATH_STR);
+    if (e != J2P_EXPT_SUCCESS) {
         ERROR("convert failed (%s)\n\tconverting json path \"%s\"\n", j2p_expt_msg_list[e].desc, "signal_strength");
     }
 
