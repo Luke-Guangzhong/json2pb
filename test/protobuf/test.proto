@@ -7,4 +7,5 @@ message TestMessage {
     repeated int32    f_repeated_int32    = 4;
     repeated sint32   f_repeated_sint32   = 5;
     repeated sfixed32 f_repeated_sfixed32 = 6;
+    int32             deprecated_field    = 7 [deprecated = true];
 }

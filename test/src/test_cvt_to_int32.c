@@ -10,7 +10,7 @@
  */
 #include <errno.h>
 #include <limits.h>
-#include <linux/limits.h>
+// #include <linux/limits.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -54,6 +54,8 @@ void test_cvt_invalid_json_str_to_single_number(void);
 
 void test_cvt_json_array_to_repeated_int32(void);
 void test_cvt_json_array_to_repeated_int32_partly_failed(void);
+void test_cvt_json_array_to_repeated_int32_all_failed(void);
+void test_cvt_json_array_to_repeated_int32_empty(void);
 
 void test_cvt_json_null_to_repeated_int32(void);
 void test_cvt_json_bool_to_repeated_int32(void);
@@ -116,6 +118,8 @@ CU_TestInfo test_int32_invalid_json_type[] = {
 CU_TestInfo test_repeated_int32_conversion[] = {
     {"Convert JSON array to repeated Protobuf int32 field",              test_cvt_json_array_to_repeated_int32              },
     {"Partial failure converting JSON array to repeated Protobuf int32", test_cvt_json_array_to_repeated_int32_partly_failed},
+    {"All failure converting JSON array to repeated Protobuf int32",     test_cvt_json_array_to_repeated_int32_all_failed   },
+    {"Convert Empty JSON array to repeated Protobuf int32",              test_cvt_json_array_to_repeated_int32_empty        },
     CU_TEST_INFO_NULL
 };
 
@@ -492,6 +496,34 @@ test_cvt_json_array_to_repeated_int32_partly_failed(void)
     CU_ASSERT_EQUAL(e, J2P_EXPT_PARTIAL_FAIL);
     CU_ASSERT_EQUAL(msg->n_f_repeated_int32, valid_elem_num);
     CU_ASSERT_EQUAL(memcmp(msg->f_repeated_int32, res_value, valid_elem_num * sizeof(int32_t)), 0);
+}
+
+void
+test_cvt_json_array_to_repeated_int32_all_failed(void)
+{
+    const char* value = "[\"invalid number string\",\"0x80000000\"]";
+
+    cJSON* array_value = cJSON_Parse(value);
+    cJSON_AddItemToObject(root, repeated_int32_field_name, array_value);
+
+    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, repeated_int32_field_name), (ProtobufCMessage*)msg, repeated_int32_field_name);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_NO_VALID_FOUND);
+    CU_ASSERT_EQUAL(msg->n_f_repeated_int32, 0);
+    CU_ASSERT_PTR_NULL(msg->f_repeated_int32);
+}
+
+void
+test_cvt_json_array_to_repeated_int32_empty(void)
+{
+    const char* value = "[]";
+
+    cJSON* array_value = cJSON_Parse(value);
+    cJSON_AddItemToObject(root, repeated_int32_field_name, array_value);
+
+    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, repeated_int32_field_name), (ProtobufCMessage*)msg, repeated_int32_field_name);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_EMPTY_ARRAY);
+    CU_ASSERT_EQUAL(msg->n_f_repeated_int32, 0);
+    CU_ASSERT_PTR_NULL(msg->f_repeated_int32);
 }
 
 void

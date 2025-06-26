@@ -83,6 +83,17 @@ cvt_json_2_pb_field(const cJSON*                root,
         return J2P_EXPT_FIELD_NOT_FOUND;
     }
 
+    const bool is_oneof      = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_ONEOF);
+    const bool is_deprecated = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_DEPRECATED);
+
+    if (is_deprecated) {
+        return J2P_EXPT_FIELD_IS_DEPRECATED;
+    }
+
+    if (is_oneof && *(int32_t*)((void*)msg + field_desc->quantifier_offset) != 0) {
+        return J2P_EXPT_ONEOF_ALREADY_SET;
+    }
+
     j2p_expt_t rtn = J2P_EXPT_SUCCESS;
 
     switch (field_desc->type) {
@@ -94,7 +105,7 @@ cvt_json_2_pb_field(const cJSON*                root,
     case PROTOBUF_C_TYPE_INT64:
     case PROTOBUF_C_TYPE_SINT64:
     case PROTOBUF_C_TYPE_SFIXED64:
-        // rtn = cvt_int64_t(root, msg, item, field_desc);
+        rtn = cvt_int64_t(root, msg, item, field_desc);
         break;
     case PROTOBUF_C_TYPE_UINT32:
     case PROTOBUF_C_TYPE_FIXED32:
@@ -110,20 +121,20 @@ cvt_json_2_pb_field(const cJSON*                root,
     case PROTOBUF_C_TYPE_DOUBLE:
         // rtn = cvt_double(root, msg, item, field_desc);
         break;
+    case PROTOBUF_C_TYPE_BOOL:
+        // rtn = cvt_bool(root, msg, item, field_desc, bool_cvt);
+        break;
+    case PROTOBUF_C_TYPE_ENUM:
+        // rtn = __cvt_enum__(msg, field_desc, root, string_enum);
+        break;
     case PROTOBUF_C_TYPE_STRING:
         // rtn = cvt_string(root, msg, item, field_desc);
         break;
     case PROTOBUF_C_TYPE_MESSAGE:
         // rtn = __cvt_pb_msg__(msg, field_desc, root, msg_convertor);
         break;
-    case PROTOBUF_C_TYPE_BOOL:
-        // rtn = cvt_bool(root, msg, item, field_desc, bool_cvt);
-        break;
     case PROTOBUF_C_TYPE_BYTES:
         // rtn = __cvt_bytes__(msg, field_desc, root, mode);
-        break;
-    case PROTOBUF_C_TYPE_ENUM:
-        // rtn = __cvt_enum__(msg, field_desc, root, string_enum);
         break;
     default:
         // printf("field %s cannot processed in json for now\n",
@@ -148,13 +159,8 @@ cvt_int32_t(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, c
         return J2P_EXPT_INVALID_ARG;
     }
 
-    const bool is_repeated   = (field_desc->label == PROTOBUF_C_LABEL_REPEATED);
-    const bool is_oneof      = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_ONEOF);
-    const bool is_deprecated = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_DEPRECATED);
-
-    if (is_deprecated) {
-        return J2P_EXPT_FIELD_IS_DEPRECATED;
-    }
+    const bool is_repeated = (field_desc->label == PROTOBUF_C_LABEL_REPEATED);
+    const bool is_oneof    = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_ONEOF);
 
     if (is_repeated) {
         if (!cJSON_IsArray(item)) {
@@ -207,11 +213,7 @@ cvt_int32_t(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, c
         }
     } else {
         if (is_oneof) {
-            if ((*(int32_t*)((void*)msg + field_desc->quantifier_offset)) != 0) {
-                return J2P_EXPT_ONEOF_ALREADY_SET;
-            } else {
-                (*(int32_t*)((void*)msg + field_desc->quantifier_offset)) = field_desc->id;
-            }
+            (*(int32_t*)((void*)msg + field_desc->quantifier_offset)) = field_desc->id;
         }
         int32_t* field_ptr = (int32_t*)((void*)msg + field_desc->offset);
         return cvt_single_int32_t(item, field_ptr);
@@ -232,13 +234,8 @@ cvt_int64_t(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, c
         return J2P_EXPT_INVALID_ARG;
     }
 
-    const bool is_repeated   = (field_desc->label == PROTOBUF_C_LABEL_REPEATED);
-    const bool is_oneof      = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_ONEOF);
-    const bool is_deprecated = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_DEPRECATED);
-
-    if (is_deprecated) {
-        return J2P_EXPT_FIELD_IS_DEPRECATED;
-    }
+    const bool is_repeated = (field_desc->label == PROTOBUF_C_LABEL_REPEATED);
+    const bool is_oneof    = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_ONEOF);
 
     if (is_repeated) {
         if (!cJSON_IsArray(item)) {
@@ -250,14 +247,14 @@ cvt_int64_t(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, c
             const cJSON*   json_array = item;
             const uint64_t length     = cJSON_GetArraySize(json_array);
             j2p_expt_t     rtn        = J2P_EXPT_SUCCESS;
-            int32_t* const array      = (int32_t*)calloc(length, sizeof(int32_t));
+            int64_t* const array      = (int64_t*)calloc(length, sizeof(int64_t));
             if (NULL == array) {
                 exit(EXIT_FAILURE);
             }
 
             cJSON_ArrayForEach(element, item)
             {
-                rtn = cvt_single_int32_t(element, &array[count]);
+                rtn = cvt_single_int64_t(element, &array[count]);
                 if (rtn != EXIT_SUCCESS) {
                     char* path = cJSONUtils_FindPointerFromObjectTo(root, element);
                     printf("[EXCEPTION]: %s %s\n", path, j2p_expt_msg_list[rtn].desc);
@@ -272,13 +269,13 @@ cvt_int64_t(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, c
                 return J2P_EXPT_NO_VALID_FOUND;
             }
 
-            int32_t** field_ptr = (int32_t**)((void*)msg + field_desc->offset);
-            *field_ptr          = (int32_t*)calloc(count, sizeof(int32_t));
+            int64_t** field_ptr = (int64_t**)((void*)msg + field_desc->offset);
+            *field_ptr          = (int64_t*)calloc(count, sizeof(int64_t));
             if (NULL == (*field_ptr)) {
                 exit(EXIT_FAILURE);
             }
 
-            memcpy((*field_ptr), array, count * sizeof(int32_t));
+            memcpy((*field_ptr), array, count * sizeof(int64_t));
             *(size_t*)((void*)msg + field_desc->quantifier_offset) = count;
 
             free(array);
@@ -291,13 +288,9 @@ cvt_int64_t(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, c
         }
     } else {
         if (is_oneof) {
-            if ((*(int32_t*)((void*)msg + field_desc->quantifier_offset)) != 0) {
-                return J2P_EXPT_ONEOF_ALREADY_SET;
-            } else {
-                (*(int32_t*)((void*)msg + field_desc->quantifier_offset)) = field_desc->id;
-            }
+            (*(int64_t*)((void*)msg + field_desc->quantifier_offset)) = field_desc->id;
         }
-        int32_t* field_ptr = (int32_t*)((void*)msg + field_desc->offset);
-        return cvt_single_int32_t(item, field_ptr);
+        int64_t* field_ptr = (int64_t*)((void*)msg + field_desc->offset);
+        return cvt_single_int64_t(item, field_ptr);
     }
 }
