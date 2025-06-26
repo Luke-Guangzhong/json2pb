@@ -43,8 +43,8 @@ const j2p_expt_msg j2p_expt_msg_list[] = {
 };
 
 static j2p_expt_t cvt_int32_t(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
+static j2p_expt_t cvt_int64_t(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
 
-// static j2p_expt_t cvt_int64_t(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
 // static j2p_expt_t cvt_uint32_t(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
 // static j2p_expt_t cvt_uint64_t(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
 // static j2p_expt_t cvt_float(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
@@ -145,6 +145,90 @@ cvt_int32_t(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, c
 
     if (NULL == msg || NULL == field_desc || NULL == item || NULL == msg->descriptor ||
         !(field_desc->type != PROTOBUF_C_TYPE_INT32 || field_desc->type != PROTOBUF_C_TYPE_SINT32 || field_desc->type != PROTOBUF_C_TYPE_SFIXED32)) {
+        return J2P_EXPT_INVALID_ARG;
+    }
+
+    const bool is_repeated   = (field_desc->label == PROTOBUF_C_LABEL_REPEATED);
+    const bool is_oneof      = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_ONEOF);
+    const bool is_deprecated = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_DEPRECATED);
+
+    if (is_deprecated) {
+        return J2P_EXPT_FIELD_IS_DEPRECATED;
+    }
+
+    if (is_repeated) {
+        if (!cJSON_IsArray(item)) {
+            return J2P_EXPT_UNACCEPTABLE_JSON_TYPE;
+        }
+        if (cJSON_GetArraySize(item) > 0) {
+            uint64_t       count      = 0;
+            const cJSON*   element    = NULL;
+            const cJSON*   json_array = item;
+            const uint64_t length     = cJSON_GetArraySize(json_array);
+            j2p_expt_t     rtn        = J2P_EXPT_SUCCESS;
+            int32_t* const array      = (int32_t*)calloc(length, sizeof(int32_t));
+            if (NULL == array) {
+                exit(EXIT_FAILURE);
+            }
+
+            cJSON_ArrayForEach(element, item)
+            {
+                rtn = cvt_single_int32_t(element, &array[count]);
+                if (rtn != EXIT_SUCCESS) {
+                    char* path = cJSONUtils_FindPointerFromObjectTo(root, element);
+                    printf("[EXCEPTION]: %s %s\n", path, j2p_expt_msg_list[rtn].desc);
+                    free(path);
+                } else {
+                    count++;
+                }
+            }
+
+            if (count == 0) { /* no valid element found */
+                free(array);
+                return J2P_EXPT_NO_VALID_FOUND;
+            }
+
+            int32_t** field_ptr = (int32_t**)((void*)msg + field_desc->offset);
+            *field_ptr          = (int32_t*)calloc(count, sizeof(int32_t));
+            if (NULL == (*field_ptr)) {
+                exit(EXIT_FAILURE);
+            }
+
+            memcpy((*field_ptr), array, count * sizeof(int32_t));
+            *(size_t*)((void*)msg + field_desc->quantifier_offset) = count;
+
+            free(array);
+            if (count == length)
+                return J2P_EXPT_SUCCESS;
+            else
+                return J2P_EXPT_PARTIAL_FAIL;
+        } else {
+            return J2P_EXPT_EMPTY_ARRAY;
+        }
+    } else {
+        if (is_oneof) {
+            if ((*(int32_t*)((void*)msg + field_desc->quantifier_offset)) != 0) {
+                return J2P_EXPT_ONEOF_ALREADY_SET;
+            } else {
+                (*(int32_t*)((void*)msg + field_desc->quantifier_offset)) = field_desc->id;
+            }
+        }
+        int32_t* field_ptr = (int32_t*)((void*)msg + field_desc->offset);
+        return cvt_single_int32_t(item, field_ptr);
+    }
+}
+
+static j2p_expt_t
+cvt_int64_t(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc)
+{
+    assert(msg != NULL);
+    assert(field_desc != NULL);
+    assert(item != NULL);
+    assert(msg->descriptor != NULL);
+    assert(field_desc->type == PROTOBUF_C_TYPE_INT64 || field_desc->type == PROTOBUF_C_TYPE_SINT64 || field_desc->type == PROTOBUF_C_TYPE_SFIXED64);
+
+    if (NULL == msg || NULL == field_desc || NULL == item || NULL == msg->descriptor ||
+        !(field_desc->type != PROTOBUF_C_TYPE_INT64 || field_desc->type != PROTOBUF_C_TYPE_SINT64 || field_desc->type != PROTOBUF_C_TYPE_SFIXED64)) {
         return J2P_EXPT_INVALID_ARG;
     }
 
