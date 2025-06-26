@@ -8,4 +8,9 @@ message TestMessage {
     repeated sint32   f_repeated_sint32   = 5;
     repeated sfixed32 f_repeated_sfixed32 = 6;
     int32             deprecated_field    = 7 [deprecated = true];
+
+    oneof oneof_field {
+        int32 oneof_int32 = 8;
+        sint32 oneof_sint32 = 9;
+    }
 }

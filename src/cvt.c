@@ -78,3 +78,8 @@ cvt_single_int64_t(const cJSON* const item, int64_t* const field)
 
     return J2P_EXPT_SUCCESS;
 }
+
+j2p_expt_t
+cvt_single_numeric(const cJSON* const item, void* const field, const size_t size)
+{
+}
