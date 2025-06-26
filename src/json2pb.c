@@ -27,6 +27,7 @@ const j2p_expt_msg j2p_expt_msg_list[] = {
     {J2P_EXPT_UNACCEPTABLE_JSON_TYPE,   "unacceptable json type"                                },
     {J2P_EXPT_INVALID_NUMBER_STRING,    "invalid number string"                                 },
     {J2P_EXPT_EMPTY_ARRAY,              "empty array in json"                                   },
+    {J2P_EXPT_PARTIAL_FAIL,             "partial fail when convert json array to repeated field"},
     {J2P_EXPT_NO_VALID_FOUND,           "all element in array are not valid for this field"     },
     {J2P_EXPT_JSON_GENERAL,             "general error in json"                                 },
     {J2P_EXPT_UNINITIALIZED,            "protobuf message not initialized"                      },
@@ -172,7 +173,7 @@ cvt_int32_t(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, c
 
             cJSON_ArrayForEach(element, item)
             {
-                rtn = cvt_single_int32_t(root, element, &array[count]);
+                rtn = cvt_single_int32_t(element, &array[count]);
                 if (rtn != EXIT_SUCCESS) {
                     char* path = cJSONUtils_FindPointerFromObjectTo(root, element);
                     printf("[EXCEPTION]: %s %s\n", path, j2p_expt_msg_list[rtn].desc);
@@ -197,7 +198,10 @@ cvt_int32_t(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, c
             *(size_t*)((void*)msg + field_desc->quantifier_offset) = count;
 
             free(array);
-            return J2P_EXPT_SUCCESS;
+            if (count == length)
+                return J2P_EXPT_SUCCESS;
+            else
+                return J2P_EXPT_PARTIAL_FAIL;
         } else {
             return J2P_EXPT_EMPTY_ARRAY;
         }
@@ -210,6 +214,6 @@ cvt_int32_t(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, c
             }
         }
         int32_t* field_ptr = (int32_t*)((void*)msg + field_desc->offset);
-        return cvt_single_int32_t(root, item, field_ptr);
+        return cvt_single_int32_t(item, field_ptr);
     }
 }

@@ -18,9 +18,8 @@
 #include "json2pb.h"
 
 j2p_expt_t
-cvt_single_int32_t(const cJSON* const root, const cJSON* const item, int32_t* const field)
+cvt_single_int32_t(const cJSON* const item, int32_t* const field)
 {
-    assert(NULL != root);
     assert(NULL != item);
     assert(NULL != field);
 
