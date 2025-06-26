@@ -8,15 +8,18 @@
  * @copyright Copyright (c) 2025
  *
  */
+#include <errno.h>
+#include <limits.h>
+#include <linux/limits.h>
 #include <stdlib.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include <CUnit/Basic.h>
 #include <CUnit/TestDB.h>
 
 #include "json2pb.h"
 #include "test.pb-c.h"
-
-#define PATH_MAX 256
 
 /******************************************************************************/
 /*                                Declarations                                */
@@ -179,7 +182,7 @@ setup_successful_conversion(void)
 
     /* 生成日志文件路径 */
     {
-        char safe_name[PATH_MAX];
+        char safe_name[PATH_MAX - 11] = {};
         sanitize_name(current->pName, safe_name, sizeof(safe_name));
         snprintf(log_path, sizeof(log_path), "log/%s.log", safe_name);
     }
