@@ -10,7 +10,6 @@
  */
 #include <errno.h>
 #include <limits.h>
-// #include <linux/limits.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -20,6 +19,10 @@
 
 #include "json2pb.h"
 #include "test.pb-c.h"
+
+#ifndef PATH_MAX
+#define PATH_MAX 4096
+#endif
 
 /******************************************************************************/
 /*                                Declarations                                */
