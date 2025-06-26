@@ -42,13 +42,14 @@ const j2p_expt_msg j2p_expt_msg_list[] = {
 };
 
 static j2p_expt_t cvt_int32_t(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
-static j2p_expt_t cvt_int64_t(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
-static j2p_expt_t cvt_uint32_t(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
-static j2p_expt_t cvt_uint64_t(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
-static j2p_expt_t cvt_float(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
-static j2p_expt_t cvt_double(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
-static j2p_expt_t cvt_string(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
-static j2p_expt_t cvt_bool(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, const string_bool_convertor bool_cvt);
+
+// static j2p_expt_t cvt_int64_t(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
+// static j2p_expt_t cvt_uint32_t(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
+// static j2p_expt_t cvt_uint64_t(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
+// static j2p_expt_t cvt_float(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
+// static j2p_expt_t cvt_double(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
+// static j2p_expt_t cvt_string(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
+// static j2p_expt_t cvt_bool(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, const string_bool_convertor bool_cvt);
 
 j2p_expt_t
 cvt_json_2_pb_field(const cJSON*                root,

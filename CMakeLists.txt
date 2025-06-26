@@ -41,13 +41,11 @@ externalproject_add(
     UPDATE_COMMAND ""
     BUILD_ALWAYS OFF
     EXCLUDE_FROM_ALL TRUE)
-set(LIBCJSON_FILENAME "libcjson${CMAKE_STATIC_LIBRARY_SUFFIX}")
 add_library(libcJSON STATIC IMPORTED)
-set_target_properties(libcJSON PROPERTIES IMPORTED_LOCATION "${CMAKE_CURRENT_BINARY_DIR}/lib/${LIBCJSON_FILENAME}")
+set_target_properties(libcJSON PROPERTIES IMPORTED_LOCATION "${CMAKE_CURRENT_BINARY_DIR}/lib/libcjson${CMAKE_STATIC_LIBRARY_SUFFIX}")
 add_dependencies(libcJSON external-cjson)
-set(LIBCJSON_UTILS_FILENAME "libcjson_utils${CMAKE_STATIC_LIBRARY_SUFFIX}")
 add_library(libcJSON_utils STATIC IMPORTED)
-set_target_properties(libcJSON_utils PROPERTIES IMPORTED_LOCATION "${CMAKE_CURRENT_BINARY_DIR}/lib/${LIBCJSON_UTILS_FILENAME}")
+set_target_properties(libcJSON_utils PROPERTIES IMPORTED_LOCATION "${CMAKE_CURRENT_BINARY_DIR}/lib/libcjson_utils${CMAKE_STATIC_LIBRARY_SUFFIX}")
 add_dependencies(libcJSON_utils external-cjson)
 
 externalproject_add(
@@ -59,9 +57,8 @@ externalproject_add(
     UPDATE_COMMAND ""
     BUILD_ALWAYS OFF
     EXCLUDE_FROM_ALL TRUE)
-set(LIBTROWER_BASE64_FILENAME "libtrower-base64${CMAKE_SHARED_LIBRARY_SUFFIX}")
 add_library(libtrower-base64_shared SHARED IMPORTED)
-set_target_properties(libtrower-base64_shared PROPERTIES IMPORTED_LOCATION "${CMAKE_CURRENT_BINARY_DIR}/lib/${LIBTROWER_BASE64_FILENAME}")
+set_target_properties(libtrower-base64_shared PROPERTIES IMPORTED_LOCATION "${CMAKE_CURRENT_BINARY_DIR}/lib/libtrower-base64${CMAKE_SHARED_LIBRARY_SUFFIX}")
 add_dependencies(libtrower-base64_shared external-trower-base64)
 
 aux_source_directory(src LIB_SRC_LIST)
