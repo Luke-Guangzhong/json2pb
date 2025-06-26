@@ -182,7 +182,6 @@ setup_successful_conversion(void)
         char safe_name[PATH_MAX];
         sanitize_name(current->pName, safe_name, sizeof(safe_name));
         snprintf(log_path, sizeof(log_path), "log/%s.log", safe_name);
-        printf("Log file: %s\n", log_path);
     }
 
     /* 打开日志文件并重定向 stdout */
