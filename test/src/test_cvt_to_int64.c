@@ -124,7 +124,6 @@ test_cvt_json_decimal_string_to_single_int64(void)
     cJSON_AddStringToObject(root, int64_field_name, value);
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, int64_field_name), (ProtobufCMessage*)msg, int64_field_name);
-    printf("e = %d (%s)\n", e, j2p_expt_msg_list[e].desc);
     CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
     CU_ASSERT_EQUAL(msg->f_int64, 1234567890);
 }
@@ -137,7 +136,6 @@ test_cvt_json_hex_string_to_single_int64(void)
     cJSON_AddStringToObject(root, int64_field_name, value);
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, int64_field_name), (ProtobufCMessage*)msg, int64_field_name);
-    printf("e = %d (%s)\n", e, j2p_expt_msg_list[e].desc);
     CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
     CU_ASSERT_EQUAL(msg->f_int64, 0x4a0);
 }
@@ -164,7 +162,6 @@ test_cvt_json_octal_string_to_single_int64(void)
     cJSON_AddStringToObject(root, int64_field_name, value);
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, int64_field_name), (ProtobufCMessage*)msg, int64_field_name);
-    printf("e = %d (%s)\n", e, j2p_expt_msg_list[e].desc);
     CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
     CU_ASSERT_EQUAL(msg->f_int64, 0110);
 }

@@ -162,7 +162,6 @@ test_reject_uninitialized_msg(void)
     }
 
     cJSON_AddNumberToObject(root, "f_int32", 12345);
-    printf("root:\n%s\n", cJSON_Print(root));
 
     j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "f_int32"), (ProtobufCMessage*)msg, "f_int32", NULL, NULL, J2P_FILE_PATH_STR);
     CU_ASSERT_EQUAL(e, J2P_EXPT_UNINITIALIZED);
@@ -281,7 +280,6 @@ int
 main(int argc, char const* argv[])
 {
     char current_source_file_path[PATH_MAX] = __FILE__;
-    printf("current_source_file_path: %s\n", current_source_file_path);
     init_file_name(__FILE__);
     unsigned  rv    = 1;
     CU_pSuite suite = NULL;
