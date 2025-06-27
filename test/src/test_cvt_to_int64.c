@@ -15,6 +15,8 @@
 #include "test.pb-c.h"
 #include "utils.h"
 
+typedef __int128_t int128_t;
+
 /******************************************************************************/
 /*                                Declarations                                */
 /******************************************************************************/
@@ -69,19 +71,32 @@ const char repeated_sint64_field_name[]   = "f_repeated_sint64";
 const char repeated_sfixed64_field_name[] = "f_repeated_sfixed64";
 
 CU_TestInfo test_int64_conversion[] = {
-    {"Convert JSON number to Protobuf int32 field",             test_cvt_json_number_to_single_int64        },
-    {"Convert JSON decimal string to Protobuf int32 field",     test_cvt_json_decimal_string_to_single_int64},
-    {"Convert JSON hexadecimal string to Protobuf int32 field", test_cvt_json_hex_string_to_single_int64    },
+    {"Convert JSON number to Protobuf int64 field",             test_cvt_json_number_to_single_int64        },
+    {"Convert JSON decimal string to Protobuf int64 field",     test_cvt_json_decimal_string_to_single_int64},
+    {"Convert JSON hexadecimal string to Protobuf int64 field", test_cvt_json_hex_string_to_single_int64    },
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
-    {"Convert JSON binary string to Protobuf int32 field",      test_cvt_json_binary_string_to_single_int64 },
+    {"Convert JSON binary string to Protobuf int64 field",      test_cvt_json_binary_string_to_single_int64 },
 #endif
-    {"Convert JSON octal string to Protobuf int32 field",       test_cvt_json_octal_string_to_single_int64  },
-    {"Convert JSON number to Protobuf oneof int32 field",       test_cvt_json_number_to_oneof_int64         },
+    {"Convert JSON octal string to Protobuf int64 field",       test_cvt_json_octal_string_to_single_int64  },
+    {"Convert JSON number to Protobuf oneof int64 field",       test_cvt_json_number_to_oneof_int64         },
+    CU_TEST_INFO_NULL,
+};
+
+CU_TestInfo test_int64_overflow[] = {
+    {"Reject conversion of JSON number to Protobuf int64 on overflow",  test_cvt_json_number_overflow_int64 },
+    {"Reject conversion of JSON number to Protobuf int64 on underflow", test_cvt_json_number_underflow_int64},
+    {"Reject conversion of JSON string to Protobuf int64 on overflow",  test_cvt_json_str_overflow_int64    },
+    {"Reject conversion of JSON string to Protobuf int64 on underflow", test_cvt_json_str_underflow_int64   },
+    {"Accept conversion of JSON number to Protobuf int64 at EXACT_MAX", test_cvt_json_number_max_int64      },
+    {"Accept conversion of JSON number to Protobuf int64 at EXACT_MIN", test_cvt_json_number_min_int64      },
+    {"Accept conversion of JSON string to Protobuf int64 at INT64_MAX", test_cvt_json_str_max_int64         },
+    {"Accept conversion of JSON string to Protobuf int64 at INT64_MIN", test_cvt_json_str_min_int64         },
     CU_TEST_INFO_NULL,
 };
 
 CU_SuiteInfo suites[] = {
-    {"Convert JSON to Protobuf int64 field", NULL, NULL, setup_successful_conversion, teardown_successful_conversion, test_int64_conversion},
+    {"Convert JSON to Protobuf int64 field",                  NULL, NULL, setup_successful_conversion, teardown_successful_conversion, test_int64_conversion},
+    {"Convert JSON to Protobuf int64 with overflow handling", NULL, NULL, setup_successful_conversion, teardown_successful_conversion, test_int64_overflow  },
     CU_SUITE_INFO_NULL,
 };
 
@@ -109,6 +124,7 @@ test_cvt_json_decimal_string_to_single_int64(void)
     cJSON_AddStringToObject(root, int64_field_name, value);
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, int64_field_name), (ProtobufCMessage*)msg, int64_field_name);
+    printf("e = %d (%s)\n", e, j2p_expt_msg_list[e].desc);
     CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
     CU_ASSERT_EQUAL(msg->f_int64, 1234567890);
 }
@@ -121,6 +137,7 @@ test_cvt_json_hex_string_to_single_int64(void)
     cJSON_AddStringToObject(root, int64_field_name, value);
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, int64_field_name), (ProtobufCMessage*)msg, int64_field_name);
+    printf("e = %d (%s)\n", e, j2p_expt_msg_list[e].desc);
     CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
     CU_ASSERT_EQUAL(msg->f_int64, 0x4a0);
 }
@@ -147,6 +164,7 @@ test_cvt_json_octal_string_to_single_int64(void)
     cJSON_AddStringToObject(root, int64_field_name, value);
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, int64_field_name), (ProtobufCMessage*)msg, int64_field_name);
+    printf("e = %d (%s)\n", e, j2p_expt_msg_list[e].desc);
     CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
     CU_ASSERT_EQUAL(msg->f_int64, 0110);
 }
@@ -163,6 +181,102 @@ test_cvt_json_number_to_oneof_int64(void)
     CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
     CU_ASSERT_EQUAL(msg->oneof_int64, oneof_int64_value);
     CU_ASSERT_EQUAL(msg->test_oneof_case, field_desc->id);
+}
+
+void
+test_cvt_json_number_overflow_int64(void)
+{
+    double value = 0x1.0p64;
+
+    cJSON_AddNumberToObject(root, int64_field_name, value);
+
+    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, int64_field_name), (ProtobufCMessage*)msg, int64_field_name);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_NOT_EXACT_INT64);
+    CU_ASSERT_EQUAL(msg->f_int64, 0);
+}
+
+void
+test_cvt_json_number_underflow_int64(void)
+{
+    double value = -0x1.0p64;
+
+    cJSON_AddNumberToObject(root, int64_field_name, value);
+
+    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, int64_field_name), (ProtobufCMessage*)msg, int64_field_name);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_NOT_EXACT_INT64);
+    CU_ASSERT_EQUAL(msg->f_int64, 0);
+}
+
+void
+test_cvt_json_str_overflow_int64(void)
+{
+    const char* value = "0x8000000000000000";
+
+    cJSON_AddStringToObject(root, int64_field_name, value);
+
+    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, int64_field_name), (ProtobufCMessage*)msg, int64_field_name);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_VALUE_OVERFLOW);
+    CU_ASSERT_EQUAL(msg->f_int64, 0);
+}
+
+void
+test_cvt_json_str_underflow_int64(void)
+{
+    const char* value = "-0x8000000000000001";
+
+    cJSON_AddStringToObject(root, int64_field_name, value);
+
+    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, int64_field_name), (ProtobufCMessage*)msg, int64_field_name);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_VALUE_OVERFLOW);
+    CU_ASSERT_EQUAL(msg->f_int64, 0);
+}
+
+void
+test_cvt_json_number_max_int64(void)
+{
+    double value = 0x1.0p53 - 1;
+
+    cJSON_AddNumberToObject(root, int64_field_name, value);
+
+    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, int64_field_name), (ProtobufCMessage*)msg, int64_field_name);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
+    CU_ASSERT_EQUAL(msg->f_int64, 0x1.0p53 - 1);
+}
+
+void
+test_cvt_json_number_min_int64(void)
+{
+    double value = -0x1.0p53 + 1;
+
+    cJSON_AddNumberToObject(root, int64_field_name, value);
+
+    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, int64_field_name), (ProtobufCMessage*)msg, int64_field_name);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
+    CU_ASSERT_EQUAL(msg->f_int64, -0x1.0p53 + 1);
+}
+
+void
+test_cvt_json_str_max_int64(void)
+{
+    const char* value = "0x7fffffffffffffff";
+
+    cJSON_AddStringToObject(root, int64_field_name, value);
+
+    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, int64_field_name), (ProtobufCMessage*)msg, int64_field_name);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
+    CU_ASSERT_EQUAL(msg->f_int64, 0x7fffffffffffffff);
+}
+
+void
+test_cvt_json_str_min_int64(void)
+{
+    const char* value = "-0x800000000000000";
+
+    cJSON_AddStringToObject(root, int64_field_name, value);
+
+    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, int64_field_name), (ProtobufCMessage*)msg, int64_field_name);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
+    CU_ASSERT_EQUAL(msg->f_int64, -0x800000000000000);
 }
 
 /******************************************************************************/

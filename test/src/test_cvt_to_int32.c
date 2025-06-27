@@ -241,7 +241,7 @@ test_cvt_json_number_underflow_int32(void)
 void
 test_cvt_json_str_overflow_int32(void)
 {
-    const char* value = "0x80000000";
+    const char* value = "2147483648";
 
     cJSON_AddStringToObject(root, int32_field_name, value);
 
