@@ -44,8 +44,6 @@ cvt_single_int32_t(const cJSON* const item, int32_t* const field)
             return J2P_EXPT_VALUE_OVERFLOW;
         }
         *field = (int32_t)num_value;
-    } else if (cJSON_IsNull(item)) {
-        return J2P_EXPT_NULL_VALUE;
     } else {
         return J2P_EXPT_UNACCEPTABLE_JSON_TYPE;
     }
@@ -87,8 +85,6 @@ cvt_single_int64_t(const cJSON* const item, int64_t* const field)
             return J2P_EXPT_VALUE_OVERFLOW;
         }
         *field = (int64_t)num_value;
-    } else if (cJSON_IsNull(item)) {
-        return J2P_EXPT_NULL_VALUE;
     } else {
         return J2P_EXPT_UNACCEPTABLE_JSON_TYPE;
     }

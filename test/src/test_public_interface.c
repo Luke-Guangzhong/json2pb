@@ -181,7 +181,7 @@ test_reject_json_null(void)
     cJSON_AddNullToObject(root, "f_int32");
 
     j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "f_int32"), (ProtobufCMessage*)msg, "f_int32", NULL, NULL, J2P_FILE_PATH_STR);
-    CU_ASSERT_EQUAL(e, J2P_EXPT_NULL_VALUE);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_UNACCEPTABLE_JSON_TYPE);
     CU_ASSERT_EQUAL(msg->f_int32, 0);
 
     test_message__free_unpacked(msg, NULL);

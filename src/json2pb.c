@@ -22,7 +22,6 @@
 
 const j2p_expt_msg j2p_expt_msg_list[] = {
     {J2P_EXPT_SUCCESS,                  "success"                                                                                 },
-    {J2P_EXPT_NULL_VALUE,               "null value in json"                                                                      },
     {J2P_EXPT_VALUE_OVERFLOW,           "json value overflow"                                                                     },
     {J2P_EXPT_UNACCEPTABLE_JSON_TYPE,   "unacceptable json type"                                                                  },
     {J2P_EXPT_INVALID_NUMBER_STRING,    "invalid number string"                                                                   },
@@ -94,7 +93,7 @@ cvt_json_2_pb_field(const cJSON*                root,
     }
 
     if (cJSON_IsNull(item)) {
-        return J2P_EXPT_NULL_VALUE;
+        return J2P_EXPT_UNACCEPTABLE_JSON_TYPE;
     }
 
     const ProtobufCFieldDescriptor* field_desc = protobuf_c_message_descriptor_get_field_by_name(msg->descriptor, field_name);
@@ -104,6 +103,7 @@ cvt_json_2_pb_field(const cJSON*                root,
 
     const bool is_oneof      = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_ONEOF);
     const bool is_deprecated = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_DEPRECATED);
+    const bool is_repeated   = (field_desc->label == PROTOBUF_C_LABEL_REPEATED);
 
     if (is_deprecated) {
         return J2P_EXPT_FIELD_IS_DEPRECATED;
@@ -111,6 +111,10 @@ cvt_json_2_pb_field(const cJSON*                root,
 
     if (is_oneof && *(int32_t*)((void*)msg + field_desc->quantifier_offset) != 0) {
         return J2P_EXPT_ONEOF_ALREADY_SET;
+    }
+
+    if (is_repeated && !cJSON_IsArray(item)) {
+        return J2P_EXPT_UNACCEPTABLE_JSON_TYPE;
     }
 
     char* json_ptr = cJSONUtils_FindPointerFromObjectTo(root, item);
@@ -331,9 +335,6 @@ cvt_numeric(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, c
     const bool is_oneof    = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_ONEOF);
 
     if (is_repeated) {
-        if (!cJSON_IsArray(item)) {
-            return J2P_EXPT_UNACCEPTABLE_JSON_TYPE;
-        }
         if (cJSON_GetArraySize(item) > 0) {
             uint64_t       count      = 0;
             const cJSON*   element    = NULL;
