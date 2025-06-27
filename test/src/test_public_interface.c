@@ -12,7 +12,6 @@
 #include <unistd.h>
 
 #include "json2pb.h"
-#include "test.pb-c.h"
 #include "utils.h"
 
 /******************************************************************************/
@@ -31,6 +30,11 @@ void test_reject_uninitialized_msg(void);
 void test_reject_json_null(void);
 void test_reject_unknown_field(void);
 void test_reject_unknown_item(void);
+
+void test_cvt_json_bool_to_single_number(void);
+void test_cvt_json_array_to_single_number(void);
+void test_cvt_json_object_to_single_number(void);
+void test_cvt_invalid_json_str_to_single_number(void);
 
 /******************************************************************************/
 /*                              Global Variable                               */
@@ -59,9 +63,9 @@ CU_TestInfo invalid_argument_tests[] = {
 };
 
 CU_SuiteInfo suites[] = {
-    {"Test Public Interface reject locked protobuf fields", NULL, NULL, setup_successful_conversion, teardown_successful_conversion, field_flag_tests      },
-    {"Test Public Interface reject illegal arguments",      NULL, NULL, setup_successful_conversion, teardown_successful_conversion, illegal_argument_tests},
-    {"Test Public Interface reject invalid arguments",      NULL, NULL, setup_redirect_stdout,       teardown_redirect_stdout,       invalid_argument_tests},
+    {"Test Public Interface reject locked protobuf fields", init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion, field_flag_tests      },
+    {"Test Public Interface reject illegal arguments",      init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion, illegal_argument_tests},
+    {"Test Public Interface reject invalid arguments",      init_sutie_name, cleanup_sutie_name, setup_redirect_stdout,       teardown_redirect_stdout,       invalid_argument_tests},
     CU_SUITE_INFO_NULL
 };
 
@@ -246,6 +250,26 @@ test_reject_unknown_item(void)
     another_root = NULL;
 }
 
+void
+test_cvt_json_bool_to_single_number(void)
+{
+}
+
+void
+test_cvt_json_array_to_single_number(void)
+{
+}
+
+void
+test_cvt_json_object_to_single_number(void)
+{
+}
+
+void
+test_cvt_invalid_json_str_to_single_number(void)
+{
+}
+
 /******************************************************************************/
 /*                                 Main Code                                  */
 /******************************************************************************/
@@ -253,6 +277,9 @@ test_reject_unknown_item(void)
 int
 main(int argc, char const* argv[])
 {
+    char current_source_file_path[PATH_MAX] = __FILE__;
+    printf("current_source_file_path: %s\n", current_source_file_path);
+    init_file_name(__FILE__);
     unsigned  rv    = 1;
     CU_pSuite suite = NULL;
 

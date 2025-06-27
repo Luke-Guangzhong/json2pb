@@ -37,11 +37,6 @@ void test_cvt_json_number_min_int64(void);
 void test_cvt_json_str_max_int64(void);
 void test_cvt_json_str_min_int64(void);
 
-void test_cvt_json_bool_to_single_number(void);
-void test_cvt_json_array_to_single_number(void);
-void test_cvt_json_object_to_single_number(void);
-void test_cvt_invalid_json_str_to_single_number(void);
-
 void test_cvt_json_array_to_repeated_int64(void);
 void test_cvt_json_array_to_repeated_int64_partly_failed(void);
 void test_cvt_json_array_to_repeated_int64_all_failed(void);
@@ -92,9 +87,21 @@ CU_TestInfo test_int64_overflow[] = {
     CU_TEST_INFO_NULL,
 };
 
+CU_TestInfo test_repeated_int64_conversion[] = {
+    {"Convert JSON array to repeated Protobuf int64 field",              test_cvt_json_array_to_repeated_int64              },
+    {"Partial failure converting JSON array to repeated Protobuf int64", test_cvt_json_array_to_repeated_int64_partly_failed},
+    {"All failure converting JSON array to repeated Protobuf int64",     test_cvt_json_array_to_repeated_int64_all_failed   },
+    {"Convert Empty JSON array to repeated Protobuf int64",              test_cvt_json_array_to_repeated_int64_empty        },
+    CU_TEST_INFO_NULL
+};
+
 CU_SuiteInfo suites[] = {
-    {"Convert JSON to Protobuf int64 field",                  NULL, NULL, setup_successful_conversion, teardown_successful_conversion, test_int64_conversion},
-    {"Convert JSON to Protobuf int64 with overflow handling", NULL, NULL, setup_successful_conversion, teardown_successful_conversion, test_int64_overflow  },
+    {"Convert JSON to Protobuf int64 field",                  init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion, test_int64_conversion},
+    {"Convert JSON to Protobuf int64 with overflow handling", init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion,
+     test_int64_overflow                                                                                                                                                             },
+    {"Convert JSON array to repeated Protobuf int64 field",   init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion,
+     test_repeated_int64_conversion                                                                                                                                                  },
+
     CU_SUITE_INFO_NULL,
 };
 
@@ -277,6 +284,72 @@ test_cvt_json_str_min_int64(void)
     CU_ASSERT_EQUAL(msg->f_int64, -0x800000000000000);
 }
 
+void
+test_cvt_json_array_to_repeated_int64(void)
+{
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
+    const char*   value          = "[1234567890, \"1234567890\",\"0x4a0\",\"0b110\",\"0110\"]";
+    const int64_t res_value[]    = {1234567890, 1234567890, 0x4a0, 0b110, 0110};
+    const size_t  valid_elem_num = 5;
+#else
+    const char*   value          = "[1234567890, \"1234567890\",\"0x4a0\",\"0110\"]";
+    const int64_t res_value[]    = {1234567890, 1234567890, 0x4a0, 0110};
+    const size_t  valid_elem_num = 4;
+#endif
+
+    cJSON* array_value = cJSON_Parse(value);
+    cJSON_AddItemToObject(root, repeated_int64_field_name, array_value);
+
+    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, repeated_int64_field_name), (ProtobufCMessage*)msg, repeated_int64_field_name);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
+    CU_ASSERT_EQUAL(msg->n_f_repeated_int64, valid_elem_num);
+    CU_ASSERT_EQUAL(memcmp(msg->f_repeated_int64, res_value, valid_elem_num * sizeof(int64_t)), 0);
+}
+
+void
+test_cvt_json_array_to_repeated_int64_partly_failed(void)
+{
+    const char*   value          = "[1234567890, \"0x4a0\",\"0110\",\"invalid number string\",\"0x7fffffffffffffffffffffff\"]";
+    const int64_t res_value[]    = {1234567890, 0x4a0, 0110};
+    const size_t  valid_elem_num = 3;
+
+    cJSON* array_value = cJSON_Parse(value);
+    cJSON_AddItemToObject(root, repeated_int64_field_name, array_value);
+
+    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, repeated_int64_field_name), (ProtobufCMessage*)msg, repeated_int64_field_name);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_PARTIAL_FAIL);
+    CU_ASSERT_EQUAL(msg->n_f_repeated_int64, valid_elem_num);
+    CU_ASSERT_EQUAL(memcmp(msg->f_repeated_int64, res_value, valid_elem_num * sizeof(int64_t)), 0);
+}
+
+void
+test_cvt_json_array_to_repeated_int64_all_failed(void)
+{
+    const char* value = "[\"invalid number string\",\"0x7fffffffffffffffffffffff\"]";
+
+    cJSON* array_value = cJSON_Parse(value);
+    cJSON_AddItemToObject(root, repeated_int64_field_name, array_value);
+
+    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, repeated_int64_field_name), (ProtobufCMessage*)msg, repeated_int64_field_name);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_NO_VALID_FOUND);
+    CU_ASSERT_EQUAL(msg->n_f_repeated_int64, 0);
+    CU_ASSERT_PTR_NULL(msg->f_repeated_int64);
+}
+
+void
+test_cvt_json_array_to_repeated_int64_empty(void)
+{
+    const char* value = "[]";
+
+    cJSON* array_value = cJSON_Parse(value);
+    cJSON_AddItemToObject(root, repeated_int64_field_name, array_value);
+
+    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, repeated_int64_field_name), (ProtobufCMessage*)msg, repeated_int64_field_name);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_EMPTY_ARRAY);
+    CU_ASSERT_EQUAL(msg->n_f_repeated_int64, 0);
+    CU_ASSERT_PTR_NULL(msg->f_repeated_int64);
+}
+
 /******************************************************************************/
 /*                                 Main Code                                  */
 /******************************************************************************/
@@ -284,6 +357,8 @@ test_cvt_json_str_min_int64(void)
 int
 main(int argc, char const* argv[])
 {
+
+    init_file_name(__FILE__);
     unsigned  rv    = 1;
     CU_pSuite suite = NULL;
 

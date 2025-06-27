@@ -73,7 +73,6 @@ cvt_single_int64_t(const cJSON* const item, int64_t* const field)
         errno                     = 0;
         char*           endptr    = NULL;
         const long long num_value = strtoll(cJSON_GetStringValue(item), &endptr, 0);
-        printf("value = %lld\n", num_value);
         if (errno != 0 || *endptr != '\0') {
             if (errno == ERANGE) {
                 return J2P_EXPT_VALUE_OVERFLOW;

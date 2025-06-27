@@ -11,6 +11,7 @@
 #pragma once
 
 #include <errno.h>
+#include <libgen.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -36,6 +37,10 @@ static void sanitize_name(const char* in, char* out, size_t out_sz);
 static void setup_redirect_stdout(void);
 static void teardown_redirect_stdout(void);
 
+static int init_sutie_name(void);
+static int cleanup_sutie_name(void);
+void       init_file_name(const char* file_path);
+
 /******************************************************************************/
 /*                              Global Variable                               */
 /******************************************************************************/
@@ -45,7 +50,8 @@ static cJSON*       root = NULL;
 
 static int  saved_stdout_fd = -1;
 static char log_path[PATH_MAX];
-static char log_path[PATH_MAX];
+static char current_sutie_path[1024];
+static char current_file_name[1024];
 
 /******************************************************************************/
 /*                                 Utilities                                  */
@@ -94,8 +100,10 @@ setup_redirect_stdout(void)
     }
 
     /* 确保 build/log 目录存在 */
-    if (mkdir("log", 0777) != 0 && errno != EEXIST) {
-        perror("mkdir log");
+    char test_case_log_dir[PATH_MAX] = {};
+    snprintf(test_case_log_dir, sizeof(test_case_log_dir), "log/%s/%s", current_file_name, current_sutie_path);
+    if (mkdir(test_case_log_dir, 0777) != 0 && errno != EEXIST) {
+        perror("mkdir test case log");
         exit(EXIT_FAILURE);
     }
 
@@ -111,7 +119,7 @@ setup_redirect_stdout(void)
     {
         char safe_name[PATH_MAX - 11] = {};
         sanitize_name(current->pName, safe_name, sizeof(safe_name));
-        snprintf(log_path, sizeof(log_path), "log/%s.log", safe_name);
+        snprintf(log_path, sizeof(log_path), "%s/%s.log", test_case_log_dir, safe_name);
     }
 
     /* 打开日志文件并重定向 stdout */
@@ -154,5 +162,47 @@ teardown_redirect_stdout(void)
         dup2(saved_stdout_fd, fileno(stdout));
         close(saved_stdout_fd);
         saved_stdout_fd = -1;
+    }
+}
+
+int
+init_sutie_name(void)
+{
+    CU_pSuite current = CU_get_current_suite();
+    if (!current || !current->pName) {
+        exit(EXIT_FAILURE);
+    }
+
+    sanitize_name(current->pName, current_sutie_path, sizeof(current_sutie_path));
+
+    char tes_suite_log_dir[PATH_MAX] = {};
+    snprintf(tes_suite_log_dir, sizeof(tes_suite_log_dir), "log/%s", current_file_name);
+
+    if (mkdir(tes_suite_log_dir, 0777) != 0 && errno != EEXIST) {
+        perror("mkdir suite log");
+        exit(EXIT_FAILURE);
+    }
+}
+
+int
+cleanup_sutie_name(void)
+{
+    current_sutie_path[0] = '\0';
+}
+
+void
+init_file_name(const char* file_path)
+{
+    char current_file_path[PATH_MAX] = {};
+
+    snprintf(current_file_path, sizeof(current_file_path), "%s", file_path);
+
+    char* file_name = basename(current_file_path);
+
+    snprintf(current_file_name, sizeof(current_file_name), "%s", file_name);
+
+    if (mkdir("log", 0777) != 0 && errno != EEXIST) {
+        perror("mkdir log");
+        exit(EXIT_FAILURE);
     }
 }

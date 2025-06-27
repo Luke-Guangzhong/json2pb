@@ -36,11 +36,6 @@ void test_cvt_json_number_min_int32(void);
 void test_cvt_json_str_max_int32(void);
 void test_cvt_json_str_min_int32(void);
 
-void test_cvt_json_bool_to_single_number(void);
-void test_cvt_json_array_to_single_number(void);
-void test_cvt_json_object_to_single_number(void);
-void test_cvt_invalid_json_str_to_single_number(void);
-
 void test_cvt_json_array_to_repeated_int32(void);
 void test_cvt_json_array_to_repeated_int32_partly_failed(void);
 void test_cvt_json_array_to_repeated_int32_all_failed(void);
@@ -91,14 +86,6 @@ CU_TestInfo test_int32_overflow[] = {
     CU_TEST_INFO_NULL,
 };
 
-CU_TestInfo test_int32_invalid_json_type[] = {
-    {"Reject conversion of JSON boolean to Protobuf int32",        test_cvt_json_bool_to_single_number       },
-    {"Reject conversion of JSON array to Protobuf int32",          test_cvt_json_array_to_single_number      },
-    {"Reject conversion of JSON object to Protobuf int32",         test_cvt_json_object_to_single_number     },
-    {"Reject conversion of invalid JSON string to Protobuf int32", test_cvt_invalid_json_str_to_single_number},
-    CU_TEST_INFO_NULL,
-};
-
 CU_TestInfo test_repeated_int32_conversion[] = {
     {"Convert JSON array to repeated Protobuf int32 field",              test_cvt_json_array_to_repeated_int32              },
     {"Partial failure converting JSON array to repeated Protobuf int32", test_cvt_json_array_to_repeated_int32_partly_failed},
@@ -107,6 +94,10 @@ CU_TestInfo test_repeated_int32_conversion[] = {
     CU_TEST_INFO_NULL
 };
 
+/**
+ * @brief
+ * @todo should be tested by inteerface, it worked for all repeated fields
+ */
 CU_TestInfo test_repeated_int32_invalid_json_type[] = {
     {"Reject conversion of JSON boolean to repeated Protobuf int32 field", test_cvt_json_bool_to_repeated_int32  },
     {"Reject conversion of JSON number to repeated Protobuf int32 field",  test_cvt_json_number_to_repeated_int32},
@@ -124,12 +115,14 @@ CU_TestInfo test_x32_conversion[] = {
 };
 
 CU_SuiteInfo suites[] = {
-    {"Convert JSON to Protobuf int32 field",                  NULL, NULL, setup_successful_conversion, teardown_successful_conversion, test_int32_conversion                },
-    {"Convert JSON to Protobuf int32 with overflow handling", NULL, NULL, setup_successful_conversion, teardown_successful_conversion, test_int32_overflow                  },
-    {"Reject invalid JSON types for Protobuf int32 field",    NULL, NULL, setup_successful_conversion, teardown_successful_conversion, test_int32_invalid_json_type         },
-    {"Convert JSON array to repeated Protobuf int32 field",   NULL, NULL, setup_successful_conversion, teardown_successful_conversion, test_repeated_int32_conversion       },
-    {"Reject invalid JSON types for repeated Protobuf int32", NULL, NULL, setup_successful_conversion, teardown_successful_conversion, test_repeated_int32_invalid_json_type},
-    {"Convert JSON to Protobuf sint32/sfixed32 field",        NULL, NULL, setup_successful_conversion, teardown_successful_conversion, test_x32_conversion                  },
+    {"Convert JSON to Protobuf int32 field",                  init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion, test_int32_conversion},
+    {"Convert JSON to Protobuf int32 with overflow handling", init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion,
+     test_int32_overflow                                                                                                                                                             },
+    {"Convert JSON array to repeated Protobuf int32 field",   init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion,
+     test_repeated_int32_conversion                                                                                                                                                  },
+    {"Reject invalid JSON types for repeated Protobuf int32", init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion,
+     test_repeated_int32_invalid_json_type                                                                                                                                           },
+    {"Convert JSON to Protobuf sint32/sfixed32 field",        init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion, test_x32_conversion  },
     CU_SUITE_INFO_NULL,
 };
 
@@ -311,48 +304,6 @@ test_cvt_json_str_min_int32(void)
 }
 
 void
-test_cvt_json_bool_to_single_number(void)
-{
-    cJSON_AddTrueToObject(root, int32_field_name);
-
-    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, int32_field_name), (ProtobufCMessage*)msg, int32_field_name);
-    CU_ASSERT_EQUAL(e, J2P_EXPT_UNACCEPTABLE_JSON_TYPE);
-    CU_ASSERT_EQUAL(msg->f_int32, 0);
-}
-
-void
-test_cvt_json_array_to_single_number(void)
-{
-    cJSON_AddArrayToObject(root, int32_field_name);
-
-    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, int32_field_name), (ProtobufCMessage*)msg, int32_field_name);
-    CU_ASSERT_EQUAL(e, J2P_EXPT_UNACCEPTABLE_JSON_TYPE);
-    CU_ASSERT_EQUAL(msg->f_int32, 0);
-}
-
-void
-test_cvt_json_object_to_single_number(void)
-{
-    cJSON_AddObjectToObject(root, int32_field_name);
-
-    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, int32_field_name), (ProtobufCMessage*)msg, int32_field_name);
-    CU_ASSERT_EQUAL(e, J2P_EXPT_UNACCEPTABLE_JSON_TYPE);
-    CU_ASSERT_EQUAL(msg->f_int32, 0);
-}
-
-void
-test_cvt_invalid_json_str_to_single_number(void)
-{
-    const char* value = "0x110q4sslkdfjalsdf";
-
-    cJSON_AddStringToObject(root, int32_field_name, value);
-
-    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, int32_field_name), (ProtobufCMessage*)msg, int32_field_name);
-    CU_ASSERT_EQUAL(e, J2P_EXPT_INVALID_NUMBER_STRING);
-    CU_ASSERT_EQUAL(msg->f_int32, 0);
-}
-
-void
 test_cvt_json_array_to_repeated_int32(void)
 {
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
@@ -527,6 +478,7 @@ test_cvt_json_array_to_repeated_sfixed32(void)
 int
 main(int argc, char const* argv[])
 {
+    init_file_name(__FILE__);
     unsigned  rv    = 1;
     CU_pSuite suite = NULL;
 

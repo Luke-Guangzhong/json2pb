@@ -36,6 +36,8 @@ execute_process(
 
 link_libraries(libjson2pb cunit)
 
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/log)
+
 include_directories(${PROTO_OUTPUT_INCLUDE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
 aux_source_directory(${PROTO_OUTPUT_SRC_DIR} PROTOBUF_SOURCES)
 
