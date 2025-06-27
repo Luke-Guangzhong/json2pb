@@ -52,6 +52,9 @@ static j2p_expt_t cvt_int64_t(const cJSON* const root, ProtobufCMessage* msg, co
 // static j2p_expt_t cvt_string(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
 // static j2p_expt_t cvt_bool(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, const string_bool_convertor bool_cvt);
 
+static j2p_expt_t
+cvt_numeric(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, const size_t elem_size, single_field_cvt_func cvt_func);
+
 j2p_expt_t
 cvt_json_2_pb_field(const cJSON*                root,
                     const cJSON*                item,
@@ -100,7 +103,8 @@ cvt_json_2_pb_field(const cJSON*                root,
     case PROTOBUF_C_TYPE_INT32:
     case PROTOBUF_C_TYPE_SINT32:
     case PROTOBUF_C_TYPE_SFIXED32:
-        rtn = cvt_int32_t(root, msg, item, field_desc);
+        // rtn = cvt_int32_t(root, msg, item, field_desc);
+        rtn = cvt_numeric(root, msg, item, field_desc, sizeof(int32_t), (single_field_cvt_func)cvt_single_int32_t);
         break;
     case PROTOBUF_C_TYPE_INT64:
     case PROTOBUF_C_TYPE_SINT64:
@@ -296,7 +300,7 @@ cvt_int64_t(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, c
 }
 
 static j2p_expt_t
-cvt_numeric(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, const size_t elem_size)
+cvt_numeric(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, const size_t elem_size, single_field_cvt_func cvt_func)
 {
     assert(msg != NULL);
     assert(field_desc != NULL);
@@ -329,7 +333,7 @@ cvt_numeric(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, c
 
             cJSON_ArrayForEach(element, item)
             {
-                rtn = cvt_single_numeric(element, &array[count], elem_size);
+                rtn = cvt_func(element, array + (count * elem_size));
                 if (rtn != EXIT_SUCCESS) {
                     char* path = cJSONUtils_FindPointerFromObjectTo(root, element);
                     printf("[EXCEPTION]: %s %s\n", path, j2p_expt_msg_list[rtn].desc);
@@ -366,6 +370,6 @@ cvt_numeric(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, c
             (*(int32_t*)((void*)msg + field_desc->quantifier_offset)) = field_desc->id;
         }
         void* field_ptr = (void*)msg + field_desc->offset;
-        return cvt_single_numeric(item, field_ptr, elem_size);
+        return cvt_func(item, field_ptr);
     }
 }
