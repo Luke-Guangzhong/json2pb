@@ -1,5 +1,5 @@
 /**
- * @file test_cvt_int32_t.c
+ * @file test_cvt_to_int32_t.c
  * @author luguangzhong (luke_guangzhong@petalmail.com)
  * @brief
  * @version 0.1
@@ -39,6 +39,7 @@ void test_cvt_json_hex_string_to_single_int32(void);
 void test_cvt_json_binary_string_to_single_int32(void);
 #endif
 void test_cvt_json_octal_string_to_single_int32(void);
+void test_cvt_json_number_to_oneof_int32(void);
 
 void test_cvt_json_number_overflow_int32(void);
 void test_cvt_json_number_underflow_int32(void);
@@ -94,6 +95,7 @@ CU_TestInfo test_int32_conversion[] = {
     {"Convert JSON binary string to Protobuf int32 field",      test_cvt_json_binary_string_to_single_int32 },
 #endif
     {"Convert JSON octal string to Protobuf int32 field",       test_cvt_json_octal_string_to_single_int32  },
+    {"Convert JSON number to Protobuf oneof int32 field",       test_cvt_json_number_to_oneof_int32         },
     CU_TEST_INFO_NULL,
 };
 
@@ -313,6 +315,20 @@ test_cvt_json_octal_string_to_single_int32(void)
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, int32_field_name), (ProtobufCMessage*)msg, int32_field_name);
     CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
     CU_ASSERT_EQUAL(msg->f_int32, 0110);
+}
+
+void
+test_cvt_json_number_to_oneof_int32(void)
+{
+    int32_t oneof_int32_value = 123456789;
+    cJSON_AddNumberToObject(root, "oneof_int32", oneof_int32_value);
+
+    j2p_expt_t                      e          = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, "oneof_int32"), (ProtobufCMessage*)msg, "oneof_int32");
+    const ProtobufCFieldDescriptor* field_desc = protobuf_c_message_descriptor_get_field_by_name(msg->base.descriptor, "oneof_int32");
+    CU_ASSERT_PTR_NOT_NULL_FATAL(field_desc);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
+    CU_ASSERT_EQUAL(msg->oneof_int32, oneof_int32_value);
+    CU_ASSERT_EQUAL(msg->test_oneof_case, field_desc->id);
 }
 
 void

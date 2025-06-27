@@ -8,9 +8,18 @@ message TestMessage {
     repeated sint32   f_repeated_sint32   = 5;
     repeated sfixed32 f_repeated_sfixed32 = 6;
     int32             deprecated_field    = 7 [deprecated = true];
-
-    oneof oneof_field {
-        int32 oneof_int32 = 8;
-        sint32 oneof_sint32 = 9;
+    int64             f_int64             = 8;
+    sint64            f_sint64            = 9;
+    sfixed64          f_sfixed64          = 10;
+    int64             f_repeated_int64    = 11;
+    sint64            f_repeated_sint64   = 12;
+    sfixed64          f_repeated_sfixed64 = 13;
+    oneof             test_oneof {
+        int32    oneof_int32    = 14;
+        sint32   oneof_sint32   = 15;
+        sfixed32 oneof_sfixed32 = 16;
+        int64    oneof_int64    = 17;
+        sint64   oneof_sint64   = 18;
+        sfixed64 oneof_sfixed64 = 19;
     }
 }

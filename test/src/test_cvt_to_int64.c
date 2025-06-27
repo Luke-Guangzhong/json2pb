@@ -1,9 +1,9 @@
 /**
- * @file test_public_interface.c
+ * @file test_cvt_to_int64.c
  * @author luguangzhong (luke_guangzhong@petalmail.com)
  * @brief
  * @version 0.1
- * @date 2025-06-26
+ * @date 2025-06-27
  *
  * @copyright Copyright (c) 2025
  *
@@ -33,28 +33,62 @@ static void sanitize_name(const char* in, char* out, size_t out_sz);
 void        setup_successful_conversion(void);
 void        teardown_successful_conversion(void);
 
-void test_cvt_json_to_deprecated_field(void);
-void test_cvt_json_to_already_setted_oneof_field(void);
+void test_cvt_json_number_to_single_int64(void);
+void test_cvt_json_decimal_string_to_single_int64(void);
+void test_cvt_json_hex_string_to_single_int64(void);
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
+void test_cvt_json_binary_string_to_single_int64(void);
+#endif
+void test_cvt_json_octal_string_to_single_int64(void);
+
+void test_cvt_json_number_overflow_int64(void);
+void test_cvt_json_number_underflow_int64(void);
+void test_cvt_json_str_overflow_int64(void);
+void test_cvt_json_str_underflow_int64(void);
+void test_cvt_json_number_max_int64(void);
+void test_cvt_json_number_min_int64(void);
+void test_cvt_json_str_max_int64(void);
+void test_cvt_json_str_min_int64(void);
+
+void test_cvt_json_null_to_single_number(void);
+void test_cvt_json_bool_to_single_number(void);
+void test_cvt_json_array_to_single_number(void);
+void test_cvt_json_object_to_single_number(void);
+void test_cvt_invalid_json_str_to_single_number(void);
+
+void test_cvt_json_array_to_repeated_int64(void);
+void test_cvt_json_array_to_repeated_int64_partly_failed(void);
+void test_cvt_json_array_to_repeated_int64_all_failed(void);
+void test_cvt_json_array_to_repeated_int64_empty(void);
+
+void test_cvt_json_null_to_repeated_int64(void);
+void test_cvt_json_bool_to_repeated_int64(void);
+void test_cvt_json_number_to_repeated_int64(void);
+void test_cvt_json_string_to_repeated_int64(void);
+void test_cvt_json_object_to_repeated_int64(void);
+
+void test_cvt_json_number_to_sint64(void);
+void test_cvt_json_array_to_repeated_sint64(void);
+void test_cvt_json_number_to_sfixed64(void);
+void test_cvt_json_array_to_repeated_sfixed64(void);
 
 /******************************************************************************/
 /*                              Global Variable                               */
 /******************************************************************************/
 
-TestMessage* msg  = NULL;
-cJSON*       root = NULL;
-
-static int  saved_stdout_fd = -1;
-static char log_path[PATH_MAX];
-
-CU_TestInfo field_flag_tests[] = {
-    {"Reject conversion of deprecated field",           test_cvt_json_to_deprecated_field          },
-    {"Reject conversion of already setted oneof field", test_cvt_json_to_already_setted_oneof_field},
-    CU_TEST_INFO_NULL,
-};
+TestMessage* msg                            = NULL;
+cJSON*       root                           = NULL;
+const char   int64_field_name[]             = "f_int64";
+const char   sint64_field_name[]            = "f_sint64";
+const char   sfixed64_field_name[]          = "f_sfixed64";
+const char   repeated_int64_field_name[]    = "f_repeated_int64";
+const char   repeated_sint64_field_name[]   = "f_repeated_sint64";
+const char   repeated_sfixed64_field_name[] = "f_repeated_sfixed64";
+static int   saved_stdout_fd                = -1;
+static char  log_path[PATH_MAX];
 
 CU_SuiteInfo suites[] = {
-    {"Test Public Interface reject locked protobuf fields", NULL, NULL, setup_successful_conversion, teardown_successful_conversion, field_flag_tests},
-    CU_SUITE_INFO_NULL
+    CU_SUITE_INFO_NULL,
 };
 
 /******************************************************************************/
@@ -155,39 +189,6 @@ teardown_successful_conversion(void)
 /******************************************************************************/
 /*                                 Test Cases                                 */
 /******************************************************************************/
-
-void
-test_cvt_json_to_deprecated_field(void)
-{
-    int32_t deprecated_value = 123456789;
-    cJSON_AddNumberToObject(root, "deprecated_field", deprecated_value);
-
-    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, "deprecated_field"), (ProtobufCMessage*)msg, "deprecated_field");
-    CU_ASSERT_EQUAL(e, J2P_EXPT_FIELD_IS_DEPRECATED);
-    CU_ASSERT_EQUAL(msg->deprecated_field, 0);
-}
-
-void
-test_cvt_json_to_already_setted_oneof_field(void)
-{
-    int32_t oneof_int32_value = 123456789;
-    cJSON_AddNumberToObject(root, "oneof_int32", oneof_int32_value);
-
-    j2p_expt_t                      e          = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, "oneof_int32"), (ProtobufCMessage*)msg, "oneof_int32");
-    const ProtobufCFieldDescriptor* field_desc = protobuf_c_message_descriptor_get_field_by_name(msg->base.descriptor, "oneof_int32");
-    CU_ASSERT_PTR_NOT_NULL_FATAL(field_desc);
-    CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
-    CU_ASSERT_EQUAL(msg->oneof_int32, oneof_int32_value);
-    CU_ASSERT_EQUAL(msg->test_oneof_case, field_desc->id);
-
-    cJSON_AddNumberToObject(root, "oneof_sint32", 2345);
-    e          = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, "oneof_sint32"), (ProtobufCMessage*)msg, "oneof_sint32");
-    field_desc = protobuf_c_message_descriptor_get_field_by_name(msg->base.descriptor, "oneof_sint32");
-    CU_ASSERT_PTR_NOT_NULL_FATAL(field_desc);
-    CU_ASSERT_EQUAL(e, J2P_EXPT_ONEOF_ALREADY_SET);
-    CU_ASSERT_NOT_EQUAL(msg->test_oneof_case, field_desc->id);
-    CU_ASSERT_NOT_EQUAL(msg->oneof_sint32, 2345)
-}
 
 /******************************************************************************/
 /*                                 Main Code                                  */

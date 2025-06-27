@@ -39,6 +39,8 @@ link_libraries(libjson2pb cunit)
 include_directories(${PROTO_OUTPUT_INCLUDE_DIR})
 aux_source_directory(${PROTO_OUTPUT_SRC_DIR} PROTOBUF_SOURCES)
 
+add_executable(test_public_interface src/test_public_interface.c ${PROTOBUF_SOURCES})
 add_executable(test_cvt_to_int32 src/test_cvt_to_int32.c ${PROTOBUF_SOURCES})
 
+add_test(NAME test_public_interface COMMAND test_public_interface)
 add_test(NAME test_cvt_to_int32 COMMAND test_cvt_to_int32)
