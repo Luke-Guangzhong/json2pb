@@ -42,11 +42,6 @@ void test_cvt_json_array_to_repeated_int64_partly_failed(void);
 void test_cvt_json_array_to_repeated_int64_all_failed(void);
 void test_cvt_json_array_to_repeated_int64_empty(void);
 
-void test_cvt_json_bool_to_repeated_int64(void);
-void test_cvt_json_number_to_repeated_int64(void);
-void test_cvt_json_string_to_repeated_int64(void);
-void test_cvt_json_object_to_repeated_int64(void);
-
 void test_cvt_json_number_to_sint64(void);
 void test_cvt_json_array_to_repeated_sint64(void);
 void test_cvt_json_number_to_sfixed64(void);

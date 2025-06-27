@@ -30,6 +30,10 @@ void test_reject_uninitialized_msg(void);
 void test_reject_json_null(void);
 void test_reject_unknown_field(void);
 void test_reject_unknown_item(void);
+void test_cvt_json_bool_to_repeated_field(void);
+void test_cvt_json_number_to_repeated_field(void);
+void test_cvt_json_string_to_repeated_field(void);
+void test_cvt_json_object_to_repeated_field(void);
 
 void test_cvt_json_bool_to_single_number(void);
 void test_cvt_json_array_to_single_number(void);
@@ -55,17 +59,21 @@ CU_TestInfo illegal_argument_tests[] = {
 };
 
 CU_TestInfo invalid_argument_tests[] = {
-    {"Reject JSON null",         test_reject_json_null        },
-    {"Reject unknown field",     test_reject_unknown_field    },
-    {"Reject unknown item",      test_reject_unknown_item     },
-    {"Reject uninitialized msg", test_reject_uninitialized_msg},
+    {"Reject JSON null",                              test_reject_json_null                 },
+    {"Reject unknown field",                          test_reject_unknown_field             },
+    {"Reject unknown item",                           test_reject_unknown_item              },
+    {"Reject uninitialized msg",                      test_reject_uninitialized_msg         },
+    {"Reject conversion of bool to repeated field",   test_cvt_json_bool_to_repeated_field  },
+    {"Reject conversion of number to repeated field", test_cvt_json_number_to_repeated_field},
+    {"Reject conversion of string to repeated field", test_cvt_json_string_to_repeated_field},
+    {"Reject conversion of object to repeated field", test_cvt_json_object_to_repeated_field},
     CU_TEST_INFO_NULL,
 };
 
 CU_SuiteInfo suites[] = {
     {"Test Public Interface reject locked protobuf fields", init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion, field_flag_tests      },
     {"Test Public Interface reject illegal arguments",      init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion, illegal_argument_tests},
-    {"Test Public Interface reject invalid arguments",      init_sutie_name, cleanup_sutie_name, setup_redirect_stdout,       teardown_redirect_stdout,       invalid_argument_tests},
+    {"Test Public Interface reject invalid arguments",      init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion, invalid_argument_tests},
     CU_SUITE_INFO_NULL
 };
 
@@ -147,12 +155,9 @@ test_reject_null_field_name(void)
 void
 test_reject_uninitialized_msg(void)
 {
+    test_message__free_unpacked(msg, NULL);
     msg = (TestMessage*)calloc(1, sizeof(TestMessage));
     if (NULL == msg) {
-        exit(EXIT_FAILURE);
-    }
-    root = cJSON_CreateObject();
-    if (NULL == root) {
         exit(EXIT_FAILURE);
     }
 
@@ -165,72 +170,74 @@ test_reject_uninitialized_msg(void)
 
     free(msg);
     msg = NULL;
-    cJSON_Delete(root);
-    root = NULL;
+}
+
+void
+test_cvt_json_bool_to_repeated_field(void)
+{
+    cJSON_AddBoolToObject(root, "f_repeated_int32", true);
+
+    j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "f_repeated_int32"), (ProtobufCMessage*)msg, "f_repeated_int32", NULL, NULL, J2P_FILE_PATH_STR);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_UNACCEPTABLE_JSON_TYPE);
+    CU_ASSERT_EQUAL(msg->n_f_repeated_int32, 0);
+    CU_ASSERT_PTR_NULL(msg->f_repeated_int32);
+}
+
+void
+test_cvt_json_number_to_repeated_field(void)
+{
+    cJSON_AddNumberToObject(root, "f_repeated_int32", 12345);
+
+    j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "f_repeated_int32"), (ProtobufCMessage*)msg, "f_repeated_int32", NULL, NULL, J2P_FILE_PATH_STR);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_UNACCEPTABLE_JSON_TYPE);
+    CU_ASSERT_EQUAL(msg->n_f_repeated_int32, 0);
+    CU_ASSERT_PTR_NULL(msg->f_repeated_int32);
+}
+
+void
+test_cvt_json_string_to_repeated_field(void)
+{
+    cJSON_AddStringToObject(root, "f_repeated_int32", "test string");
+
+    j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "f_repeated_int32"), (ProtobufCMessage*)msg, "f_repeated_int32", NULL, NULL, J2P_FILE_PATH_STR);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_UNACCEPTABLE_JSON_TYPE);
+    CU_ASSERT_EQUAL(msg->n_f_repeated_int32, 0);
+    CU_ASSERT_PTR_NULL(msg->f_repeated_int32);
+}
+
+void
+test_cvt_json_object_to_repeated_field(void)
+{
+    cJSON_AddObjectToObject(root, "f_repeated_int32");
+
+    j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "f_repeated_int32"), (ProtobufCMessage*)msg, "f_repeated_int32", NULL, NULL, J2P_FILE_PATH_STR);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_UNACCEPTABLE_JSON_TYPE);
+    CU_ASSERT_EQUAL(msg->n_f_repeated_int32, 0);
+    CU_ASSERT_PTR_NULL(msg->f_repeated_int32);
 }
 
 void
 test_reject_json_null(void)
 {
-    msg = (TestMessage*)calloc(1, sizeof(TestMessage));
-    if (NULL == msg) {
-        exit(EXIT_FAILURE);
-    }
-    test_message__init(msg);
-    root = cJSON_CreateObject();
-    if (NULL == root) {
-        exit(EXIT_FAILURE);
-    }
-
     cJSON_AddNullToObject(root, "f_int32");
 
     j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "f_int32"), (ProtobufCMessage*)msg, "f_int32", NULL, NULL, J2P_FILE_PATH_STR);
     CU_ASSERT_EQUAL(e, J2P_EXPT_UNACCEPTABLE_JSON_TYPE);
     CU_ASSERT_EQUAL(msg->f_int32, 0);
-
-    test_message__free_unpacked(msg, NULL);
-    msg = NULL;
-    cJSON_Delete(root);
-    root = NULL;
 }
 
 void
 test_reject_unknown_field(void)
 {
-    msg = (TestMessage*)calloc(1, sizeof(TestMessage));
-    if (NULL == msg) {
-        exit(EXIT_FAILURE);
-    }
-    test_message__init(msg);
-    root = cJSON_CreateObject();
-    if (NULL == root) {
-        exit(EXIT_FAILURE);
-    }
-
     cJSON_AddNumberToObject(root, "unknown_field", 12345);
 
     j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "unknown_field"), (ProtobufCMessage*)msg, "unknown_field", NULL, NULL, J2P_FILE_PATH_STR);
     CU_ASSERT_EQUAL(e, J2P_EXPT_FIELD_NOT_FOUND);
-
-    test_message__free_unpacked(msg, NULL);
-    msg = NULL;
-    cJSON_Delete(root);
-    root = NULL;
 }
 
 void
 test_reject_unknown_item(void)
 {
-    msg = (TestMessage*)calloc(1, sizeof(TestMessage));
-    if (NULL == msg) {
-        exit(EXIT_FAILURE);
-    }
-    test_message__init(msg);
-    root = cJSON_CreateObject();
-    if (NULL == root) {
-        exit(EXIT_FAILURE);
-    }
-
     cJSON* another_root = cJSON_CreateObject();
     if (NULL == another_root) {
         exit(EXIT_FAILURE);
@@ -242,10 +249,6 @@ test_reject_unknown_item(void)
     CU_ASSERT_EQUAL(e, J2P_EXPT_JSON_POINTER_NOT_FOUND);
     CU_ASSERT_EQUAL(msg->f_int32, 0);
 
-    test_message__free_unpacked(msg, NULL);
-    msg = NULL;
-    cJSON_Delete(root);
-    root = NULL;
     cJSON_Delete(another_root);
     another_root = NULL;
 }

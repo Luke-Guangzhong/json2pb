@@ -41,11 +41,6 @@ void test_cvt_json_array_to_repeated_int32_partly_failed(void);
 void test_cvt_json_array_to_repeated_int32_all_failed(void);
 void test_cvt_json_array_to_repeated_int32_empty(void);
 
-void test_cvt_json_bool_to_repeated_int32(void);
-void test_cvt_json_number_to_repeated_int32(void);
-void test_cvt_json_string_to_repeated_int32(void);
-void test_cvt_json_object_to_repeated_int32(void);
-
 void test_cvt_json_number_to_sint32(void);
 void test_cvt_json_array_to_repeated_sint32(void);
 void test_cvt_json_number_to_sfixed32(void);
@@ -94,18 +89,6 @@ CU_TestInfo test_repeated_int32_conversion[] = {
     CU_TEST_INFO_NULL
 };
 
-/**
- * @brief
- * @todo should be tested by inteerface, it worked for all repeated fields
- */
-CU_TestInfo test_repeated_int32_invalid_json_type[] = {
-    {"Reject conversion of JSON boolean to repeated Protobuf int32 field", test_cvt_json_bool_to_repeated_int32  },
-    {"Reject conversion of JSON number to repeated Protobuf int32 field",  test_cvt_json_number_to_repeated_int32},
-    {"Reject conversion of JSON string to repeated Protobuf int32 field",  test_cvt_json_string_to_repeated_int32},
-    {"Reject conversion of JSON object to repeated Protobuf int32 field",  test_cvt_json_object_to_repeated_int32},
-    CU_TEST_INFO_NULL,
-};
-
 CU_TestInfo test_x32_conversion[] = {
     {"Convert JSON number to Protobuf sint32 field",           test_cvt_json_number_to_sint32          },
     {"Convert JSON array to Protobuf repeated sint32 field",   test_cvt_json_array_to_repeated_sint32  },
@@ -120,8 +103,6 @@ CU_SuiteInfo suites[] = {
      test_int32_overflow                                                                                                                                                             },
     {"Convert JSON array to repeated Protobuf int32 field",   init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion,
      test_repeated_int32_conversion                                                                                                                                                  },
-    {"Reject invalid JSON types for repeated Protobuf int32", init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion,
-     test_repeated_int32_invalid_json_type                                                                                                                                           },
     {"Convert JSON to Protobuf sint32/sfixed32 field",        init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion, test_x32_conversion  },
     CU_SUITE_INFO_NULL,
 };
