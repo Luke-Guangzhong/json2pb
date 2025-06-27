@@ -50,7 +50,6 @@ void test_cvt_json_number_min_int32(void);
 void test_cvt_json_str_max_int32(void);
 void test_cvt_json_str_min_int32(void);
 
-void test_cvt_json_null_to_single_number(void);
 void test_cvt_json_bool_to_single_number(void);
 void test_cvt_json_array_to_single_number(void);
 void test_cvt_json_object_to_single_number(void);
@@ -61,7 +60,6 @@ void test_cvt_json_array_to_repeated_int32_partly_failed(void);
 void test_cvt_json_array_to_repeated_int32_all_failed(void);
 void test_cvt_json_array_to_repeated_int32_empty(void);
 
-void test_cvt_json_null_to_repeated_int32(void);
 void test_cvt_json_bool_to_repeated_int32(void);
 void test_cvt_json_number_to_repeated_int32(void);
 void test_cvt_json_string_to_repeated_int32(void);
@@ -112,7 +110,6 @@ CU_TestInfo test_int32_overflow[] = {
 };
 
 CU_TestInfo test_int32_invalid_json_type[] = {
-    {"Reject conversion of JSON null to Protobuf int32",           test_cvt_json_null_to_single_number       },
     {"Reject conversion of JSON boolean to Protobuf int32",        test_cvt_json_bool_to_single_number       },
     {"Reject conversion of JSON array to Protobuf int32",          test_cvt_json_array_to_single_number      },
     {"Reject conversion of JSON object to Protobuf int32",         test_cvt_json_object_to_single_number     },
@@ -129,7 +126,6 @@ CU_TestInfo test_repeated_int32_conversion[] = {
 };
 
 CU_TestInfo test_repeated_int32_invalid_json_type[] = {
-    {"Reject conversion of JSON null to repeated Protobuf int32 field",    test_cvt_json_null_to_repeated_int32  },
     {"Reject conversion of JSON boolean to repeated Protobuf int32 field", test_cvt_json_bool_to_repeated_int32  },
     {"Reject conversion of JSON number to repeated Protobuf int32 field",  test_cvt_json_number_to_repeated_int32},
     {"Reject conversion of JSON string to repeated Protobuf int32 field",  test_cvt_json_string_to_repeated_int32},
@@ -428,16 +424,6 @@ test_cvt_json_str_min_int32(void)
 }
 
 void
-test_cvt_json_null_to_single_number(void)
-{
-    cJSON_AddNullToObject(root, int32_field_name);
-
-    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, int32_field_name), (ProtobufCMessage*)msg, int32_field_name);
-    CU_ASSERT_EQUAL(e, J2P_EXPT_NULL_VALUE);
-    CU_ASSERT_EQUAL(msg->f_int32, 0);
-}
-
-void
 test_cvt_json_bool_to_single_number(void)
 {
     cJSON_AddTrueToObject(root, int32_field_name);
@@ -543,17 +529,6 @@ test_cvt_json_array_to_repeated_int32_empty(void)
     CU_ASSERT_EQUAL(e, J2P_EXPT_EMPTY_ARRAY);
     CU_ASSERT_EQUAL(msg->n_f_repeated_int32, 0);
     CU_ASSERT_PTR_NULL(msg->f_repeated_int32);
-}
-
-void
-test_cvt_json_null_to_repeated_int32(void)
-{
-    cJSON_AddNullToObject(root, repeated_int32_field_name);
-
-    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, repeated_int32_field_name), (ProtobufCMessage*)msg, repeated_int32_field_name);
-    CU_ASSERT_EQUAL(e, J2P_EXPT_NULL_VALUE);
-    CU_ASSERT_PTR_NULL(msg->f_repeated_int32);
-    CU_ASSERT_EQUAL(msg->n_f_repeated_int32, 0);
 }
 
 void

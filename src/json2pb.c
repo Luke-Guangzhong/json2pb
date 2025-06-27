@@ -29,6 +29,7 @@ const j2p_expt_msg j2p_expt_msg_list[] = {
     {J2P_EXPT_EMPTY_ARRAY,              "empty array in json"                                   },
     {J2P_EXPT_PARTIAL_FAIL,             "partial fail when convert json array to repeated field"},
     {J2P_EXPT_NO_VALID_FOUND,           "all element in array are not valid for this field"     },
+    {J2P_EXPT_JSON_POINTER_NOT_FOUND,   "cannot locate object by json pointer"                  },
     {J2P_EXPT_JSON_GENERAL,             "general error in json"                                 },
     {J2P_EXPT_UNINITIALIZED,            "protobuf message not initialized"                      },
     {J2P_EXPT_FIELD_NOT_FOUND,          "specified field not found in protobuf message"         },
@@ -42,7 +43,28 @@ const j2p_expt_msg j2p_expt_msg_list[] = {
     {J2P_EXPT_OS_GENERAL,               "general error in operating system"                     },
 };
 
+/**
+ * @brief
+ *
+ * @param root
+ * @param msg
+ * @param item
+ * @param field_desc
+ * @return j2p_expt_t
+ * @deprecated use cvt_numeric instead
+ */
 static j2p_expt_t cvt_int32_t(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
+
+/**
+ * @brief
+ *
+ * @param root
+ * @param msg
+ * @param item
+ * @param field_desc
+ * @return j2p_expt_t
+ * @deprecated use cvt_numeric instead
+ */
 static j2p_expt_t cvt_int64_t(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
 
 // static j2p_expt_t cvt_uint32_t(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
@@ -58,7 +80,7 @@ cvt_numeric(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, c
 j2p_expt_t
 cvt_json_2_pb_field(const cJSON*                root,
                     const cJSON*                item,
-                    ProtobufCMessage* const     msg,
+                    ProtobufCMessage*           msg,
                     const char* const           field_name,
                     const string_bool_convertor bool_cvt,
                     const string_enum_convertor enum_cvt,
@@ -97,6 +119,14 @@ cvt_json_2_pb_field(const cJSON*                root,
         return J2P_EXPT_ONEOF_ALREADY_SET;
     }
 
+    char* json_ptr = cJSONUtils_FindPointerFromObjectTo(root, item);
+    if (NULL == json_ptr) {
+        return J2P_EXPT_JSON_POINTER_NOT_FOUND;
+    } else {
+        free(json_ptr);
+        json_ptr = NULL;
+    }
+
     j2p_expt_t rtn = J2P_EXPT_SUCCESS;
 
     switch (field_desc->type) {
@@ -109,7 +139,7 @@ cvt_json_2_pb_field(const cJSON*                root,
     case PROTOBUF_C_TYPE_INT64:
     case PROTOBUF_C_TYPE_SINT64:
     case PROTOBUF_C_TYPE_SFIXED64:
-        rtn = cvt_int64_t(root, msg, item, field_desc);
+        rtn = cvt_numeric(root, msg, item, field_desc, sizeof(int64_t), (single_field_cvt_func)cvt_single_int64_t);
         break;
     case PROTOBUF_C_TYPE_UINT32:
     case PROTOBUF_C_TYPE_FIXED32:
