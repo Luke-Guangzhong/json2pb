@@ -67,13 +67,6 @@ static j2p_expt_t cvt_int32_t(const cJSON* root, ProtobufCMessage* msg, const cJ
  */
 static j2p_expt_t cvt_int64_t(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
 
-// static j2p_expt_t cvt_uint32_t(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
-// static j2p_expt_t cvt_uint64_t(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
-// static j2p_expt_t cvt_float(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
-// static j2p_expt_t cvt_double(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
-// static j2p_expt_t cvt_string(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc);
-// static j2p_expt_t cvt_bool(const cJSON* root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, const string_bool_convertor bool_cvt);
-
 static j2p_expt_t
 cvt_numeric(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, const size_t elem_size, single_field_cvt_func cvt_func);
 
@@ -133,7 +126,6 @@ cvt_json_2_pb_field(const cJSON*                root,
     case PROTOBUF_C_TYPE_INT32:
     case PROTOBUF_C_TYPE_SINT32:
     case PROTOBUF_C_TYPE_SFIXED32:
-        // rtn = cvt_int32_t(root, msg, item, field_desc);
         rtn = cvt_numeric(root, msg, item, field_desc, sizeof(int32_t), (single_field_cvt_func)cvt_single_int32_t);
         break;
     case PROTOBUF_C_TYPE_INT64:
@@ -143,36 +135,27 @@ cvt_json_2_pb_field(const cJSON*                root,
         break;
     case PROTOBUF_C_TYPE_UINT32:
     case PROTOBUF_C_TYPE_FIXED32:
-        // rtn = cvt_uint32_t(root, msg, item, field_desc);
         break;
     case PROTOBUF_C_TYPE_UINT64:
     case PROTOBUF_C_TYPE_FIXED64:
-        // rtn = cvt_uint64_t(root, msg, item, field_desc);
         break;
     case PROTOBUF_C_TYPE_FLOAT:
-        // rtn = cvt_float(root, msg, item, field_desc);
         break;
     case PROTOBUF_C_TYPE_DOUBLE:
-        // rtn = cvt_double(root, msg, item, field_desc);
         break;
     case PROTOBUF_C_TYPE_BOOL:
-        // rtn = cvt_bool(root, msg, item, field_desc, bool_cvt);
         break;
     case PROTOBUF_C_TYPE_ENUM:
-        // rtn = __cvt_enum__(msg, field_desc, root, string_enum);
         break;
     case PROTOBUF_C_TYPE_STRING:
-        // rtn = cvt_string(root, msg, item, field_desc);
         break;
     case PROTOBUF_C_TYPE_MESSAGE:
-        // rtn = __cvt_pb_msg__(msg, field_desc, root, msg_convertor);
         break;
     case PROTOBUF_C_TYPE_BYTES:
-        // rtn = __cvt_bytes__(msg, field_desc, root, mode);
         break;
     default:
-        // printf("field %s cannot processed in json for now\n",
-        // field_desc->name);
+        printf("field %s cannot processed in json for now\n", field_desc->name);
+        rtn = J2P_EXPT_CODE_GENERAL;
         break;
     }
 

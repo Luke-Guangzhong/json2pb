@@ -9,29 +9,15 @@
  *
  */
 
-#include <errno.h>
-#include <limits.h>
-#include <stdlib.h>
-#include <sys/stat.h>
 #include <unistd.h>
-
-#include <CUnit/Basic.h>
-#include <CUnit/TestDB.h>
 
 #include "json2pb.h"
 #include "test.pb-c.h"
-
-#ifndef PATH_MAX
-#define PATH_MAX 4096
-#endif
+#include "utils.h"
 
 /******************************************************************************/
 /*                                Declarations                                */
 /******************************************************************************/
-
-static void sanitize_name(const char* in, char* out, size_t out_sz);
-void        setup_successful_conversion(void);
-void        teardown_successful_conversion(void);
 
 void test_cvt_json_number_to_single_int64(void);
 void test_cvt_json_decimal_string_to_single_int64(void);
@@ -40,6 +26,7 @@ void test_cvt_json_hex_string_to_single_int64(void);
 void test_cvt_json_binary_string_to_single_int64(void);
 #endif
 void test_cvt_json_octal_string_to_single_int64(void);
+void test_cvt_json_number_to_oneof_int64(void);
 
 void test_cvt_json_number_overflow_int64(void);
 void test_cvt_json_number_underflow_int64(void);
@@ -50,7 +37,6 @@ void test_cvt_json_number_min_int64(void);
 void test_cvt_json_str_max_int64(void);
 void test_cvt_json_str_min_int64(void);
 
-void test_cvt_json_null_to_single_number(void);
 void test_cvt_json_bool_to_single_number(void);
 void test_cvt_json_array_to_single_number(void);
 void test_cvt_json_object_to_single_number(void);
@@ -61,7 +47,6 @@ void test_cvt_json_array_to_repeated_int64_partly_failed(void);
 void test_cvt_json_array_to_repeated_int64_all_failed(void);
 void test_cvt_json_array_to_repeated_int64_empty(void);
 
-void test_cvt_json_null_to_repeated_int64(void);
 void test_cvt_json_bool_to_repeated_int64(void);
 void test_cvt_json_number_to_repeated_int64(void);
 void test_cvt_json_string_to_repeated_int64(void);
@@ -76,119 +61,109 @@ void test_cvt_json_array_to_repeated_sfixed64(void);
 /*                              Global Variable                               */
 /******************************************************************************/
 
-TestMessage* msg                            = NULL;
-cJSON*       root                           = NULL;
-const char   int64_field_name[]             = "f_int64";
-const char   sint64_field_name[]            = "f_sint64";
-const char   sfixed64_field_name[]          = "f_sfixed64";
-const char   repeated_int64_field_name[]    = "f_repeated_int64";
-const char   repeated_sint64_field_name[]   = "f_repeated_sint64";
-const char   repeated_sfixed64_field_name[] = "f_repeated_sfixed64";
-static int   saved_stdout_fd                = -1;
-static char  log_path[PATH_MAX];
+const char int64_field_name[]             = "f_int64";
+const char sint64_field_name[]            = "f_sint64";
+const char sfixed64_field_name[]          = "f_sfixed64";
+const char repeated_int64_field_name[]    = "f_repeated_int64";
+const char repeated_sint64_field_name[]   = "f_repeated_sint64";
+const char repeated_sfixed64_field_name[] = "f_repeated_sfixed64";
+
+CU_TestInfo test_int64_conversion[] = {
+    {"Convert JSON number to Protobuf int32 field",             test_cvt_json_number_to_single_int64        },
+    {"Convert JSON decimal string to Protobuf int32 field",     test_cvt_json_decimal_string_to_single_int64},
+    {"Convert JSON hexadecimal string to Protobuf int32 field", test_cvt_json_hex_string_to_single_int64    },
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
+    {"Convert JSON binary string to Protobuf int32 field",      test_cvt_json_binary_string_to_single_int64 },
+#endif
+    {"Convert JSON octal string to Protobuf int32 field",       test_cvt_json_octal_string_to_single_int64  },
+    {"Convert JSON number to Protobuf oneof int32 field",       test_cvt_json_number_to_oneof_int64         },
+    CU_TEST_INFO_NULL,
+};
 
 CU_SuiteInfo suites[] = {
+    {"Convert JSON to Protobuf int64 field", NULL, NULL, setup_successful_conversion, teardown_successful_conversion, test_int64_conversion},
     CU_SUITE_INFO_NULL,
 };
 
 /******************************************************************************/
-/*                                 Utilities                                  */
-/******************************************************************************/
-
-/* 把测试用例名转换成文件名安全的格式，比如把空格和特殊字符换成下划线 */
-static void
-sanitize_name(const char* in, char* out, size_t out_sz)
-{
-    size_t j = 0;
-    for (size_t i = 0; in[i] != '\0' && j + 1 < out_sz; ++i) {
-        char c = in[i];
-        if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')) {
-            out[j++] = c;
-        } else {
-            out[j++] = '_';
-        }
-    }
-    out[j] = '\0';
-}
-
-void
-setup_successful_conversion(void)
-{
-    msg = (TestMessage*)calloc(1, sizeof(TestMessage));
-    if (NULL == msg) {
-        exit(EXIT_FAILURE);
-    }
-    test_message__init(msg);
-    root = cJSON_CreateObject();
-    if (NULL == root) {
-        exit(EXIT_FAILURE);
-    }
-
-    CU_pTest current = CU_get_current_test();
-    if (!current || !current->pName) {
-        exit(EXIT_FAILURE);
-    }
-
-    /* 确保 build/log 目录存在 */
-    if (mkdir("log", 0777) != 0 && errno != EEXIST) {
-        perror("mkdir log");
-        exit(EXIT_FAILURE);
-    }
-
-    /* 备份 stdout */
-    fflush(stdout);
-    saved_stdout_fd = dup(fileno(stdout));
-    if (saved_stdout_fd < 0) {
-        perror("dup stdout");
-        exit(EXIT_FAILURE);
-    }
-
-    /* 生成日志文件路径 */
-    {
-        char safe_name[PATH_MAX - 11] = {};
-        sanitize_name(current->pName, safe_name, sizeof(safe_name));
-        snprintf(log_path, sizeof(log_path), "log/%s.log", safe_name);
-    }
-
-    /* 打开日志文件并重定向 stdout */
-    FILE* f = fopen(log_path, "w");
-    if (!f) {
-        perror("fopen log file");
-        /* 恢复 stdout */
-        dup2(saved_stdout_fd, fileno(stdout));
-        close(saved_stdout_fd);
-        exit(EXIT_FAILURE);
-    }
-    if (dup2(fileno(f), fileno(stdout)) < 0) {
-        perror("dup2 to stdout");
-        fclose(f);
-        dup2(saved_stdout_fd, fileno(stdout));
-        close(saved_stdout_fd);
-        exit(EXIT_FAILURE);
-    }
-    fclose(f);
-    return;
-}
-
-void
-teardown_successful_conversion(void)
-{
-    cJSON_Delete(root);
-    test_message__free_unpacked(msg, NULL);
-    msg  = NULL;
-    root = NULL;
-    fflush(stdout);
-    if (saved_stdout_fd >= 0) {
-        dup2(saved_stdout_fd, fileno(stdout));
-        close(saved_stdout_fd);
-        saved_stdout_fd = -1;
-    }
-    return;
-}
-
-/******************************************************************************/
 /*                                 Test Cases                                 */
 /******************************************************************************/
+
+void
+test_cvt_json_number_to_single_int64(void)
+{
+    int64_t value = 1234567890;
+
+    cJSON_AddNumberToObject(root, int64_field_name, value);
+
+    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, int64_field_name), (ProtobufCMessage*)msg, int64_field_name);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
+    CU_ASSERT_EQUAL(msg->f_int64, value);
+}
+
+void
+test_cvt_json_decimal_string_to_single_int64(void)
+{
+    const char* value = "1234567890";
+
+    cJSON_AddStringToObject(root, int64_field_name, value);
+
+    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, int64_field_name), (ProtobufCMessage*)msg, int64_field_name);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
+    CU_ASSERT_EQUAL(msg->f_int64, 1234567890);
+}
+
+void
+test_cvt_json_hex_string_to_single_int64(void)
+{
+    const char* value = "0x4a0";
+
+    cJSON_AddStringToObject(root, int64_field_name, value);
+
+    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, int64_field_name), (ProtobufCMessage*)msg, int64_field_name);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
+    CU_ASSERT_EQUAL(msg->f_int64, 0x4a0);
+}
+
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
+void
+test_cvt_json_binary_string_to_single_int64(void)
+{
+    const char* value = "0b110";
+
+    cJSON_AddStringToObject(root, int64_field_name, value);
+
+    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, int64_field_name), (ProtobufCMessage*)msg, int64_field_name);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
+    CU_ASSERT_EQUAL(msg->f_int64 == 0b110);
+}
+#endif
+
+void
+test_cvt_json_octal_string_to_single_int64(void)
+{
+    const char* value = "0110";
+
+    cJSON_AddStringToObject(root, int64_field_name, value);
+
+    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, int64_field_name), (ProtobufCMessage*)msg, int64_field_name);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
+    CU_ASSERT_EQUAL(msg->f_int64, 0110);
+}
+
+void
+test_cvt_json_number_to_oneof_int64(void)
+{
+    int64_t oneof_int64_value = 123456789;
+    cJSON_AddNumberToObject(root, "oneof_int64", oneof_int64_value);
+
+    j2p_expt_t                      e          = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, "oneof_int64"), (ProtobufCMessage*)msg, "oneof_int64");
+    const ProtobufCFieldDescriptor* field_desc = protobuf_c_message_descriptor_get_field_by_name(msg->base.descriptor, "oneof_int64");
+    CU_ASSERT_PTR_NOT_NULL_FATAL(field_desc);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
+    CU_ASSERT_EQUAL(msg->oneof_int64, oneof_int64_value);
+    CU_ASSERT_EQUAL(msg->test_oneof_case, field_desc->id);
+}
 
 /******************************************************************************/
 /*                                 Main Code                                  */
