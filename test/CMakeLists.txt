@@ -36,7 +36,7 @@ execute_process(
 
 link_libraries(libjson2pb cunit)
 
-include_directories(${PROTO_OUTPUT_INCLUDE_DIR})
+include_directories(${PROTO_OUTPUT_INCLUDE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
 aux_source_directory(${PROTO_OUTPUT_SRC_DIR} PROTOBUF_SOURCES)
 
 add_executable(test_public_interface src/test_public_interface.c ${PROTOBUF_SOURCES})
