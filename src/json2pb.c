@@ -140,6 +140,7 @@ cvt_json_2_pb_field(const cJSON*                root,
         break;
     case PROTOBUF_C_TYPE_UINT32:
     case PROTOBUF_C_TYPE_FIXED32:
+        rtn = cvt_numeric(root, msg, item, field_desc, sizeof(uint32_t), (single_field_cvt_func)cvt_single_uint32_t);
         break;
     case PROTOBUF_C_TYPE_UINT64:
     case PROTOBUF_C_TYPE_FIXED64:

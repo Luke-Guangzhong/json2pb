@@ -90,3 +90,38 @@ cvt_single_int64_t(const cJSON* const item, int64_t* const field)
 
     return J2P_EXPT_SUCCESS;
 }
+
+j2p_expt_t
+cvt_single_uint32_t(const cJSON* const item, uint32_t* const field)
+{
+    assert(NULL != item);
+    assert(NULL != field);
+
+    if (cJSON_IsNumber(item)) {
+        const double num_value = cJSON_GetNumberValue(item);
+
+        if (isinf(num_value) || isnan(num_value) || num_value < 0 || num_value > UINT32_MAX) {
+            return J2P_EXPT_VALUE_OVERFLOW;
+        }
+        *field = (uint32_t)num_value;
+    } else if (NULL != cJSON_GetStringValue(item)) {
+        errno                         = 0;
+        char*               endptr    = NULL;
+        const unsigned long num_value = strtoul(cJSON_GetStringValue(item), &endptr, 0);
+        if (errno != 0 || *endptr != '\0') {
+            if (errno == ERANGE) {
+                return J2P_EXPT_VALUE_OVERFLOW;
+            } else {
+                return J2P_EXPT_INVALID_NUMBER_STRING;
+            }
+        }
+        if (num_value < 0 || num_value > UINT32_MAX) {
+            return J2P_EXPT_VALUE_OVERFLOW;
+        }
+        *field = (uint32_t)num_value;
+    } else {
+        return J2P_EXPT_UNACCEPTABLE_JSON_TYPE;
+    }
+
+    return J2P_EXPT_SUCCESS;
+}
