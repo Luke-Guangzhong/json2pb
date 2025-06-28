@@ -90,13 +90,21 @@ CU_TestInfo test_repeated_int64_conversion[] = {
     CU_TEST_INFO_NULL
 };
 
+CU_TestInfo test_x64_conversion[] = {
+    {"Convert JSON number to Protobuf sint64 field",           test_cvt_json_number_to_sint64          },
+    {"Convert JSON array to Protobuf repeated sint64 field",   test_cvt_json_array_to_repeated_sint64  },
+    {"Convert JSON number to Protobuf sfixed64 field",         test_cvt_json_number_to_sfixed64        },
+    {"Convert JSON array to Protobuf repeated sfixed64 field", test_cvt_json_array_to_repeated_sfixed64},
+    CU_TEST_INFO_NULL,
+};
+
 CU_SuiteInfo suites[] = {
     {"Convert JSON to Protobuf int64 field",                  init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion, test_int64_conversion},
     {"Convert JSON to Protobuf int64 with overflow handling", init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion,
      test_int64_overflow                                                                                                                                                             },
     {"Convert JSON array to repeated Protobuf int64 field",   init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion,
      test_repeated_int64_conversion                                                                                                                                                  },
-
+    {"Convert JSON to Protobuf sint64/sfixed64 field",        init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion, test_x64_conversion  },
     CU_SUITE_INFO_NULL,
 };
 
@@ -340,6 +348,64 @@ test_cvt_json_array_to_repeated_int64_empty(void)
     CU_ASSERT_EQUAL(e, J2P_EXPT_EMPTY_ARRAY);
     CU_ASSERT_EQUAL(msg->n_f_repeated_int64, 0);
     CU_ASSERT_PTR_NULL(msg->f_repeated_int64);
+}
+
+void
+test_cvt_json_number_to_sint64(void)
+{
+    int64_t value = 0x4a0;
+
+    cJSON_AddNumberToObject(root, sint64_field_name, value);
+
+    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, sint64_field_name), (ProtobufCMessage*)msg, sint64_field_name);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
+    CU_ASSERT_EQUAL(msg->f_sint64, value);
+}
+
+void
+test_cvt_json_array_to_repeated_sint64(void)
+{
+    const char* value          = "[123,\"123\",\"0x4a0\",\"0110\"]";
+    int64_t     expect_array[] = {123, 123, 0x4a0, 0110};
+    size_t      expect_length  = 4;
+
+    cJSON* array_value = cJSON_Parse(value);
+
+    cJSON_AddItemToObject(root, repeated_sint64_field_name, array_value);
+
+    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, repeated_sint64_field_name), (ProtobufCMessage*)msg, repeated_sint64_field_name);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
+    CU_ASSERT_EQUAL(msg->n_f_repeated_sint64, expect_length);
+    CU_ASSERT_EQUAL(memcmp(msg->f_repeated_sint64, expect_array, expect_length * sizeof(int64_t)), 0);
+}
+
+void
+test_cvt_json_number_to_sfixed64(void)
+{
+    int64_t value = 0x4a0;
+
+    cJSON_AddNumberToObject(root, sfixed64_field_name, value);
+
+    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, sfixed64_field_name), (ProtobufCMessage*)msg, sfixed64_field_name);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
+    CU_ASSERT_EQUAL(msg->f_sfixed64, value);
+}
+
+void
+test_cvt_json_array_to_repeated_sfixed64(void)
+{
+    const char* value          = "[123,\"123\",\"0x4a0\",\"0110\"]";
+    int64_t     expect_array[] = {123, 123, 0x4a0, 0110};
+    size_t      expect_length  = 4;
+
+    cJSON* array_value = cJSON_Parse(value);
+
+    cJSON_AddItemToObject(root, repeated_sfixed64_field_name, array_value);
+
+    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, repeated_sfixed64_field_name), (ProtobufCMessage*)msg, repeated_sfixed64_field_name);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
+    CU_ASSERT_EQUAL(msg->n_f_repeated_sfixed64, expect_length);
+    CU_ASSERT_EQUAL(memcmp(msg->f_repeated_sfixed64, expect_array, expect_length * sizeof(int64_t)), 0);
 }
 
 /******************************************************************************/

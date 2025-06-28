@@ -182,12 +182,14 @@ init_sutie_name(void)
         perror("mkdir suite log");
         exit(EXIT_FAILURE);
     }
+    return 0;
 }
 
 int
 cleanup_sutie_name(void)
 {
     current_sutie_path[0] = '\0';
+    return 0;
 }
 
 void
