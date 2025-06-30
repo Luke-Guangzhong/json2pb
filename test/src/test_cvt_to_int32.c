@@ -89,7 +89,7 @@ CU_TestInfo test_repeated_int32_conversion[] = {
     CU_TEST_INFO_NULL
 };
 
-CU_TestInfo test_x32_conversion[] = {
+CU_TestInfo test_xs32_conversion[] = {
     {"Convert JSON number to Protobuf sint32 field",           test_cvt_json_number_to_sint32          },
     {"Convert JSON array to Protobuf repeated sint32 field",   test_cvt_json_array_to_repeated_sint32  },
     {"Convert JSON number to Protobuf sfixed32 field",         test_cvt_json_number_to_sfixed32        },
@@ -103,7 +103,7 @@ CU_SuiteInfo suites[] = {
      test_int32_overflow                                                                                                                                                             },
     {"Convert JSON array to repeated Protobuf int32 field",   init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion,
      test_repeated_int32_conversion                                                                                                                                                  },
-    {"Convert JSON to Protobuf sint32/sfixed32 field",        init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion, test_x32_conversion  },
+    {"Convert JSON to Protobuf sint32/sfixed32 field",        init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion, test_xs32_conversion },
     CU_SUITE_INFO_NULL,
 };
 
@@ -409,8 +409,8 @@ test_cvt_json_number_to_sint32(void)
 void
 test_cvt_json_array_to_repeated_sint32(void)
 {
-    const char* value          = "[123,\"123\",\"0x4a0\",\"0110\"]";
-    int32_t     expect_array[] = {123, 123, 0x4a0, 0110};
+    const char* value          = "[123,\"-123\",\"0x4a0\",\"0110\"]";
+    int32_t     expect_array[] = {123, -123, 0x4a0, 0110};
     size_t      expect_length  = 4;
 
     cJSON* array_value = cJSON_Parse(value);
@@ -438,8 +438,8 @@ test_cvt_json_number_to_sfixed32(void)
 void
 test_cvt_json_array_to_repeated_sfixed32(void)
 {
-    const char* value          = "[123,\"123\",\"0x4a0\",\"0110\"]";
-    int32_t     expect_array[] = {123, 123, 0x4a0, 0110};
+    const char* value          = "[123,\"-123\",\"0x4a0\",\"0110\"]";
+    int32_t     expect_array[] = {123, -123, 0x4a0, 0110};
     size_t      expect_length  = 4;
 
     cJSON* array_value = cJSON_Parse(value);

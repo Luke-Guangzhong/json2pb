@@ -86,12 +86,19 @@ CU_TestInfo test_repeated_uint32_conversion[] = {
     CU_TEST_INFO_NULL
 };
 
+CU_TestInfo test_xu32_conversion[] = {
+    {"Convert JSON number to Protobuf fixed32 field",         test_cvt_json_number_to_fixed32        },
+    {"Convert JSON array to Protobuf repeated fixed32 field", test_cvt_json_array_to_repeated_fixed32},
+    CU_TEST_INFO_NULL,
+};
+
 CU_SuiteInfo suites[] = {
     {"Convert JSON to Protobuf uint32 field",                  init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion, test_uint32_conversion},
     {"Convert JSON to Protobuf uint32 with overflow handling", init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion,
      test_uint32_overflow                                                                                                                                                              },
     {"Convert JSON array to repeated Protobuf uint32 field",   init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion,
      test_repeated_uint32_conversion                                                                                                                                                   },
+    {"Convert JSON to Protobuf fixed32 field",                 init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion, test_xu32_conversion  },
     CU_SUITE_INFO_NULL,
 };
 
@@ -340,11 +347,30 @@ test_cvt_json_array_to_repeated_uint32_empty(void)
 void
 test_cvt_json_number_to_fixed32(void)
 {
+    uint32_t value = 0x4a0;
+
+    cJSON_AddNumberToObject(root, fixed32_field_name, value);
+
+    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, fixed32_field_name), (ProtobufCMessage*)msg, fixed32_field_name);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
+    CU_ASSERT_EQUAL(msg->f_fixed32, value);
 }
 
 void
 test_cvt_json_array_to_repeated_fixed32(void)
 {
+    const char* value          = "[123,\"123\",\"0x4a0\",\"0110\"]";
+    uint32_t    expect_array[] = {123, 123, 0x4a0, 0110};
+    size_t      expect_length  = 4;
+
+    cJSON* array_value = cJSON_Parse(value);
+
+    cJSON_AddItemToObject(root, repeated_fixed32_field_name, array_value);
+
+    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, repeated_fixed32_field_name), (ProtobufCMessage*)msg, repeated_fixed32_field_name);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
+    CU_ASSERT_EQUAL(msg->n_f_repeated_fixed32, expect_length);
+    CU_ASSERT_EQUAL(memcmp(msg->f_repeated_fixed32, expect_array, expect_length * sizeof(uint32_t)), 0);
 }
 
 /******************************************************************************/
