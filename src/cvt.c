@@ -105,9 +105,13 @@ cvt_single_uint32_t(const cJSON* const item, uint32_t* const field)
         }
         *field = (uint32_t)num_value;
     } else if (NULL != cJSON_GetStringValue(item)) {
+        const char* num_str = cJSON_GetStringValue(item);
+        if (num_str[0] == '-') {
+            return J2P_EXPT_VALUE_OVERFLOW;
+        }
         errno                         = 0;
         char*               endptr    = NULL;
-        const unsigned long num_value = strtoul(cJSON_GetStringValue(item), &endptr, 0);
+        const unsigned long num_value = strtoul(num_str, &endptr, 0);
         if (errno != 0 || *endptr != '\0') {
             if (errno == ERANGE) {
                 return J2P_EXPT_VALUE_OVERFLOW;
@@ -115,7 +119,7 @@ cvt_single_uint32_t(const cJSON* const item, uint32_t* const field)
                 return J2P_EXPT_INVALID_NUMBER_STRING;
             }
         }
-        if (num_value > UINT32_MAX) {
+        if (num_value < 0 || num_value > UINT32_MAX) {
             return J2P_EXPT_VALUE_OVERFLOW;
         }
         *field = (uint32_t)num_value;
@@ -140,9 +144,13 @@ cvt_single_uint64_t(const cJSON* const item, uint64_t* const field)
         }
         *field = (uint64_t)num_value;
     } else if (NULL != cJSON_GetStringValue(item)) {
+        const char* num_str = cJSON_GetStringValue(item);
+        if (num_str[0] == '-') {
+            return J2P_EXPT_VALUE_OVERFLOW;
+        }
         errno                              = 0;
         char*                    endptr    = NULL;
-        const unsigned long long num_value = strtoull(cJSON_GetStringValue(item), &endptr, 0);
+        const unsigned long long num_value = strtoull(num_str, &endptr, 0);
         if (errno != 0 || *endptr != '\0') {
             if (errno == ERANGE) {
                 return J2P_EXPT_VALUE_OVERFLOW;
@@ -150,7 +158,7 @@ cvt_single_uint64_t(const cJSON* const item, uint64_t* const field)
                 return J2P_EXPT_INVALID_NUMBER_STRING;
             }
         }
-        if (num_value > UINT64_MAX) {
+        if (num_value < 0 || num_value > UINT64_MAX) {
             return J2P_EXPT_VALUE_OVERFLOW;
         }
         *field = (uint64_t)num_value;
