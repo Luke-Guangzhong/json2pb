@@ -19,7 +19,7 @@ default_string_bool_convertor(const char* const str)
     return 0 == strncmp("true", str, 4);
 }
 
-bool
+int
 default_string_bool_convertor_v2(const ProtobufCFieldDescriptor* const field_desc, const char* const str)
 {
     assert(NULL != str);

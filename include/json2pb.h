@@ -64,6 +64,8 @@ typedef j2p_expt_t (*obj_msg_convertor)(ProtobufCMessage* const msg, const cJSON
 
 typedef int (*compand_convertor)(void* p1, void* p2);
 
+typedef j2p_expt_t (*single_field_cvt_func)(const cJSON* const item, void* const field);
+
 j2p_expt_t cvt_json_2_pb_field(const cJSON*                root,
                                const cJSON*                item,
                                ProtobufCMessage* const     msg,

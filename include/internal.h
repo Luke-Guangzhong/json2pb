@@ -14,8 +14,6 @@
 
 #include "json2pb.h"
 
-typedef j2p_expt_t (*single_field_cvt_func)(const cJSON* const item, void* const field);
-
 j2p_expt_t cvt_single_int32_t(const cJSON* const item, int32_t* const field);
 
 j2p_expt_t cvt_single_int64_t(const cJSON* const item, int64_t* const field);
