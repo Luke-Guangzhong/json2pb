@@ -62,7 +62,7 @@ typedef int (*string_enum_convertor)(const ProtobufCEnumDescriptor* const enum_d
 
 typedef j2p_expt_t (*obj_msg_convertor)(ProtobufCMessage* const msg, const cJSON* const root);
 
-typedef int (*string_compand_convertor)(void* p1, void* p2);
+typedef int (*compand_convertor)(void* p1, void* p2);
 
 j2p_expt_t cvt_json_2_pb_field(const cJSON*                root,
                                const cJSON*                item,

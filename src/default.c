@@ -19,6 +19,14 @@ default_string_bool_convertor(const char* const str)
     return 0 == strncmp("true", str, 4);
 }
 
+bool
+default_string_bool_convertor_v2(const ProtobufCFieldDescriptor* const field_desc, const char* const str)
+{
+    assert(NULL != str);
+    (void)field_desc;
+    return 0 == strncmp("true", str, 4);
+}
+
 int
 default_string_enum_convertor(const ProtobufCEnumDescriptor* const enum_desc, const char* const str)
 {

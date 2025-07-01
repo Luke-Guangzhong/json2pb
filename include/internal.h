@@ -40,6 +40,8 @@ j2p_expt_t cvt_single_message(const cJSON* const item, char** const field, obj_m
 
 bool default_string_bool_convertor(const char* const str);
 
+int default_string_bool_convertor_v2(const ProtobufCFieldDescriptor* const field_desc, const char* const str);
+
 int default_string_enum_convertor(const ProtobufCEnumDescriptor* const enum_desc, const char* const str);
 
 int int_range_lookup(unsigned n_ranges, const ProtobufCIntRange* ranges, int value);

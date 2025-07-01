@@ -392,6 +392,6 @@ cvt_enum(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, cons
 }
 
 static j2p_expt_t
-cvt_compand(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, const size_t elem_size)
+cvt_compand(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const size_t elem_size, const ProtobufCFieldDescriptor* field_desc, compand_convertor compand_cvt)
 {
 }
