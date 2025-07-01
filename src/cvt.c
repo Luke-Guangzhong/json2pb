@@ -9,6 +9,7 @@
  *
  */
 #include <errno.h>
+#include <float.h>
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -180,30 +181,43 @@ cvt_single_float(const cJSON* const item, float* const field)
     assert(NULL != field);
 
     if (cJSON_IsNumber(item)) {
-        const double num_value = cJSON_GetNumberValue(item);
+        double num_value = cJSON_GetNumberValue(item);
 
-        if (isinf(num_value) || isnan(num_value)) {
+        if (isnan(num_value) || isinf(num_value)) {
             return J2P_EXPT_VALUE_OVERFLOW;
         }
 
-        float float_value = (float)num_value;
-        if (float_value != num_value) {
+        double abs_val = fabs(num_value);
+        if (abs_val != 0.0 && (abs_val < FLT_TRUE_MIN || abs_val > FLT_MAX)) {
+            return J2P_EXPT_VALUE_OVERFLOW;
+        }
+
+        float  fval = (float)num_value;
+        double back = (double)fval;
+        if (back != num_value) {
             return J2P_EXPT_NOT_EXACT;
         }
 
-        *field = float_value;
+        *field = fval;
     } else if (NULL != cJSON_GetStringValue(item)) {
-        errno                 = 0;
-        char*       endptr    = NULL;
-        const float num_value = strtof(cJSON_GetStringValue(item), &endptr);
-        if (errno != 0 || *endptr != '\0') {
-            if (errno == ERANGE) {
-                return J2P_EXPT_VALUE_OVERFLOW;
-            } else {
-                return J2P_EXPT_INVALID_NUMBER_STRING;
-            }
+        const char* str_val = cJSON_GetStringValue(item);
+        errno               = 0;
+        char* endptr        = NULL;
+        float fval          = strtof(str_val, &endptr);
+
+        if (errno == ERANGE) {
+            return J2P_EXPT_VALUE_OVERFLOW;
         }
-        *field = (float)num_value;
+
+        if (endptr == str_val || *endptr != '\0') {
+            return J2P_EXPT_INVALID_NUMBER_STRING;
+        }
+
+        if (isnan(fval) || isinf(fval)) {
+            return J2P_EXPT_VALUE_OVERFLOW;
+        }
+
+        *field = fval;
     } else {
         return J2P_EXPT_UNACCEPTABLE_JSON_TYPE;
     }
