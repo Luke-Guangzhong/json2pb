@@ -43,8 +43,15 @@ const j2p_expt_msg j2p_expt_msg_list[] = {
     {J2P_EXPT_OS_GENERAL,               "general error in operating system"                     },
 };
 
+static j2p_expt_t cvt_numeric(const cJSON* const              root,
+                              ProtobufCMessage*               msg,
+                              const cJSON*                    item,
+                              const ProtobufCFieldDescriptor* field_desc,
+                              const size_t                    elem_size,
+                              single_field_cvt_func           str_num_cvt);
+
 static j2p_expt_t
-cvt_numeric(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, const size_t elem_size, single_field_cvt_func cvt_func);
+cvt_bool(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, string_bool_convertor str_bool_cvt);
 
 j2p_expt_t
 cvt_json_2_pb_field(const cJSON*                root,
@@ -53,7 +60,8 @@ cvt_json_2_pb_field(const cJSON*                root,
                     const char* const           field_name,
                     const string_bool_convertor bool_cvt,
                     const string_enum_convertor enum_cvt,
-                    const j2p_file_t            file_type)
+                    const j2p_file_t            file_type,
+                    const obj_msg_convertor     msg_cvt)
 {
     assert(root != NULL);
     assert(msg != NULL);
@@ -126,8 +134,10 @@ cvt_json_2_pb_field(const cJSON*                root,
         rtn = cvt_numeric(root, msg, item, field_desc, sizeof(float), (single_field_cvt_func)cvt_single_float);
         break;
     case PROTOBUF_C_TYPE_DOUBLE:
+        rtn = cvt_numeric(root, msg, item, field_desc, sizeof(double), (single_field_cvt_func)cvt_single_double);
         break;
     case PROTOBUF_C_TYPE_BOOL:
+        rtn = cvt_bool(root, msg, item, field_desc, bool_cvt);
         break;
     case PROTOBUF_C_TYPE_ENUM:
         break;
@@ -147,16 +157,21 @@ cvt_json_2_pb_field(const cJSON*                root,
 }
 
 static j2p_expt_t
-cvt_numeric(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, const size_t elem_size, single_field_cvt_func cvt_func)
+cvt_numeric(const cJSON* const              root,
+            ProtobufCMessage*               msg,
+            const cJSON*                    item,
+            const ProtobufCFieldDescriptor* field_desc,
+            const size_t                    elem_size,
+            single_field_cvt_func           str_num_cvt)
 {
     assert(msg != NULL);
     assert(field_desc != NULL);
     assert(item != NULL);
     assert(msg->descriptor != NULL);
-    assert(field_desc->type != PROTOBUF_C_TYPE_STRING && field_desc->type != PROTOBUF_C_TYPE_MESSAGE && field_desc->type != PROTOBUF_C_TYPE_BYTES);
+    assert(field_desc->type != PROTOBUF_C_TYPE_BOOL && field_desc->type != PROTOBUF_C_TYPE_MESSAGE && field_desc->type != PROTOBUF_C_TYPE_ENUM);
 
     if (NULL == msg || NULL == field_desc || NULL == item || NULL == msg->descriptor ||
-        !(field_desc->type != PROTOBUF_C_TYPE_STRING && field_desc->type != PROTOBUF_C_TYPE_MESSAGE && field_desc->type != PROTOBUF_C_TYPE_BYTES)) {
+        !(field_desc->type != PROTOBUF_C_TYPE_BOOL && field_desc->type != PROTOBUF_C_TYPE_MESSAGE && field_desc->type != PROTOBUF_C_TYPE_ENUM)) {
         return J2P_EXPT_INVALID_ARG;
     }
 
@@ -177,7 +192,7 @@ cvt_numeric(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, c
 
             cJSON_ArrayForEach(element, item)
             {
-                rtn = cvt_func(element, array + (count * elem_size));
+                rtn = str_num_cvt(element, array + (count * elem_size));
                 if (rtn != EXIT_SUCCESS) {
                     char* path = cJSONUtils_FindPointerFromObjectTo(root, element);
                     printf("[EXCEPTION]: %s %s\n", path, j2p_expt_msg_list[rtn].desc);
@@ -214,6 +229,78 @@ cvt_numeric(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, c
             (*(int32_t*)((void*)msg + field_desc->quantifier_offset)) = field_desc->id;
         }
         void* field_ptr = (void*)msg + field_desc->offset;
-        return cvt_func(item, field_ptr);
+        return str_num_cvt(item, field_ptr);
+    }
+}
+
+static j2p_expt_t
+cvt_bool(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, string_bool_convertor str_bool_cvt)
+{
+    assert(msg != NULL);
+    assert(field_desc != NULL);
+    assert(item != NULL);
+    assert(msg->descriptor != NULL);
+    assert(field_desc->type != PROTOBUF_C_TYPE_STRING && field_desc->type != PROTOBUF_C_TYPE_MESSAGE && field_desc->type != PROTOBUF_C_TYPE_BYTES);
+
+    if (NULL == msg || NULL == field_desc || NULL == item || NULL == msg->descriptor ||
+        !(field_desc->type != PROTOBUF_C_TYPE_STRING && field_desc->type != PROTOBUF_C_TYPE_MESSAGE && field_desc->type != PROTOBUF_C_TYPE_BYTES)) {
+        return J2P_EXPT_INVALID_ARG;
+    }
+
+    const bool is_repeated = (field_desc->label == PROTOBUF_C_LABEL_REPEATED);
+    const bool is_oneof    = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_ONEOF);
+
+    if (is_repeated) {
+        if (cJSON_GetArraySize(item) > 0) {
+            uint64_t       count      = 0;
+            const cJSON*   element    = NULL;
+            const cJSON*   json_array = item;
+            const uint64_t length     = cJSON_GetArraySize(json_array);
+            j2p_expt_t     rtn        = J2P_EXPT_SUCCESS;
+            bool* const    array      = (bool*)calloc(length, sizeof(bool));
+            if (NULL == array) {
+                exit(EXIT_FAILURE);
+            }
+
+            cJSON_ArrayForEach(element, json_array)
+            {
+                rtn = cvt_single_bool(element, (bool*)array + count, str_bool_cvt);
+                if (rtn != EXIT_SUCCESS) {
+                    char* path = cJSONUtils_FindPointerFromObjectTo(root, element);
+                    printf("[EXCEPTION]: %s %s\n", path, j2p_expt_msg_list[rtn].desc);
+                    free(path);
+                } else {
+                    count++;
+                }
+            }
+
+            if (count == 0) { /* no valid element found */
+                free(array);
+                return J2P_EXPT_NO_VALID_FOUND;
+            }
+
+            bool** field_ptr = (bool**)((void*)msg + field_desc->offset);
+            *field_ptr       = (bool*)calloc(count, sizeof(bool));
+            if (NULL == (*field_ptr)) {
+                exit(EXIT_FAILURE);
+            }
+
+            memcpy((*field_ptr), array, count * sizeof(bool));
+            *(size_t*)((void*)msg + field_desc->quantifier_offset) = count;
+
+            free(array);
+            if (count == length)
+                return J2P_EXPT_SUCCESS;
+            else
+                return J2P_EXPT_PARTIAL_FAIL;
+        } else {
+            return J2P_EXPT_EMPTY_ARRAY;
+        }
+    } else {
+        if (is_oneof) {
+            (*(int32_t*)((void*)msg + field_desc->quantifier_offset)) = field_desc->id;
+        }
+        void* field_ptr = (void*)msg + field_desc->offset;
+        return cvt_single_bool(item, field_ptr, str_bool_cvt);
     }
 }

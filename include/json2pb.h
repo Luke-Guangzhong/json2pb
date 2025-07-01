@@ -59,12 +59,17 @@ typedef bool (*string_bool_convertor)(const char* const str);
 
 typedef int (*string_enum_convertor)(const char* const str);
 
+typedef j2p_expt_t (*obj_msg_convertor)(const cJSON* const root, ProtobufCMessage* const msg);
+
 j2p_expt_t cvt_json_2_pb_field(const cJSON*                root,
                                const cJSON*                item,
                                ProtobufCMessage* const     msg,
                                const char* const           field_name,
                                const string_bool_convertor bool_cvt,
                                const string_enum_convertor enum_cvt,
-                               const j2p_file_t            file_type);
+                               const j2p_file_t            file_type,
+                               const obj_msg_convertor     msg_cvt);
 
 j2p_expt_t cvt_json_2_pb_number(const cJSON* const root, const cJSON* const item, ProtobufCMessage* const msg, const char* const field_name);
+
+j2p_expt_t cvt_json_2_pb_bool(const cJSON* const root, const cJSON* const item, ProtobufCMessage* const msg, const char* const field_name, string_bool_convertor str_bool_cvt_func);

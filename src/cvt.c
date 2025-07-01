@@ -224,3 +224,66 @@ cvt_single_float(const cJSON* const item, float* const field)
 
     return J2P_EXPT_SUCCESS;
 }
+
+j2p_expt_t
+cvt_single_double(const cJSON* const item, double* const field)
+{
+    assert(NULL != item);
+    assert(NULL != field);
+
+    if (cJSON_IsNumber(item)) {
+        double num_value = cJSON_GetNumberValue(item);
+
+        if (isnan(num_value) || isinf(num_value)) {
+            return J2P_EXPT_VALUE_OVERFLOW;
+        }
+
+        *field = num_value;
+    } else if (NULL != cJSON_GetStringValue(item)) {
+        const char* str_val = cJSON_GetStringValue(item);
+        errno               = 0;
+        char*  endptr       = NULL;
+        double num_value    = strtod(str_val, &endptr);
+
+        if (errno == ERANGE) {
+            return J2P_EXPT_VALUE_OVERFLOW;
+        }
+
+        if (endptr == str_val || *endptr != '\0') {
+            return J2P_EXPT_INVALID_NUMBER_STRING;
+        }
+
+        if (isnan(num_value) || isinf(num_value)) {
+            return J2P_EXPT_VALUE_OVERFLOW;
+        }
+
+        *field = num_value;
+    } else {
+        return J2P_EXPT_UNACCEPTABLE_JSON_TYPE;
+    }
+
+    return J2P_EXPT_SUCCESS;
+}
+
+j2p_expt_t
+cvt_single_bool(const cJSON* const item, bool* const field, string_bool_convertor str_bool_cvt)
+{
+    assert(NULL != item);
+    assert(NULL != field);
+
+    if (NULL == str_bool_cvt) {
+        str_bool_cvt = default_string_bool_convertor;
+    }
+
+    if (cJSON_IsBool(item)) {
+        *field = cJSON_IsTrue(item);
+    } else if (cJSON_IsNumber(item)) {
+        *field = cJSON_GetNumberValue(item) != 0.0;
+    } else if (NULL != cJSON_GetStringValue(item)) {
+        const char* str_val = cJSON_GetStringValue(item);
+        *field              = str_bool_cvt(str_val);
+    } else {
+        return J2P_EXPT_UNACCEPTABLE_JSON_TYPE;
+    }
+    return J2P_EXPT_SUCCESS;
+}

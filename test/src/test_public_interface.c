@@ -87,7 +87,7 @@ test_cvt_json_to_deprecated_field(void)
     int32_t deprecated_value = 123456789;
     cJSON_AddNumberToObject(root, "deprecated_field", deprecated_value);
 
-    j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "deprecated_field"), (ProtobufCMessage*)msg, "deprecated_field", NULL, NULL, J2P_FILE_PATH_STR);
+    j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "deprecated_field"), (ProtobufCMessage*)msg, "deprecated_field", NULL, NULL, J2P_FILE_PATH_STR, NULL);
     CU_ASSERT_EQUAL(e, J2P_EXPT_FIELD_IS_DEPRECATED);
     CU_ASSERT_EQUAL(msg->deprecated_field, 0);
 }
@@ -98,7 +98,7 @@ test_cvt_json_to_already_setted_oneof_field(void)
     int32_t oneof_int32_value = 123456789;
     cJSON_AddNumberToObject(root, "oneof_int32", oneof_int32_value);
 
-    j2p_expt_t                      e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "oneof_int32"), (ProtobufCMessage*)msg, "oneof_int32", NULL, NULL, J2P_FILE_PATH_STR);
+    j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "oneof_int32"), (ProtobufCMessage*)msg, "oneof_int32", NULL, NULL, J2P_FILE_PATH_STR, NULL);
     const ProtobufCFieldDescriptor* field_desc = protobuf_c_message_descriptor_get_field_by_name(msg->base.descriptor, "oneof_int32");
     CU_ASSERT_PTR_NOT_NULL_FATAL(field_desc);
     CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
@@ -106,7 +106,7 @@ test_cvt_json_to_already_setted_oneof_field(void)
     CU_ASSERT_EQUAL(msg->test_oneof_case, field_desc->id);
 
     cJSON_AddNumberToObject(root, "oneof_sint32", 2345);
-    e          = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "oneof_sint32"), (ProtobufCMessage*)msg, "oneof_sint32", NULL, NULL, J2P_FILE_PATH_STR);
+    e          = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "oneof_sint32"), (ProtobufCMessage*)msg, "oneof_sint32", NULL, NULL, J2P_FILE_PATH_STR, NULL);
     field_desc = protobuf_c_message_descriptor_get_field_by_name(msg->base.descriptor, "oneof_sint32");
     CU_ASSERT_PTR_NOT_NULL_FATAL(field_desc);
     CU_ASSERT_EQUAL(e, J2P_EXPT_ONEOF_ALREADY_SET);
@@ -119,7 +119,7 @@ test_reject_null_root(void)
 {
     cJSON_AddNumberToObject(root, "f_int32", 123456789);
 
-    j2p_expt_t e = cvt_json_2_pb_field(NULL, cJSON_GetObjectItem(root, "f_int32"), (ProtobufCMessage*)msg, "f_int32", NULL, NULL, J2P_FILE_PATH_STR);
+    j2p_expt_t e = cvt_json_2_pb_field(NULL, cJSON_GetObjectItem(root, "f_int32"), (ProtobufCMessage*)msg, "f_int32", NULL, NULL, J2P_FILE_PATH_STR, NULL);
     CU_ASSERT_EQUAL(e, J2P_EXPT_INVALID_ARG);
     CU_ASSERT_EQUAL(msg->f_int32, 0);
 }
@@ -127,7 +127,7 @@ test_reject_null_root(void)
 void
 test_reject_null_item(void)
 {
-    j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "f_int32"), (ProtobufCMessage*)msg, "f_int32", NULL, NULL, J2P_FILE_PATH_STR);
+    j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "f_int32"), (ProtobufCMessage*)msg, "f_int32", NULL, NULL, J2P_FILE_PATH_STR, NULL);
     CU_ASSERT_EQUAL(e, J2P_EXPT_INVALID_ARG);
     CU_ASSERT_EQUAL(msg->f_int32, 0);
 }
@@ -137,7 +137,7 @@ test_reject_null_msg(void)
 {
     cJSON_AddNumberToObject(root, "f_int32", 123456789);
 
-    j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "f_int32"), NULL, "f_int32", NULL, NULL, J2P_FILE_PATH_STR);
+    j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "f_int32"), NULL, "f_int32", NULL, NULL, J2P_FILE_PATH_STR, NULL);
     CU_ASSERT_EQUAL(e, J2P_EXPT_INVALID_ARG);
     CU_ASSERT_EQUAL(msg->f_int32, 0);
 }
@@ -147,7 +147,7 @@ test_reject_null_field_name(void)
 {
     cJSON_AddNumberToObject(root, "f_int32", 123456789);
 
-    j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "f_int32"), (ProtobufCMessage*)msg, NULL, NULL, NULL, J2P_FILE_PATH_STR);
+    j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "f_int32"), (ProtobufCMessage*)msg, NULL, NULL, NULL, J2P_FILE_PATH_STR, NULL);
     CU_ASSERT_EQUAL(e, J2P_EXPT_INVALID_ARG);
     CU_ASSERT_EQUAL(msg->f_int32, 0);
 }
@@ -163,7 +163,7 @@ test_reject_uninitialized_msg(void)
 
     cJSON_AddNumberToObject(root, "f_int32", 12345);
 
-    j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "f_int32"), (ProtobufCMessage*)msg, "f_int32", NULL, NULL, J2P_FILE_PATH_STR);
+    j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "f_int32"), (ProtobufCMessage*)msg, "f_int32", NULL, NULL, J2P_FILE_PATH_STR, NULL);
     CU_ASSERT_EQUAL(e, J2P_EXPT_UNINITIALIZED);
     CU_ASSERT_EQUAL(msg->f_int32, 0);
 
@@ -176,7 +176,7 @@ test_cvt_json_bool_to_repeated_field(void)
 {
     cJSON_AddBoolToObject(root, "f_repeated_int32", true);
 
-    j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "f_repeated_int32"), (ProtobufCMessage*)msg, "f_repeated_int32", NULL, NULL, J2P_FILE_PATH_STR);
+    j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "f_repeated_int32"), (ProtobufCMessage*)msg, "f_repeated_int32", NULL, NULL, J2P_FILE_PATH_STR, NULL);
     CU_ASSERT_EQUAL(e, J2P_EXPT_UNACCEPTABLE_JSON_TYPE);
     CU_ASSERT_EQUAL(msg->n_f_repeated_int32, 0);
     CU_ASSERT_PTR_NULL(msg->f_repeated_int32);
@@ -187,7 +187,7 @@ test_cvt_json_number_to_repeated_field(void)
 {
     cJSON_AddNumberToObject(root, "f_repeated_int32", 12345);
 
-    j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "f_repeated_int32"), (ProtobufCMessage*)msg, "f_repeated_int32", NULL, NULL, J2P_FILE_PATH_STR);
+    j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "f_repeated_int32"), (ProtobufCMessage*)msg, "f_repeated_int32", NULL, NULL, J2P_FILE_PATH_STR, NULL);
     CU_ASSERT_EQUAL(e, J2P_EXPT_UNACCEPTABLE_JSON_TYPE);
     CU_ASSERT_EQUAL(msg->n_f_repeated_int32, 0);
     CU_ASSERT_PTR_NULL(msg->f_repeated_int32);
@@ -198,7 +198,7 @@ test_cvt_json_string_to_repeated_field(void)
 {
     cJSON_AddStringToObject(root, "f_repeated_int32", "test string");
 
-    j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "f_repeated_int32"), (ProtobufCMessage*)msg, "f_repeated_int32", NULL, NULL, J2P_FILE_PATH_STR);
+    j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "f_repeated_int32"), (ProtobufCMessage*)msg, "f_repeated_int32", NULL, NULL, J2P_FILE_PATH_STR, NULL);
     CU_ASSERT_EQUAL(e, J2P_EXPT_UNACCEPTABLE_JSON_TYPE);
     CU_ASSERT_EQUAL(msg->n_f_repeated_int32, 0);
     CU_ASSERT_PTR_NULL(msg->f_repeated_int32);
@@ -209,7 +209,7 @@ test_cvt_json_object_to_repeated_field(void)
 {
     cJSON_AddObjectToObject(root, "f_repeated_int32");
 
-    j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "f_repeated_int32"), (ProtobufCMessage*)msg, "f_repeated_int32", NULL, NULL, J2P_FILE_PATH_STR);
+    j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "f_repeated_int32"), (ProtobufCMessage*)msg, "f_repeated_int32", NULL, NULL, J2P_FILE_PATH_STR, NULL);
     CU_ASSERT_EQUAL(e, J2P_EXPT_UNACCEPTABLE_JSON_TYPE);
     CU_ASSERT_EQUAL(msg->n_f_repeated_int32, 0);
     CU_ASSERT_PTR_NULL(msg->f_repeated_int32);
@@ -220,7 +220,7 @@ test_reject_json_null(void)
 {
     cJSON_AddNullToObject(root, "f_int32");
 
-    j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "f_int32"), (ProtobufCMessage*)msg, "f_int32", NULL, NULL, J2P_FILE_PATH_STR);
+    j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "f_int32"), (ProtobufCMessage*)msg, "f_int32", NULL, NULL, J2P_FILE_PATH_STR, NULL);
     CU_ASSERT_EQUAL(e, J2P_EXPT_UNACCEPTABLE_JSON_TYPE);
     CU_ASSERT_EQUAL(msg->f_int32, 0);
 }
@@ -230,7 +230,7 @@ test_reject_unknown_field(void)
 {
     cJSON_AddNumberToObject(root, "unknown_field", 12345);
 
-    j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "unknown_field"), (ProtobufCMessage*)msg, "unknown_field", NULL, NULL, J2P_FILE_PATH_STR);
+    j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(root, "unknown_field"), (ProtobufCMessage*)msg, "unknown_field", NULL, NULL, J2P_FILE_PATH_STR, NULL);
     CU_ASSERT_EQUAL(e, J2P_EXPT_FIELD_NOT_FOUND);
 }
 
@@ -244,7 +244,7 @@ test_reject_unknown_item(void)
 
     cJSON_AddNumberToObject(another_root, "f_int32", 12345);
 
-    j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(another_root, "f_int32"), (ProtobufCMessage*)msg, "f_int32", NULL, NULL, J2P_FILE_PATH_STR);
+    j2p_expt_t e = cvt_json_2_pb_field(root, cJSON_GetObjectItem(another_root, "f_int32"), (ProtobufCMessage*)msg, "f_int32", NULL, NULL, J2P_FILE_PATH_STR, NULL);
     CU_ASSERT_EQUAL(e, J2P_EXPT_JSON_POINTER_NOT_FOUND);
     CU_ASSERT_EQUAL(msg->f_int32, 0);
 

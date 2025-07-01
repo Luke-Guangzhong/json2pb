@@ -8,11 +8,13 @@
  * @copyright Copyright (c) 2025
  *
  */
+#include <string.h>
+
 #include "internal.h"
 
 bool
 default_string_bool_convertor(const char* const str)
 {
     assert(NULL != str);
-    return true;
+    return 0 == strncmp("true", str, 4);
 }
