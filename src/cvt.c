@@ -287,3 +287,37 @@ cvt_single_bool(const cJSON* const item, bool* const field, string_bool_converto
     }
     return J2P_EXPT_SUCCESS;
 }
+
+j2p_expt_t
+cvt_single_enum(const cJSON* const item, int* const field, string_enum_convertor str_enum_cvt, const ProtobufCEnumDescriptor* const enum_desc)
+{
+    assert(NULL != item);
+    assert(NULL != field);
+
+    if (NULL == str_enum_cvt) {
+        str_enum_cvt = default_string_enum_convertor;
+    }
+
+    if (cJSON_IsNumber(item)) {
+        int enum_val = (int)cJSON_GetNumberValue(item);
+        int rv       = int_range_lookup(enum_desc->n_value_ranges, enum_desc->value_ranges, enum_val);
+        printf("enum_val: %d, rv: %d\n", enum_val, rv);
+        if (rv < 0) {
+            return J2P_EXPT_INVALID_ENUM_VALUE;
+        }
+
+        *field = rv;
+    } else if (NULL != cJSON_GetStringValue(item)) {
+        const char* enum_str = cJSON_GetStringValue(item);
+
+        int enum_val = str_enum_cvt(enum_desc, enum_str);
+        if (enum_val < 0) {
+            return J2P_EXPT_INVALID_ENUM_VALUE;
+        }
+
+        *field = enum_val;
+    } else {
+        return J2P_EXPT_UNACCEPTABLE_JSON_TYPE;
+    }
+    return J2P_EXPT_SUCCESS;
+}

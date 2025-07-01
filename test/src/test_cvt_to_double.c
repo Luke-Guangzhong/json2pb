@@ -76,7 +76,7 @@ CU_TestInfo test_repeated_float_conversion[] = {
     CU_TEST_INFO_NULL};
 
 CU_SuiteInfo suites[] = {
-    {"Convert JSON to Protobuf float field", init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion, test_float_conversion},
+    {"Convert JSON to Protobuf double field", init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion, test_float_conversion},
 #if 0
     {"Convert JSON to Protobuf float with overflow handling", init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion,
      test_float_overflow                                                                                                                                                             },

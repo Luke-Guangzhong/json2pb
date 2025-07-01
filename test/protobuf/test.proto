@@ -58,9 +58,11 @@ message TestMessage {
 }
 
 enum Enum {
-    ENUM_0 = 0;
-    ENUM_1 = 1;
-    ENUM_2 = 2;
+    option allow_alias = true;
+    ENUM_0             = 0;
+    ENUM_1             = 1;
+    ENUM_2             = 2;
+    ENUM_3             = 2;
 }
 
 message MessageInTestMessage {

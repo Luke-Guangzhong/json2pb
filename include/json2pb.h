@@ -21,6 +21,7 @@ typedef enum json2pb_exception_type {
     J2P_EXPT_UNACCEPTABLE_JSON_TYPE,
     J2P_EXPT_INVALID_NUMBER_STRING,
     J2P_EXPT_NOT_EXACT,
+    J2P_EXPT_INVALID_ENUM_VALUE,
 
     J2P_EXPT_EMPTY_ARRAY,
     J2P_EXPT_NO_VALID_FOUND,
@@ -57,7 +58,7 @@ extern const j2p_expt_msg j2p_expt_msg_list[];
 
 typedef bool (*string_bool_convertor)(const char* const str);
 
-typedef int (*string_enum_convertor)(const char* const str);
+typedef int (*string_enum_convertor)(const ProtobufCEnumDescriptor* const enum_desc, const char* const str);
 
 typedef j2p_expt_t (*obj_msg_convertor)(const cJSON* const root, ProtobufCMessage* const msg);
 
@@ -73,3 +74,5 @@ j2p_expt_t cvt_json_2_pb_field(const cJSON*                root,
 j2p_expt_t cvt_json_2_pb_number(const cJSON* const root, const cJSON* const item, ProtobufCMessage* const msg, const char* const field_name);
 
 j2p_expt_t cvt_json_2_pb_bool(const cJSON* const root, const cJSON* const item, ProtobufCMessage* const msg, const char* const field_name, string_bool_convertor str_bool_cvt_func);
+
+j2p_expt_t cvt_json_2_pb_enum(const cJSON* const root, const cJSON* const item, ProtobufCMessage* const msg, const char* const field_name, string_enum_convertor str_enum_cvt);

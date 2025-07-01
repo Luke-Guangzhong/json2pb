@@ -30,4 +30,12 @@ j2p_expt_t cvt_single_double(const cJSON* const item, double* const field);
 
 j2p_expt_t cvt_single_bool(const cJSON* const item, bool* const field, string_bool_convertor bool_cvt);
 
+j2p_expt_t cvt_single_enum(const cJSON* const item, int* const field, string_enum_convertor str_enum_cvt, const ProtobufCEnumDescriptor* const enum_desc);
+
 bool default_string_bool_convertor(const char* const str);
+
+int default_string_enum_convertor(const ProtobufCEnumDescriptor* const enum_desc, const char* const str);
+
+int int_range_lookup(unsigned n_ranges, const ProtobufCIntRange* ranges, int value);
+
+const ProtobufCEnumValue* protobuf_c_enum_descriptor_get_value_by_name_case_insensitive(const ProtobufCEnumDescriptor* desc, const char* name);

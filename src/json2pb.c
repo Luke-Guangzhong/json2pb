@@ -26,6 +26,7 @@ const j2p_expt_msg j2p_expt_msg_list[] = {
     {J2P_EXPT_UNACCEPTABLE_JSON_TYPE,   "unacceptable json type"                                },
     {J2P_EXPT_INVALID_NUMBER_STRING,    "invalid number string"                                 },
     {J2P_EXPT_NOT_EXACT,                "possiable precision loss, use string instead"          },
+    {J2P_EXPT_INVALID_ENUM_VALUE,       "invalid enum value"                                    },
     {J2P_EXPT_EMPTY_ARRAY,              "empty array in json"                                   },
     {J2P_EXPT_PARTIAL_FAIL,             "partial fail when convert json array to repeated field"},
     {J2P_EXPT_NO_VALID_FOUND,           "all element in array are not valid for this field"     },
@@ -50,8 +51,9 @@ static j2p_expt_t cvt_numeric(const cJSON* const              root,
                               const size_t                    elem_size,
                               single_field_cvt_func           str_num_cvt);
 
-static j2p_expt_t
-cvt_bool(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, string_bool_convertor str_bool_cvt);
+static j2p_expt_t cvt_bool(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, string_bool_convertor str_bool_cvt);
+
+static j2p_expt_t cvt_enum(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, string_enum_convertor str_enum_cvt);
 
 j2p_expt_t
 cvt_json_2_pb_field(const cJSON*                root,
@@ -140,6 +142,7 @@ cvt_json_2_pb_field(const cJSON*                root,
         rtn = cvt_bool(root, msg, item, field_desc, bool_cvt);
         break;
     case PROTOBUF_C_TYPE_ENUM:
+        rtn = cvt_enum(root, msg, item, field_desc, enum_cvt);
         break;
     case PROTOBUF_C_TYPE_STRING:
         break;
@@ -240,10 +243,9 @@ cvt_bool(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, cons
     assert(field_desc != NULL);
     assert(item != NULL);
     assert(msg->descriptor != NULL);
-    assert(field_desc->type != PROTOBUF_C_TYPE_STRING && field_desc->type != PROTOBUF_C_TYPE_MESSAGE && field_desc->type != PROTOBUF_C_TYPE_BYTES);
+    assert(field_desc->type == PROTOBUF_C_TYPE_BOOL);
 
-    if (NULL == msg || NULL == field_desc || NULL == item || NULL == msg->descriptor ||
-        !(field_desc->type != PROTOBUF_C_TYPE_STRING && field_desc->type != PROTOBUF_C_TYPE_MESSAGE && field_desc->type != PROTOBUF_C_TYPE_BYTES)) {
+    if (NULL == msg || NULL == field_desc || NULL == item || NULL == msg->descriptor || field_desc->type != PROTOBUF_C_TYPE_BOOL) {
         return J2P_EXPT_INVALID_ARG;
     }
 
@@ -300,7 +302,78 @@ cvt_bool(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, cons
         if (is_oneof) {
             (*(int32_t*)((void*)msg + field_desc->quantifier_offset)) = field_desc->id;
         }
-        void* field_ptr = (void*)msg + field_desc->offset;
+        bool* field_ptr = (void*)msg + field_desc->offset;
         return cvt_single_bool(item, field_ptr, str_bool_cvt);
+    }
+}
+
+static j2p_expt_t
+cvt_enum(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, string_enum_convertor str_enum_cvt)
+{
+    assert(msg != NULL);
+    assert(field_desc != NULL);
+    assert(item != NULL);
+    assert(msg->descriptor != NULL);
+    assert(field_desc->type == PROTOBUF_C_TYPE_ENUM);
+
+    if (NULL == msg || NULL == field_desc || NULL == item || NULL == msg->descriptor || field_desc->type != PROTOBUF_C_TYPE_ENUM) {
+        return J2P_EXPT_INVALID_ARG;
+    }
+
+    const bool is_repeated = (field_desc->label == PROTOBUF_C_LABEL_REPEATED);
+    const bool is_oneof    = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_ONEOF);
+
+    if (is_repeated) {
+        if (cJSON_GetArraySize(item) > 0) {
+            uint64_t       count      = 0;
+            const cJSON*   element    = NULL;
+            const cJSON*   json_array = item;
+            const uint64_t length     = cJSON_GetArraySize(json_array);
+            j2p_expt_t     rtn        = J2P_EXPT_SUCCESS;
+            int* const     array      = (int*)calloc(length, sizeof(int));
+            if (NULL == array) {
+                exit(EXIT_FAILURE);
+            }
+
+            cJSON_ArrayForEach(element, json_array)
+            {
+                rtn = cvt_single_enum(element, (int*)array + count, str_enum_cvt, (const ProtobufCEnumDescriptor*)field_desc->descriptor);
+                if (rtn != EXIT_SUCCESS) {
+                    char* path = cJSONUtils_FindPointerFromObjectTo(root, element);
+                    printf("[EXCEPTION]: %s %s\n", path, j2p_expt_msg_list[rtn].desc);
+                    free(path);
+                } else {
+                    count++;
+                }
+            }
+
+            if (count == 0) { /* no valid element found */
+                free(array);
+                return J2P_EXPT_NO_VALID_FOUND;
+            }
+
+            bool** field_ptr = (bool**)((void*)msg + field_desc->offset);
+            *field_ptr       = (bool*)calloc(count, sizeof(bool));
+            if (NULL == (*field_ptr)) {
+                exit(EXIT_FAILURE);
+            }
+
+            memcpy((*field_ptr), array, count * sizeof(bool));
+            *(size_t*)((void*)msg + field_desc->quantifier_offset) = count;
+
+            free(array);
+            if (count == length)
+                return J2P_EXPT_SUCCESS;
+            else
+                return J2P_EXPT_PARTIAL_FAIL;
+        } else {
+            return J2P_EXPT_EMPTY_ARRAY;
+        }
+    } else {
+        if (is_oneof) {
+            (*(int32_t*)((void*)msg + field_desc->quantifier_offset)) = field_desc->id;
+        }
+        void* field_ptr = (void*)msg + field_desc->offset;
+        return cvt_single_enum(item, field_ptr, str_enum_cvt, (const ProtobufCEnumDescriptor*)field_desc->descriptor);
     }
 }
