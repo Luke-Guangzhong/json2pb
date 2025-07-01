@@ -76,3 +76,5 @@ j2p_expt_t cvt_json_2_pb_number(const cJSON* const root, const cJSON* const item
 j2p_expt_t cvt_json_2_pb_bool(const cJSON* const root, const cJSON* const item, ProtobufCMessage* const msg, const char* const field_name, string_bool_convertor str_bool_cvt_func);
 
 j2p_expt_t cvt_json_2_pb_enum(const cJSON* const root, const cJSON* const item, ProtobufCMessage* const msg, const char* const field_name, string_enum_convertor str_enum_cvt);
+
+j2p_expt_t cvt_json_2_pb_string(const cJSON* const root, const cJSON* const item, ProtobufCMessage* const msg, const char* const field_name);

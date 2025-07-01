@@ -30,7 +30,7 @@ static j2p_expt_t cvt_numeric(const cJSON* const              root,
                               const cJSON*                    item,
                               const ProtobufCFieldDescriptor* field_desc,
                               const size_t                    elem_size,
-                              single_field_cvt_func           str_num_cvt);
+                              single_field_cvt_func           single_cvt);
 
 static j2p_expt_t cvt_bool(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, string_bool_convertor str_bool_cvt);
 
@@ -158,6 +158,7 @@ cvt_json_2_pb_field(const cJSON*                root,
         rtn = cvt_enum(root, msg, item, field_desc, enum_cvt);
         break;
     case PROTOBUF_C_TYPE_STRING:
+        rtn = cvt_numeric(root, msg, item, field_desc, sizeof(char*), (single_field_cvt_func)cvt_single_string);
         break;
     case PROTOBUF_C_TYPE_MESSAGE:
         break;
@@ -182,7 +183,7 @@ cvt_numeric(const cJSON* const              root,
             const cJSON*                    item,
             const ProtobufCFieldDescriptor* field_desc,
             const size_t                    elem_size,
-            single_field_cvt_func           str_num_cvt)
+            single_field_cvt_func           single_cvt)
 {
     assert(msg != NULL);
     assert(field_desc != NULL);
@@ -212,7 +213,7 @@ cvt_numeric(const cJSON* const              root,
 
             cJSON_ArrayForEach(element, item)
             {
-                rtn = str_num_cvt(element, array + (count * elem_size));
+                rtn = single_cvt(element, array + (count * elem_size));
                 if (rtn != EXIT_SUCCESS) {
                     char* path = cJSONUtils_FindPointerFromObjectTo(root, element);
                     printf("[EXCEPTION]: %s %s\n", path, j2p_expt_msg_list[rtn].desc);
@@ -249,7 +250,7 @@ cvt_numeric(const cJSON* const              root,
             (*(int32_t*)((void*)msg + field_desc->quantifier_offset)) = field_desc->id;
         }
         void* field_ptr = (void*)msg + field_desc->offset;
-        return str_num_cvt(item, field_ptr);
+        return single_cvt(item, field_ptr);
     }
 }
 

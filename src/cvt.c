@@ -321,3 +321,17 @@ cvt_single_enum(const cJSON* const item, int* const field, string_enum_convertor
     }
     return J2P_EXPT_SUCCESS;
 }
+
+j2p_expt_t
+cvt_single_string(const cJSON* const item, char** const field)
+{
+    assert(NULL != item);
+    assert(NULL != field);
+
+    if (NULL != cJSON_GetStringValue(item)) {
+        asprintf(field, "%s", cJSON_GetStringValue(item));
+    } else {
+        return J2P_EXPT_UNACCEPTABLE_JSON_TYPE;
+    }
+    return J2P_EXPT_SUCCESS;
+}
