@@ -172,3 +172,41 @@ cvt_single_uint64_t(const cJSON* const item, uint64_t* const field)
 
     return J2P_EXPT_SUCCESS;
 }
+
+j2p_expt_t
+cvt_single_float(const cJSON* const item, float* const field)
+{
+    assert(NULL != item);
+    assert(NULL != field);
+
+    if (cJSON_IsNumber(item)) {
+        const double num_value = cJSON_GetNumberValue(item);
+
+        if (isinf(num_value) || isnan(num_value)) {
+            return J2P_EXPT_VALUE_OVERFLOW;
+        }
+
+        float float_value = (float)num_value;
+        if (float_value != num_value) {
+            return J2P_EXPT_NOT_EXACT;
+        }
+
+        *field = float_value;
+    } else if (NULL != cJSON_GetStringValue(item)) {
+        errno                 = 0;
+        char*       endptr    = NULL;
+        const float num_value = strtof(cJSON_GetStringValue(item), &endptr);
+        if (errno != 0 || *endptr != '\0') {
+            if (errno == ERANGE) {
+                return J2P_EXPT_VALUE_OVERFLOW;
+            } else {
+                return J2P_EXPT_INVALID_NUMBER_STRING;
+            }
+        }
+        *field = (float)num_value;
+    } else {
+        return J2P_EXPT_UNACCEPTABLE_JSON_TYPE;
+    }
+
+    return J2P_EXPT_SUCCESS;
+}

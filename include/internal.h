@@ -24,4 +24,6 @@ j2p_expt_t cvt_single_uint32_t(const cJSON* const item, uint32_t* const field);
 
 j2p_expt_t cvt_single_uint64_t(const cJSON* const item, uint64_t* const field);
 
+j2p_expt_t cvt_single_float(const cJSON* const item, float* const field);
+
 bool default_string_bool_convertor(const char* const str);
