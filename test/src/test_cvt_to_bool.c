@@ -9,7 +9,7 @@
  *
  */
 
-#include <float.h>
+#include <stdbool.h>
 #include <unistd.h>
 
 #include "json2pb.h"
@@ -20,9 +20,11 @@
 /*                                Declarations                                */
 /******************************************************************************/
 
-void test_cvt_json_number_to_single_float(void);
-void test_cvt_json_decimal_string_to_single_float(void);
-void test_cvt_json_number_to_oneof_float(void);
+void test_cvt_json_bool_to_single_bool(void);
+void test_cvt_json_string_to_single_bool(void);
+void test_cvt_json_number_to_oneof_bool(void);
+
+#if 0
 
 void test_cvt_json_number_overflow_float(void);
 void test_cvt_json_number_underflow_float(void);
@@ -38,19 +40,23 @@ void test_cvt_json_array_to_repeated_float_partly_failed(void);
 void test_cvt_json_array_to_repeated_float_all_failed(void);
 void test_cvt_json_array_to_repeated_float_empty(void);
 
+#endif
+
 /******************************************************************************/
 /*                              Global Variable                               */
 /******************************************************************************/
 
-const char float_field_name[]          = "f_float";
-const char repeated_float_field_name[] = "f_repeated_float";
+const char bool_field_name[]          = "f_bool";
+const char repeated_bool_field_name[] = "f_repeated_bool";
 
-CU_TestInfo test_float_conversion[] = {
-    {"Convert JSON number to Protobuf float field",         test_cvt_json_number_to_single_float        },
-    {"Convert JSON decimal string to Protobuf float field", test_cvt_json_decimal_string_to_single_float},
-    {"Convert JSON number to Protobuf oneof float field",   test_cvt_json_number_to_oneof_float         },
+CU_TestInfo test_bool_conversion[] = {
+    {"Convert JSON number to Protobuf bool field",         test_cvt_json_bool_to_single_bool  },
+    {"Convert JSON decimal string to Protobuf bool field", test_cvt_json_string_to_single_bool},
+    {"Convert JSON number to Protobuf oneof bool field",   test_cvt_json_number_to_oneof_bool },
     CU_TEST_INFO_NULL,
 };
+
+#if 0
 
 CU_TestInfo test_float_overflow[] = {
     {"Reject conversion of JSON number to Protobuf float on overflow",  test_cvt_json_number_overflow_float },
@@ -70,12 +76,16 @@ CU_TestInfo test_repeated_float_conversion[] = {
     CU_TEST_INFO_NULL
 };
 
+#endif
+
 CU_SuiteInfo suites[] = {
-    {"Convert JSON to Protobuf float field",                  init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion, test_float_conversion},
+    {"Convert JSON to Protobuf float field", init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion, test_bool_conversion},
+#if 0
     {"Convert JSON to Protobuf float with overflow handling", init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion,
      test_float_overflow                                                                                                                                                             },
     {"Convert JSON array to repeated Protobuf float field",   init_sutie_name, cleanup_sutie_name, setup_successful_conversion, teardown_successful_conversion,
      test_repeated_float_conversion                                                                                                                                                  },
+#endif
     CU_SUITE_INFO_NULL,
 };
 
@@ -84,42 +94,41 @@ CU_SuiteInfo suites[] = {
 /******************************************************************************/
 
 void
-test_cvt_json_number_to_single_float(void)
+test_cvt_json_bool_to_single_bool(void)
 {
-    float value = 0.5f;
+    cJSON_AddTrueToObject(root, bool_field_name);
 
-    cJSON_AddNumberToObject(root, float_field_name, value);
-
-    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, float_field_name), (ProtobufCMessage*)msg, float_field_name);
+    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, bool_field_name), (ProtobufCMessage*)msg, bool_field_name);
     CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
-    CU_ASSERT_EQUAL(msg->f_float, value);
+    CU_ASSERT_EQUAL(msg->f_bool, true);
 }
 
 void
-test_cvt_json_decimal_string_to_single_float(void)
+test_cvt_json_string_to_single_bool(void)
 {
-    const char* value = "0.5";
+    const char* value = "true";
 
-    cJSON_AddStringToObject(root, float_field_name, value);
+    cJSON_AddStringToObject(root, bool_field_name, value);
 
-    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, float_field_name), (ProtobufCMessage*)msg, float_field_name);
+    j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, bool_field_name), (ProtobufCMessage*)msg, bool_field_name);
     CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
-    CU_ASSERT_EQUAL(msg->f_float, 0.5f);
+    CU_ASSERT_EQUAL(msg->f_bool, true);
 }
 
 void
-test_cvt_json_number_to_oneof_float(void)
+test_cvt_json_number_to_oneof_bool(void)
 {
-    float oneof_float_value = 0.5f;
-    cJSON_AddNumberToObject(root, "oneof_float", oneof_float_value);
+    cJSON_AddTrueToObject(root, "oneof_bool");
 
-    j2p_expt_t                      e          = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, "oneof_float"), (ProtobufCMessage*)msg, "oneof_float");
-    const ProtobufCFieldDescriptor* field_desc = protobuf_c_message_descriptor_get_field_by_name(msg->base.descriptor, "oneof_float");
+    j2p_expt_t                      e          = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, "oneof_bool"), (ProtobufCMessage*)msg, "oneof_bool");
+    const ProtobufCFieldDescriptor* field_desc = protobuf_c_message_descriptor_get_field_by_name(msg->base.descriptor, "oneof_bool");
     CU_ASSERT_PTR_NOT_NULL_FATAL(field_desc);
     CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
-    CU_ASSERT_EQUAL(msg->oneof_float, oneof_float_value);
+    CU_ASSERT_EQUAL(msg->oneof_bool, true);
     CU_ASSERT_EQUAL(msg->test_oneof_case, field_desc->id);
 }
+
+#if 0
 
 void
 test_cvt_json_number_overflow_float(void)
@@ -252,6 +261,8 @@ test_cvt_json_array_to_repeated_float_empty(void)
     CU_ASSERT_EQUAL(msg->n_f_repeated_float, 0);
     CU_ASSERT_PTR_NULL(msg->f_repeated_float);
 }
+
+#endif
 
 /******************************************************************************/
 /*                                 Main Code                                  */
