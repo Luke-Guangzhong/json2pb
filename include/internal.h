@@ -34,6 +34,10 @@ j2p_expt_t cvt_single_enum(const cJSON* const item, int* const field, string_enu
 
 j2p_expt_t cvt_single_string(const cJSON* const item, char** const field);
 
+j2p_expt_t cvt_single_bytes(const cJSON* const item, char** const field);
+
+j2p_expt_t cvt_single_message(const cJSON* const item, char** const field, obj_msg_convertor obj_cvt, const ProtobufCMessageDescriptor* const msg_desc);
+
 bool default_string_bool_convertor(const char* const str);
 
 int default_string_enum_convertor(const ProtobufCEnumDescriptor* const enum_desc, const char* const str);
