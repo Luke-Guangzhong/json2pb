@@ -71,8 +71,8 @@ CU_TestInfo test_uint64_overflow[] = {
     {"Reject conversion of JSON number to Protobuf uint64 on underflow",  test_cvt_json_number_underflow_uint64},
     {"Reject conversion of JSON string to Protobuf uint64 on overflow",   test_cvt_json_str_overflow_uint64    },
     {"Reject conversion of JSON string to Protobuf uint64 on underflow",  test_cvt_json_str_underflow_uint64   },
-    {"Accept conversion of JSON number to Protobuf uint64 at UINT64_MAX", test_cvt_json_number_max_uint64      },
-    {"Accept conversion of JSON number to Protobuf uint64 at UINT64_MIN", test_cvt_json_number_min_uint64      },
+    {"Accept conversion of JSON number to Protobuf uint64 at MAX_EXACT",  test_cvt_json_number_max_uint64      },
+    {"Accept conversion of JSON number to Protobuf uint64 at MIN_EXACT",  test_cvt_json_number_min_uint64      },
     {"Accept conversion of JSON string to Protobuf uint64 at UINT64_MAX", test_cvt_json_str_max_uint64         },
     {"Accept conversion of JSON string to Protobuf uint64 at UINT64_MIN", test_cvt_json_str_min_uint64         },
     CU_TEST_INFO_NULL,
@@ -190,7 +190,7 @@ test_cvt_json_number_overflow_uint64(void)
     cJSON_AddNumberToObject(root, uint64_field_name, value);
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, uint64_field_name), (ProtobufCMessage*)msg, uint64_field_name);
-    CU_ASSERT_EQUAL(e, J2P_EXPT_VALUE_OVERFLOW);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_NOT_EXACT_64);
     CU_ASSERT_EQUAL(msg->f_uint64, 0);
 }
 
@@ -202,7 +202,7 @@ test_cvt_json_number_underflow_uint64(void)
     cJSON_AddNumberToObject(root, uint64_field_name, value);
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, uint64_field_name), (ProtobufCMessage*)msg, uint64_field_name);
-    CU_ASSERT_EQUAL(e, J2P_EXPT_VALUE_OVERFLOW);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_NOT_EXACT_64);
     CU_ASSERT_EQUAL(msg->f_uint64, 0);
 }
 
@@ -233,7 +233,7 @@ test_cvt_json_str_underflow_uint64(void)
 void
 test_cvt_json_number_max_uint64(void)
 {
-    uint64_t value = UINT64_MAX;
+    uint64_t value = 0x1.0p53;
 
     cJSON_AddNumberToObject(root, uint64_field_name, value);
 
@@ -282,13 +282,13 @@ void
 test_cvt_json_array_to_repeated_uint64(void)
 {
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
-    const char*   value          = "[1234567890, \"1234567890\",\"0x4a0\",\"0b110\",\"0110\"]";
-    const int32_t res_value[]    = {1234567890, 1234567890, 0x4a0, 0b110, 0110};
-    const size_t  valid_elem_num = 5;
+    const char*    value          = "[1234567890, \"1234567890\",\"0x4a0\",\"0b110\",\"0110\"]";
+    const uint64_t res_value[]    = {1234567890, 1234567890, 0x4a0, 0b110, 0110};
+    const size_t   valid_elem_num = 5;
 #else
-    const char*   value          = "[1234567890, \"1234567890\",\"0x4a0\",\"0110\"]";
-    const int32_t res_value[]    = {1234567890, 1234567890, 0x4a0, 0110};
-    const size_t  valid_elem_num = 4;
+    const char*    value          = "[1234567890, \"1234567890\",\"0x4a0\",\"0110\"]";
+    const uint64_t res_value[]    = {1234567890, 1234567890, 0x4a0, 0110};
+    const size_t   valid_elem_num = 4;
 #endif
 
     cJSON* array_value = cJSON_Parse(value);
@@ -303,9 +303,9 @@ test_cvt_json_array_to_repeated_uint64(void)
 void
 test_cvt_json_array_to_repeated_uint64_partly_failed(void)
 {
-    const char*   value          = "[1234567890, \"0x4a0\",\"0110\",\"invalid number string\",\"0x10000000000000000\"]";
-    const int32_t res_value[]    = {1234567890, 0x4a0, 0110};
-    const size_t  valid_elem_num = 3;
+    const char*    value          = "[1234567890, \"0x4a0\",\"0110\",\"invalid number string\",\"0x10000000000000000\"]";
+    const uint64_t res_value[]    = {1234567890, 0x4a0, 0110};
+    const size_t   valid_elem_num = 3;
 
     cJSON* array_value = cJSON_Parse(value);
     cJSON_AddItemToObject(root, repeated_uint64_field_name, array_value);

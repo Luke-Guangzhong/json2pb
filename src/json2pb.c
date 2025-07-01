@@ -25,7 +25,7 @@ const j2p_expt_msg j2p_expt_msg_list[] = {
     {J2P_EXPT_VALUE_OVERFLOW,           "json value overflow"                                                                     },
     {J2P_EXPT_UNACCEPTABLE_JSON_TYPE,   "unacceptable json type"                                                                  },
     {J2P_EXPT_INVALID_NUMBER_STRING,    "invalid number string"                                                                   },
-    {J2P_EXPT_NOT_EXACT_INT64,          "possiable precision loss for large integers or high-precision values, use string instead"},
+    {J2P_EXPT_NOT_EXACT_64,             "possiable precision loss for large integers or high-precision values, use string instead"},
     {J2P_EXPT_EMPTY_ARRAY,              "empty array in json"                                                                     },
     {J2P_EXPT_PARTIAL_FAIL,             "partial fail when convert json array to repeated field"                                  },
     {J2P_EXPT_NO_VALID_FOUND,           "all element in array are not valid for this field"                                       },

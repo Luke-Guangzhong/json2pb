@@ -17,6 +17,9 @@
 #include "internal.h"
 #include "json2pb.h"
 
+const double MAX_EXACT = 0x1.0p53;
+const double MIN_EXACT = -0x1.0p53;
+
 j2p_expt_t
 cvt_single_int32_t(const cJSON* const item, int32_t* const field)
 {
@@ -59,14 +62,12 @@ cvt_single_int64_t(const cJSON* const item, int64_t* const field)
 
     if (cJSON_IsNumber(item)) {
         const double num_value = cJSON_GetNumberValue(item);
-        const double MAX_EXACT = 0x1.0p53;
-        const double MIN_EXACT = -0x1.0p53;
 
         if (isinf(num_value) || isnan(num_value)) {
             return J2P_EXPT_VALUE_OVERFLOW;
         }
         if (num_value < MIN_EXACT || num_value > MAX_EXACT) {
-            return J2P_EXPT_NOT_EXACT_INT64;
+            return J2P_EXPT_NOT_EXACT_64;
         }
         *field = (int64_t)num_value;
     } else if (NULL != cJSON_GetStringValue(item)) {
@@ -139,8 +140,11 @@ cvt_single_uint64_t(const cJSON* const item, uint64_t* const field)
     if (cJSON_IsNumber(item)) {
         const double num_value = cJSON_GetNumberValue(item);
 
-        if (isinf(num_value) || isnan(num_value) || num_value < 0 || num_value > UINT64_MAX) {
+        if (isinf(num_value) || isnan(num_value)) {
             return J2P_EXPT_VALUE_OVERFLOW;
+        }
+        if (num_value < 0 || num_value > MAX_EXACT) {
+            return J2P_EXPT_NOT_EXACT_64;
         }
         *field = (uint64_t)num_value;
     } else if (NULL != cJSON_GetStringValue(item)) {
