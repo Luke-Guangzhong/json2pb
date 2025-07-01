@@ -8,6 +8,7 @@
  * @copyright Copyright (c) 2025
  *
  */
+
 #include <assert.h>
 #include <protobuf-c/protobuf-c.h>
 #include <stdbool.h>
@@ -19,6 +20,25 @@
 #include "cjson/cJSON_Utils.h"
 #include "internal.h"
 #include "json2pb.h"
+
+/******************************************************************************/
+/*                                Declarations                                */
+/******************************************************************************/
+
+static j2p_expt_t cvt_numeric(const cJSON* const              root,
+                              ProtobufCMessage*               msg,
+                              const cJSON*                    item,
+                              const ProtobufCFieldDescriptor* field_desc,
+                              const size_t                    elem_size,
+                              single_field_cvt_func           str_num_cvt);
+
+static j2p_expt_t cvt_bool(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, string_bool_convertor str_bool_cvt);
+
+static j2p_expt_t cvt_enum(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, string_enum_convertor str_enum_cvt);
+
+/******************************************************************************/
+/*                              Global Variable                               */
+/******************************************************************************/
 
 const j2p_expt_msg j2p_expt_msg_list[] = {
     {J2P_EXPT_SUCCESS,                  "success"                                               },
@@ -44,16 +64,9 @@ const j2p_expt_msg j2p_expt_msg_list[] = {
     {J2P_EXPT_OS_GENERAL,               "general error in operating system"                     },
 };
 
-static j2p_expt_t cvt_numeric(const cJSON* const              root,
-                              ProtobufCMessage*               msg,
-                              const cJSON*                    item,
-                              const ProtobufCFieldDescriptor* field_desc,
-                              const size_t                    elem_size,
-                              single_field_cvt_func           str_num_cvt);
-
-static j2p_expt_t cvt_bool(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, string_bool_convertor str_bool_cvt);
-
-static j2p_expt_t cvt_enum(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, string_enum_convertor str_enum_cvt);
+/******************************************************************************/
+/*                        External Function Definition                        */
+/******************************************************************************/
 
 j2p_expt_t
 cvt_json_2_pb_field(const cJSON*                root,
@@ -158,6 +171,10 @@ cvt_json_2_pb_field(const cJSON*                root,
 
     return rtn;
 }
+
+/******************************************************************************/
+/*                        Internal Function Definition                        */
+/******************************************************************************/
 
 static j2p_expt_t
 cvt_numeric(const cJSON* const              root,
