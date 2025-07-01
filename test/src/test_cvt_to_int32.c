@@ -288,38 +288,37 @@ void
 test_cvt_json_array_to_repeated_int32(void)
 {
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
-    const char*   value          = "[1234567890, \"1234567890\",\"0x4a0\",\"0b110\",\"0110\"]";
-    const int32_t res_value[]    = {1234567890, 1234567890, 0x4a0, 0b110, 0110};
-    const size_t  valid_elem_num = 5;
+    const char*   value          = "[1234567890, \"1234567890\",\"0x4a0\",\"0b110\",\"0110\", 123.45]";
+    const int32_t expect_array[] = {1234567890, 1234567890, 0x4a0, 0b110, 0110, 123};
 #else
-    const char*   value          = "[1234567890, \"1234567890\",\"0x4a0\",\"0110\"]";
-    const int32_t res_value[]    = {1234567890, 1234567890, 0x4a0, 0110};
-    const size_t  valid_elem_num = 4;
+    const char*   value          = "[1234567890, \"1234567890\",\"0x4a0\",\"0110\", 123.45]";
+    const int32_t expect_array[] = {1234567890, 1234567890, 0x4a0, 0110, 123};
 #endif
+    const size_t expect_length = sizeof(expect_array) / sizeof(int32_t);
 
     cJSON* array_value = cJSON_Parse(value);
     cJSON_AddItemToObject(root, repeated_int32_field_name, array_value);
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, repeated_int32_field_name), (ProtobufCMessage*)msg, repeated_int32_field_name);
     CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
-    CU_ASSERT_EQUAL(msg->n_f_repeated_int32, valid_elem_num);
-    CU_ASSERT_EQUAL(memcmp(msg->f_repeated_int32, res_value, valid_elem_num * sizeof(int32_t)), 0);
+    CU_ASSERT_EQUAL(msg->n_f_repeated_int32, expect_length);
+    CU_ASSERT_EQUAL(memcmp(msg->f_repeated_int32, expect_array, expect_length * sizeof(int32_t)), 0);
 }
 
 void
 test_cvt_json_array_to_repeated_int32_partly_failed(void)
 {
     const char*   value          = "[1234567890, \"0x4a0\",\"0110\",\"invalid number string\",\"0x80000000\"]";
-    const int32_t res_value[]    = {1234567890, 0x4a0, 0110};
-    const size_t  valid_elem_num = 3;
+    const int32_t expect_array[] = {1234567890, 0x4a0, 0110};
+    const size_t  expect_length  = sizeof(expect_array) / sizeof(int32_t);
 
     cJSON* array_value = cJSON_Parse(value);
     cJSON_AddItemToObject(root, repeated_int32_field_name, array_value);
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, repeated_int32_field_name), (ProtobufCMessage*)msg, repeated_int32_field_name);
     CU_ASSERT_EQUAL(e, J2P_EXPT_PARTIAL_FAIL);
-    CU_ASSERT_EQUAL(msg->n_f_repeated_int32, valid_elem_num);
-    CU_ASSERT_EQUAL(memcmp(msg->f_repeated_int32, res_value, valid_elem_num * sizeof(int32_t)), 0);
+    CU_ASSERT_EQUAL(msg->n_f_repeated_int32, expect_length);
+    CU_ASSERT_EQUAL(memcmp(msg->f_repeated_int32, expect_array, expect_length * sizeof(int32_t)), 0);
 }
 
 void
@@ -411,7 +410,7 @@ test_cvt_json_array_to_repeated_sint32(void)
 {
     const char* value          = "[123,\"-123\",\"0x4a0\",\"0110\"]";
     int32_t     expect_array[] = {123, -123, 0x4a0, 0110};
-    size_t      expect_length  = 4;
+    size_t      expect_length  = sizeof(expect_array) / sizeof(int32_t);
 
     cJSON* array_value = cJSON_Parse(value);
 
@@ -440,7 +439,7 @@ test_cvt_json_array_to_repeated_sfixed32(void)
 {
     const char* value          = "[123,\"-123\",\"0x4a0\",\"0110\"]";
     int32_t     expect_array[] = {123, -123, 0x4a0, 0110};
-    size_t      expect_length  = 4;
+    size_t      expect_length  = sizeof(expect_array) / sizeof(int32_t);
 
     cJSON* array_value = cJSON_Parse(value);
 
