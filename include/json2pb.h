@@ -1,6 +1,6 @@
 /**
  * @file json2pb.h
- * @author luguangzhong (luke_guangzhong@petalmail.com)
+ * @author 陆光中 (luke_guangzhong@petalmail.com)
  * @brief
  * @version 0.1
  * @date 2025-01-23

@@ -1,6 +1,6 @@
 /**
  * @file test_public_interface.c
- * @author luguangzhong (luke_guangzhong@petalmail.com)
+ * @author 陆光中 (luke_guangzhong@petalmail.com)
  * @brief
  * @version 0.1
  * @date 2025-06-26
