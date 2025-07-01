@@ -32,6 +32,9 @@ static j2p_expt_t cvt_numeric(const cJSON* const              root,
                               const size_t                    elem_size,
                               single_field_cvt_func           single_cvt);
 
+static j2p_expt_t
+cvt_compand(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, const size_t elem_size, compand_convertor compand_cvt);
+
 static j2p_expt_t cvt_bool(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, string_bool_convertor str_bool_cvt);
 
 static j2p_expt_t cvt_enum(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, string_enum_convertor str_enum_cvt);
@@ -392,6 +395,6 @@ cvt_enum(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, cons
 }
 
 static j2p_expt_t
-cvt_compand(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const size_t elem_size, const ProtobufCFieldDescriptor* field_desc, compand_convertor compand_cvt)
+cvt_compand(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, const size_t elem_size, compand_convertor compand_cvt)
 {
 }

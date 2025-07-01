@@ -66,6 +66,14 @@ typedef int (*compand_convertor)(void* p1, void* p2);
 
 typedef j2p_expt_t (*single_field_cvt_func)(const cJSON* const item, void* const field);
 
+typedef union json2pb_additional_convertor {
+    j2p_file_t            file_type;
+    string_bool_convertor bool_cvt;
+    string_enum_convertor enum_cvt;
+    obj_msg_convertor     msg_cvt;
+    single_field_cvt_func num_cvt;
+} j2p_add_cvt;
+
 j2p_expt_t cvt_json_2_pb_field(const cJSON*                root,
                                const cJSON*                item,
                                ProtobufCMessage* const     msg,
@@ -74,6 +82,8 @@ j2p_expt_t cvt_json_2_pb_field(const cJSON*                root,
                                const string_enum_convertor enum_cvt,
                                const j2p_file_t            file_type,
                                const obj_msg_convertor     msg_cvt);
+
+j2p_expt_t cvt_json_2_pb_field_v2(const cJSON* root, const cJSON* item, ProtobufCMessage* const msg, const char* const field_name, const j2p_add_cvt add_cvt);
 
 j2p_expt_t cvt_json_2_pb_number(const cJSON* const root, const cJSON* const item, ProtobufCMessage* const msg, const char* const field_name);
 
