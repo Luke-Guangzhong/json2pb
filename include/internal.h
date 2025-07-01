@@ -16,6 +16,8 @@
 
 j2p_expt_t cvt_single_int32_t(const cJSON* const item, int32_t* const field);
 
+j2p_expt_t cvt_single_int32_t_v2(const cJSON* const item, int32_t* const field, const ProtobufCFieldDescriptor* const field_desc, const j2p_add_cvt add_cvt_func);
+
 j2p_expt_t cvt_single_int64_t(const cJSON* const item, int64_t* const field);
 
 j2p_expt_t cvt_single_uint32_t(const cJSON* const item, uint32_t* const field);

@@ -337,3 +337,11 @@ cvt_single_string(const cJSON* const item, char** const field)
     }
     return J2P_EXPT_SUCCESS;
 }
+
+j2p_expt_t
+cvt_single_int32_t_v2(const cJSON* const item, int32_t* const field, const ProtobufCFieldDescriptor* const field_desc, const j2p_add_cvt add_cvt_func)
+{
+    (void)field_desc;
+    (void)add_cvt_func;
+    return cvt_single_int32_t(item, field);
+}
