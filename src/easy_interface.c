@@ -34,3 +34,15 @@ cvt_json_2_pb_string(const cJSON* const root, const cJSON* const item, ProtobufC
 {
     return cvt_json_2_pb_field(root, item, msg, field_name, NULL, NULL, J2P_FILE_PATH_STR, NULL);
 }
+
+j2p_expt_t
+cvt_json_2_pb_bytes(const cJSON* const root, const cJSON* const item, ProtobufCMessage* const msg, const char* const field_name, const j2p_file_t file_type)
+{
+    return cvt_json_2_pb_field(root, item, msg, field_name, NULL, NULL, file_type, NULL);
+}
+
+j2p_expt_t
+cvt_json_2_pb_message(const cJSON* const root, const cJSON* const item, ProtobufCMessage* const msg, const char* const field_name, obj_msg_convertor msg_cvt_func)
+{
+    return cvt_json_2_pb_field(root, item, msg, field_name, NULL, NULL, J2P_FILE_PATH_STR, msg_cvt_func);
+}
