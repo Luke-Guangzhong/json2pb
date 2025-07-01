@@ -190,7 +190,7 @@ test_cvt_json_number_overflow_uint64(void)
     cJSON_AddNumberToObject(root, uint64_field_name, value);
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, uint64_field_name), (ProtobufCMessage*)msg, uint64_field_name);
-    CU_ASSERT_EQUAL(e, J2P_EXPT_NOT_EXACT_64);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_NOT_EXACT);
     CU_ASSERT_EQUAL(msg->f_uint64, 0);
 }
 
@@ -202,7 +202,7 @@ test_cvt_json_number_underflow_uint64(void)
     cJSON_AddNumberToObject(root, uint64_field_name, value);
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, uint64_field_name), (ProtobufCMessage*)msg, uint64_field_name);
-    CU_ASSERT_EQUAL(e, J2P_EXPT_NOT_EXACT_64);
+    CU_ASSERT_EQUAL(e, J2P_EXPT_NOT_EXACT);
     CU_ASSERT_EQUAL(msg->f_uint64, 0);
 }
 

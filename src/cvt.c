@@ -67,7 +67,7 @@ cvt_single_int64_t(const cJSON* const item, int64_t* const field)
             return J2P_EXPT_VALUE_OVERFLOW;
         }
         if (num_value < MIN_EXACT || num_value > MAX_EXACT) {
-            return J2P_EXPT_NOT_EXACT_64;
+            return J2P_EXPT_NOT_EXACT;
         }
         *field = (int64_t)num_value;
     } else if (NULL != cJSON_GetStringValue(item)) {
@@ -144,7 +144,7 @@ cvt_single_uint64_t(const cJSON* const item, uint64_t* const field)
             return J2P_EXPT_VALUE_OVERFLOW;
         }
         if (num_value < 0 || num_value > MAX_EXACT) {
-            return J2P_EXPT_NOT_EXACT_64;
+            return J2P_EXPT_NOT_EXACT;
         }
         *field = (uint64_t)num_value;
     } else if (NULL != cJSON_GetStringValue(item)) {
