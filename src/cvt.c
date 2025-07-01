@@ -329,7 +329,9 @@ cvt_single_string(const cJSON* const item, char** const field)
     assert(NULL != field);
 
     if (NULL != cJSON_GetStringValue(item)) {
-        asprintf(field, "%s", cJSON_GetStringValue(item));
+        if (asprintf(field, "%s", cJSON_GetStringValue(item)) < 0) {
+            exit(EXIT_FAILURE);
+        }
     } else {
         return J2P_EXPT_UNACCEPTABLE_JSON_TYPE;
     }

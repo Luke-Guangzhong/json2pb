@@ -178,12 +178,7 @@ cvt_json_2_pb_field(const cJSON*                root,
 /******************************************************************************/
 
 static j2p_expt_t
-cvt_numeric(const cJSON* const              root,
-            ProtobufCMessage*               msg,
-            const cJSON*                    item,
-            const ProtobufCFieldDescriptor* field_desc,
-            const size_t                    elem_size,
-            single_field_cvt_func           single_cvt)
+cvt_numeric(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, const size_t elem_size, single_field_cvt_func single_cvt)
 {
     assert(msg != NULL);
     assert(field_desc != NULL);
@@ -394,4 +389,9 @@ cvt_enum(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, cons
         void* field_ptr = (void*)msg + field_desc->offset;
         return cvt_single_enum(item, field_ptr, str_enum_cvt, (const ProtobufCEnumDescriptor*)field_desc->descriptor);
     }
+}
+
+static j2p_expt_t
+cvt_compand(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, const size_t elem_size)
+{
 }

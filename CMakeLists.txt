@@ -61,6 +61,8 @@ add_library(libtrower-base64_shared SHARED IMPORTED)
 set_target_properties(libtrower-base64_shared PROPERTIES IMPORTED_LOCATION "${CMAKE_CURRENT_BINARY_DIR}/lib/libtrower-base64${CMAKE_SHARED_LIBRARY_SUFFIX}")
 add_dependencies(libtrower-base64_shared external-trower-base64)
 
+add_compile_definitions(_GNU_SOURCE)
+
 aux_source_directory(src LIB_SRC_LIST)
 
 add_library(libjson2pb_shared SHARED ${LIB_SRC_LIST})
