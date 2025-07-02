@@ -14,6 +14,9 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#include "trower-base64/base64.h"
 
 #include "internal.h"
 #include "json2pb.h"
@@ -330,6 +333,7 @@ cvt_single_string(const cJSON* const item, char** const field)
 
     if (NULL != cJSON_GetStringValue(item)) {
         if (asprintf(field, "%s", cJSON_GetStringValue(item)) < 0) {
+            printf("Memory allocation failed\n");
             exit(EXIT_FAILURE);
         }
     } else {
@@ -344,4 +348,102 @@ cvt_single_int32_t_v2(const cJSON* const item, int32_t* const field, const Proto
     (void)field_desc;
     (void)add_cvt_func;
     return cvt_single_int32_t(item, field);
+}
+
+static j2p_expt_t
+util_cvt_hex_to_bytes(const char* const hex_str, uint8_t** const bytes, size_t* const bytes_len)
+{
+
+    assert(hex_str != NULL && bytes != NULL && bytes_len != NULL);
+
+    char* buffer = strdup(hex_str);
+    if (NULL == buffer) {
+        printf("Memory allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
+
+    size_t hex_len = strlen(buffer);
+
+    if (hex_len < 2) {
+        free(buffer);
+        return J2P_EXPT_INVALID_HEX_STRING;
+    }
+
+    size_t   b_len   = (hex_len % 3 == 0) ? (hex_len / 3) : (hex_len / 3 + 1);
+    uint8_t* b_data  = (uint8_t*)calloc(b_len, sizeof(uint8_t));
+    size_t   b_index = 0;
+
+    char* token  = strtok(buffer, " ");
+    char* endptr = NULL;
+    while (token != NULL) {
+        errno        = 0;
+        uint8_t byte = (uint8_t)strtoul(token, &endptr, 16);
+        if (errno != 0 || *endptr != '\0') {
+            break;
+        }
+        b_data[b_index++] = byte;
+        token             = strtok(NULL, " ");
+    }
+
+    if (b_index != b_len) {
+        free(b_data);
+        free(buffer);
+        return J2P_EXPT_INVALID_HEX_STRING;
+    }
+
+    free(buffer);
+
+    *bytes     = b_data;
+    *bytes_len = b_len;
+
+    return J2P_EXPT_SUCCESS;
+}
+
+static j2p_expt_t
+util_cvt_base64_to_bytes(const char* const base64_str, uint8_t** const bytes, size_t* const bytes_len)
+{
+    assert(base64_str != NULL && bytes != NULL && bytes_len != NULL);
+
+    size_t input_len = strlen(base64_str);
+    *bytes           = b64_decode_with_alloc(base64_str, input_len, bytes_len);
+    if (NULL == *bytes) {
+        return J2P_EXPT_INVALID_BASE64_STRING;
+    }
+
+    return J2P_EXPT_SUCCESS;
+}
+
+static j2p_expt_t
+util_cvt_file_to_bytes(const char* const file_path, uint8_t** const bytes, size_t* const bytes_len)
+{
+    assert(file_path != NULL && bytes != NULL && bytes_len != NULL);
+
+    FILE* fp = fopen(file_path, "rb");
+    if (NULL == fp) {
+        return J2P_EXPT_INVALID_FILE_PATH;
+    }
+
+    fseek(fp, 0, SEEK_END);
+    const size_t size = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+
+    uint8_t* b_data = (uint8_t*)calloc(size, sizeof(uint8_t));
+    if (NULL == b_data) {
+        printf("Memory allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (fread(b_data, sizeof(uint8_t), size, fp) != size) {
+        if (ferror(fp) != 0) {
+            perror("fread failed");
+        }
+        free(b_data);
+        fclose(fp);
+        return J2P_EXPT_INVALID_FILE_PATH;
+    } else {
+        *bytes     = b_data;
+        *bytes_len = size;
+        fclose(fp);
+        return J2P_EXPT_SUCCESS;
+    }
 }

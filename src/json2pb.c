@@ -52,27 +52,30 @@ static j2p_expt_t cvt_enum(const cJSON* const root, ProtobufCMessage* msg, const
 /******************************************************************************/
 
 const j2p_expt_msg j2p_expt_msg_list[] = {
-    {J2P_EXPT_SUCCESS,                  "success"                                               },
-    {J2P_EXPT_VALUE_OVERFLOW,           "json value overflow"                                   },
-    {J2P_EXPT_UNACCEPTABLE_JSON_TYPE,   "unacceptable json type"                                },
-    {J2P_EXPT_INVALID_NUMBER_STRING,    "invalid number string"                                 },
-    {J2P_EXPT_NOT_EXACT,                "possiable precision loss, use string instead"          },
-    {J2P_EXPT_INVALID_ENUM_VALUE,       "invalid enum value"                                    },
-    {J2P_EXPT_EMPTY_ARRAY,              "empty array in json"                                   },
-    {J2P_EXPT_PARTIAL_FAIL,             "partial fail when convert json array to repeated field"},
-    {J2P_EXPT_NO_VALID_FOUND,           "all element in array are not valid for this field"     },
-    {J2P_EXPT_JSON_POINTER_NOT_FOUND,   "cannot locate object by json pointer"                  },
-    {J2P_EXPT_JSON_GENERAL,             "general error in json"                                 },
-    {J2P_EXPT_UNINITIALIZED,            "protobuf message not initialized"                      },
-    {J2P_EXPT_FIELD_NOT_FOUND,          "specified field not found in protobuf message"         },
-    {J2P_EXPT_FIELD_IS_DEPRECATED,      "specified field already deprecated in protobuf message"},
-    {J2P_EXPT_ONEOF_ALREADY_SET,        "field with oneof already set in protobuf message"      },
-    {J2P_EXPT_PB_GENERAL,               "general error in protobuf message"                     },
-    {J2P_EXPT_INVALID_ARG,              "pass invalid argument to function"                     },
-    {J2P_EXPT_INCORRECT_EXCEPTION_TYPE, "throw an unknown exception type or this one"           },
-    {J2P_EXPT_CODE_GENERAL,             "general error in coding"                               },
-    {J2P_EXPT_MEM_ALLOC_FAILED,         "memory allocation failed"                              },
-    {J2P_EXPT_OS_GENERAL,               "general error in operating system"                     },
+    {J2P_EXPT_SUCCESS,                  "success"                                                         },
+    {J2P_EXPT_VALUE_OVERFLOW,           "json value overflow"                                             },
+    {J2P_EXPT_UNACCEPTABLE_JSON_TYPE,   "unacceptable json type"                                          },
+    {J2P_EXPT_INVALID_NUMBER_STRING,    "invalid number string"                                           },
+    {J2P_EXPT_NOT_EXACT,                "possiable precision loss, use string instead"                    },
+    {J2P_EXPT_INVALID_ENUM_VALUE,       "invalid enum value"                                              },
+    {J2P_EXPT_INVALID_HEX_STRING,       "invalid hex string"                                              },
+    {J2P_EXPT_INVALID_BASE64_STRING,    "invalid hex base64 string"                                       },
+    {J2P_EXPT_INVALID_FILE_PATH,        "invalid file path, please check the file path or file permission"},
+    {J2P_EXPT_EMPTY_ARRAY,              "empty array in json"                                             },
+    {J2P_EXPT_PARTIAL_FAIL,             "partial fail when convert json array to repeated field"          },
+    {J2P_EXPT_NO_VALID_FOUND,           "all element in array are not valid for this field"               },
+    {J2P_EXPT_JSON_POINTER_NOT_FOUND,   "cannot locate object by json pointer"                            },
+    {J2P_EXPT_JSON_GENERAL,             "general error in json"                                           },
+    {J2P_EXPT_UNINITIALIZED,            "protobuf message not initialized"                                },
+    {J2P_EXPT_FIELD_NOT_FOUND,          "specified field not found in protobuf message"                   },
+    {J2P_EXPT_FIELD_IS_DEPRECATED,      "specified field already deprecated in protobuf message"          },
+    {J2P_EXPT_ONEOF_ALREADY_SET,        "field with oneof already set in protobuf message"                },
+    {J2P_EXPT_PB_GENERAL,               "general error in protobuf message"                               },
+    {J2P_EXPT_INVALID_ARG,              "pass invalid argument to function"                               },
+    {J2P_EXPT_INCORRECT_EXCEPTION_TYPE, "throw an unknown exception type or this one"                     },
+    {J2P_EXPT_CODE_GENERAL,             "general error in coding"                                         },
+    {J2P_EXPT_MEM_ALLOC_FAILED,         "memory allocation failed"                                        },
+    {J2P_EXPT_OS_GENERAL,               "general error in operating system"                               },
 };
 
 /******************************************************************************/
@@ -304,6 +307,7 @@ cvt_numeric(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, c
             j2p_expt_t     rtn        = J2P_EXPT_SUCCESS;
             void* const    array      = (void*)calloc(length, elem_size);
             if (NULL == array) {
+                printf("Memory allocation failed\n");
                 exit(EXIT_FAILURE);
             }
 
@@ -327,6 +331,7 @@ cvt_numeric(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, c
             void** field_ptr = (void**)((void*)msg + field_desc->offset);
             *field_ptr       = (void*)calloc(count, elem_size);
             if (NULL == (*field_ptr)) {
+                printf("Memory allocation failed\n");
                 exit(EXIT_FAILURE);
             }
 
@@ -375,6 +380,7 @@ cvt_bool(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, cons
             j2p_expt_t     rtn        = J2P_EXPT_SUCCESS;
             bool* const    array      = (bool*)calloc(length, sizeof(bool));
             if (NULL == array) {
+                printf("Memory allocation failed\n");
                 exit(EXIT_FAILURE);
             }
 
@@ -398,6 +404,7 @@ cvt_bool(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, cons
             bool** field_ptr = (bool**)((void*)msg + field_desc->offset);
             *field_ptr       = (bool*)calloc(count, sizeof(bool));
             if (NULL == (*field_ptr)) {
+                printf("Memory allocation failed\n");
                 exit(EXIT_FAILURE);
             }
 
@@ -446,6 +453,7 @@ cvt_enum(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, cons
             j2p_expt_t     rtn        = J2P_EXPT_SUCCESS;
             int* const     array      = (int*)calloc(length, sizeof(int));
             if (NULL == array) {
+                printf("Memory allocation failed\n");
                 exit(EXIT_FAILURE);
             }
 
@@ -469,6 +477,7 @@ cvt_enum(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, cons
             bool** field_ptr = (bool**)((void*)msg + field_desc->offset);
             *field_ptr       = (bool*)calloc(count, sizeof(bool));
             if (NULL == (*field_ptr)) {
+                printf("Memory allocation failed\n");
                 exit(EXIT_FAILURE);
             }
 
