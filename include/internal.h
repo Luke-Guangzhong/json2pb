@@ -32,7 +32,7 @@ j2p_expt_t cvt_single_bool(const cJSON* const item, bool* const field, string_bo
 
 j2p_expt_t cvt_single_enum(const cJSON* const item, int* const field, string_enum_convertor str_enum_cvt, const ProtobufCEnumDescriptor* const enum_desc);
 
-j2p_expt_t cvt_single_enum_v2(const cJSON* const item, int32_t* const field, const ProtobufCFieldDescriptor* const field_desc, const j2p_add_cvt add_cvt_func);
+j2p_expt_t cvt_single_enum_v2(const cJSON* const item, int* const field, const ProtobufCFieldDescriptor* const field_desc, const j2p_add_cvt add_cvt_func);
 
 j2p_expt_t cvt_single_string(const cJSON* const item, char** const field);
 
