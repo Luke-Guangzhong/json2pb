@@ -453,3 +453,42 @@ util_cvt_file_to_bytes(const char* const file_path, uint8_t** const bytes, size_
         return J2P_EXPT_SUCCESS;
     }
 }
+
+j2p_expt_t
+cvt_single_bytes(const cJSON* const item, ProtobufCBinaryData** const field, j2p_file_t mode)
+{
+    assert(NULL != item);
+    assert(NULL != field);
+
+    j2p_expt_t rtn = J2P_EXPT_SUCCESS;
+
+    ProtobufCBinaryData* b_data = (ProtobufCBinaryData*)calloc(1, sizeof(ProtobufCBinaryData));
+
+    if (NULL != cJSON_GetStringValue(item)) {
+        switch (mode) {
+        case J2P_FILE_PATH_STR:
+            rtn = util_cvt_file_to_bytes(cJSON_GetStringValue(item), &b_data->data, &b_data->len);
+            break;
+        case J2P_FILE_BASE64_STR:
+            rtn = util_cvt_base64_to_bytes(cJSON_GetStringValue(item), &b_data->data, &b_data->len);
+            break;
+        case J2P_FILE_HEX_STR:
+            rtn = util_cvt_hex_to_bytes(cJSON_GetStringValue(item), &b_data->data, &b_data->len);
+            break;
+        default:
+            rtn = J2P_EXPT_INVALID_FILE_MODE;
+            break;
+        }
+    } else {
+        rtn = J2P_EXPT_UNACCEPTABLE_JSON_TYPE;
+    }
+
+    if (rtn == J2P_EXPT_SUCCESS) {
+        *field = b_data;
+    } else {
+        free(b_data->data);
+        free(b_data);
+    }
+
+    return rtn;
+}

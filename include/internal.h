@@ -36,7 +36,7 @@ j2p_expt_t cvt_single_enum_v2(const cJSON* const item, int* const field, const P
 
 j2p_expt_t cvt_single_string(const cJSON* const item, char** const field);
 
-j2p_expt_t cvt_single_bytes(const cJSON* const item, char** const field);
+j2p_expt_t cvt_single_bytes(const cJSON* const item, ProtobufCBinaryData** const field, j2p_file_t mode);
 
 j2p_expt_t cvt_single_message(const cJSON* const item, char** const field, obj_msg_convertor obj_cvt, const ProtobufCMessageDescriptor* const msg_desc);
 
