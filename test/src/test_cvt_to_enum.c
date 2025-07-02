@@ -100,6 +100,7 @@ test_cvt_json_number_to_single_enum(void)
 
     j2p_expt_t e = cvt_json_2_pb_enum(root, cJSON_GetObjectItem(root, enum_field_name), (ProtobufCMessage*)msg, enum_field_name, NULL);
     CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
+    printf("e = %d\n", e);
     CU_ASSERT_EQUAL(msg->f_enum, ENUM__ENUM_2);
     printf("msg->f_enum = %d\n", msg->f_enum);
 }
@@ -113,7 +114,9 @@ test_cvt_json_string_to_single_enum(void)
 
     j2p_expt_t e = cvt_json_2_pb_enum(root, cJSON_GetObjectItem(root, enum_field_name), (ProtobufCMessage*)msg, enum_field_name, NULL);
     CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
+    printf("e = %d\n", e);
     CU_ASSERT_EQUAL(msg->f_enum, ENUM__ENUM_2);
+    printf("msg->f_enum = %d\n", msg->f_enum);
 }
 
 void
@@ -125,8 +128,11 @@ test_cvt_json_number_to_oneof_enum(void)
     const ProtobufCFieldDescriptor* field_desc = protobuf_c_message_descriptor_get_field_by_name(msg->base.descriptor, "oneof_enum");
     CU_ASSERT_PTR_NOT_NULL_FATAL(field_desc);
     CU_ASSERT_EQUAL(e, J2P_EXPT_SUCCESS);
+    printf("e = %d\n", e);
     CU_ASSERT_EQUAL(msg->oneof_enum, ENUM__ENUM_2);
+    printf("msg->oneof_enum = %d\n", msg->oneof_enum);
     CU_ASSERT_EQUAL(msg->test_oneof_case, field_desc->id);
+    printf("msg->test_oneof_case = %d\n", msg->test_oneof_case);
 }
 
 #if 0

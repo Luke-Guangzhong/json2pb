@@ -261,6 +261,7 @@ cvt_json_2_pb_field_v2(const cJSON* root, const cJSON* item, ProtobufCMessage* c
     case PROTOBUF_C_TYPE_BOOL:
         break;
     case PROTOBUF_C_TYPE_ENUM:
+        rtn = cvt_field(root, msg, item, field_desc, sizeof(int), (single_field_cvt_func_v2)cvt_single_enum_v2, add_cvt);
         break;
     case PROTOBUF_C_TYPE_STRING:
         break;
@@ -515,4 +516,71 @@ cvt_field(const cJSON* const              root,
           single_field_cvt_func_v2        single_cvt,
           j2p_add_cvt                     add_cvt)
 {
+    assert(msg != NULL);
+    assert(field_desc != NULL);
+    assert(item != NULL);
+    assert(msg->descriptor != NULL);
+
+    if (NULL == msg || NULL == field_desc || NULL == item || NULL == msg->descriptor) {
+        return J2P_EXPT_INVALID_ARG;
+    }
+
+    const bool is_repeated = (field_desc->label == PROTOBUF_C_LABEL_REPEATED);
+    const bool is_oneof    = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_ONEOF);
+
+    if (is_repeated) {
+        if (cJSON_GetArraySize(item) > 0) {
+            uint64_t       count      = 0;
+            const cJSON*   element    = NULL;
+            const cJSON*   json_array = item;
+            const uint64_t length     = cJSON_GetArraySize(json_array);
+            j2p_expt_t     rtn        = J2P_EXPT_SUCCESS;
+            void* const    array      = (void*)calloc(length, elem_size);
+            if (NULL == array) {
+                printf("Memory allocation failed\n");
+                exit(EXIT_FAILURE);
+            }
+
+            cJSON_ArrayForEach(element, item)
+            {
+                rtn = single_cvt(element, array + (count * elem_size), field_desc, add_cvt);
+                if (rtn != EXIT_SUCCESS) {
+                    char* path = cJSONUtils_FindPointerFromObjectTo(root, element);
+                    printf("[EXCEPTION]: %s %s\n", path, j2p_expt_msg_list[rtn].desc);
+                    free(path);
+                } else {
+                    count++;
+                }
+            }
+
+            if (count == 0) { /* no valid element found */
+                free(array);
+                return J2P_EXPT_NO_VALID_FOUND;
+            }
+
+            void** field_ptr = (void**)((void*)msg + field_desc->offset);
+            *field_ptr       = (void*)calloc(count, elem_size);
+            if (NULL == (*field_ptr)) {
+                printf("Memory allocation failed\n");
+                exit(EXIT_FAILURE);
+            }
+
+            memcpy((*field_ptr), array, count * elem_size);
+            *(size_t*)((void*)msg + field_desc->quantifier_offset) = count;
+
+            free(array);
+            if (count == length)
+                return J2P_EXPT_SUCCESS;
+            else
+                return J2P_EXPT_PARTIAL_FAIL;
+        } else {
+            return J2P_EXPT_EMPTY_ARRAY;
+        }
+    } else {
+        if (is_oneof) {
+            (*(int32_t*)((void*)msg + field_desc->quantifier_offset)) = field_desc->id;
+        }
+        void* field_ptr = (void*)msg + field_desc->offset;
+        return single_cvt(item, field_ptr, field_desc, add_cvt);
+    }
 }

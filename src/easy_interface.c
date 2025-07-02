@@ -26,7 +26,9 @@ cvt_json_2_pb_bool(const cJSON* const root, const cJSON* const item, ProtobufCMe
 j2p_expt_t
 cvt_json_2_pb_enum(const cJSON* const root, const cJSON* const item, ProtobufCMessage* const msg, const char* const field_name, string_enum_convertor str_enum_cvt_func)
 {
-    return cvt_json_2_pb_field(root, item, msg, field_name, NULL, str_enum_cvt_func, J2P_FILE_PATH_STR, NULL);
+    // return cvt_json_2_pb_field(root, item, msg, field_name, NULL, str_enum_cvt_func, J2P_FILE_PATH_STR, NULL);
+    j2p_add_cvt add_cvt = {.enum_cvt = str_enum_cvt_func};
+    return cvt_json_2_pb_field_v2(root, item, msg, field_name, add_cvt);
 }
 
 j2p_expt_t

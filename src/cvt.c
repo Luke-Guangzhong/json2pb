@@ -350,6 +350,12 @@ cvt_single_int32_t_v2(const cJSON* const item, int32_t* const field, const Proto
     return cvt_single_int32_t(item, field);
 }
 
+j2p_expt_t
+cvt_single_enum_v2(const cJSON* const item, int32_t* const field, const ProtobufCFieldDescriptor* const field_desc, const j2p_add_cvt add_cvt_func)
+{
+    return cvt_single_enum(item, (int*)field, add_cvt_func.enum_cvt, field_desc->descriptor);
+}
+
 static j2p_expt_t
 util_cvt_hex_to_bytes(const char* const hex_str, uint8_t** const bytes, size_t* const bytes_len)
 {
