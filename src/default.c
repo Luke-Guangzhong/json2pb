@@ -38,3 +38,26 @@ default_string_enum_convertor(const ProtobufCEnumDescriptor* const enum_desc, co
     }
     return enum_value->value;
 }
+
+j2p_expt_t
+default_obj_msg_convertor(const cJSON* const root, const cJSON* const item, ProtobufCMessage* const msg)
+{
+    assert(NULL != root);
+    assert(NULL != item);
+    assert(NULL != msg);
+    assert(NULL != msg->descriptor);
+
+    j2p_expt_t rtn = J2P_EXPT_SUCCESS;
+
+    for (int i = 0; i < msg->descriptor->n_fields; i++) {
+        ProtobufCFieldDescriptor* field_desc = msg->descriptor->fields + i;
+        rtn                                  = cvt_json_2_pb_field(root, cJSON_GetObjectItem(item, field_desc->name), msg, field_desc->name, NULL, NULL, J2P_FILE_BASE64_STR, NULL);
+        if (rtn != J2P_EXPT_SUCCESS) {
+            char* path = cJSONUtils_FindPointerFromObjectTo(root, cJSON_GetObjectItem(item, field_desc->name));
+            printf("[EXCEPTION]: %s %s\n", path, j2p_expt_msg_list[rtn].desc);
+            free(path);
+        }
+    }
+
+    return rtn;
+}

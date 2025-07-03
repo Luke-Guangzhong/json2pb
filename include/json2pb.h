@@ -64,7 +64,7 @@ typedef bool (*string_bool_convertor)(const char* const str);
 
 typedef int (*string_enum_convertor)(const ProtobufCEnumDescriptor* const enum_desc, const char* const str);
 
-typedef j2p_expt_t (*obj_msg_convertor)(ProtobufCMessage* const msg, const cJSON* const root);
+typedef j2p_expt_t (*obj_msg_convertor)(const cJSON* const root, const cJSON* const item, ProtobufCMessage* const msg);
 
 typedef int (*compand_convertor)(void* p1, void* p2);
 

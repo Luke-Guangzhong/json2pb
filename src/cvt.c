@@ -493,3 +493,34 @@ cvt_single_bytes(const cJSON* const item, ProtobufCBinaryData* const field, j2p_
 
     return rtn;
 }
+
+j2p_expt_t
+cvt_single_message(const cJSON* const root, const cJSON* const item, void** const field, obj_msg_convertor obj_cvt, const ProtobufCMessageDescriptor* const msg_desc)
+{
+    assert(NULL != root);
+    assert(NULL != item);
+    assert(NULL != field);
+    assert(NULL != msg_desc);
+
+    if (NULL == obj_cvt) {
+        obj_cvt = default_obj_msg_convertor;
+    }
+
+    ProtobufCMessage* msg_buffer = (ProtobufCMessage*)calloc(1, msg_desc->sizeof_message);
+    if (NULL == msg_buffer) {
+        printf("Memory allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
+
+    msg_desc->message_init(msg_buffer);
+
+    j2p_expt_t rtn = obj_cvt(root, item, msg_buffer);
+
+    if (rtn == J2P_EXPT_SUCCESS) {
+        *field = msg_buffer;
+    } else {
+        protobuf_c_message_free_unpacked(msg_buffer, NULL);
+    }
+
+    return rtn;
+}

@@ -178,6 +178,7 @@ cvt_json_2_pb_field(const cJSON*                root,
         rtn = cvt_numeric(root, msg, item, field_desc, sizeof(char*), (single_field_cvt_func)cvt_single_string);
         break;
     case PROTOBUF_C_TYPE_MESSAGE:
+        rtn = cvt_message(root, msg, item, field_desc, sizeof(void*), msg_cvt);
         break;
     case PROTOBUF_C_TYPE_BYTES:
         rtn = cvt_bytes(root, msg, item, field_desc, file_type);
@@ -660,5 +661,84 @@ cvt_bytes(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, con
         }
         ProtobufCBinaryData* field_ptr = (void*)msg + field_desc->offset;
         return cvt_single_bytes(item, field_ptr, mode);
+    }
+}
+
+j2p_expt_t
+cvt_message(const cJSON* const                    root,
+            ProtobufCMessage* const               msg,
+            const cJSON* const                    item,
+            const ProtobufCFieldDescriptor* const field_desc,
+            const size_t                          elem_size,
+            obj_msg_convertor                     msg_cvt)
+{
+    assert(msg != NULL);
+    assert(field_desc != NULL);
+    assert(item != NULL);
+    assert(msg->descriptor != NULL);
+    assert(field_desc->type == PROTOBUF_C_TYPE_MESSAGE);
+
+    if (NULL == msg || NULL == field_desc || NULL == item || NULL == msg->descriptor || field_desc->type != PROTOBUF_C_TYPE_MESSAGE) {
+        return J2P_EXPT_INVALID_ARG;
+    }
+
+    const bool is_repeated = (field_desc->label == PROTOBUF_C_LABEL_REPEATED);
+    const bool is_oneof    = (field_desc->flags == PROTOBUF_C_FIELD_FLAG_ONEOF);
+
+    if (is_repeated) {
+        if (cJSON_GetArraySize(item) > 0) {
+            uint64_t       count      = 0;
+            const cJSON*   element    = NULL;
+            const cJSON*   json_array = item;
+            const uint64_t length     = cJSON_GetArraySize(json_array);
+            j2p_expt_t     rtn        = J2P_EXPT_SUCCESS;
+            void** const   array      = (void**)calloc(length, elem_size);
+            if (NULL == array) {
+                printf("Memory allocation failed\n");
+                exit(EXIT_FAILURE);
+            }
+
+            cJSON_ArrayForEach(element, json_array)
+            {
+                rtn = cvt_single_message(root, element, array + count, msg_cvt, field_desc->descriptor);
+                if (rtn != EXIT_SUCCESS) {
+                    char* path = cJSONUtils_FindPointerFromObjectTo(root, element);
+                    printf("[EXCEPTION]: %s %s\n", path, j2p_expt_msg_list[rtn].desc);
+                    free(path);
+                } else {
+                    count++;
+                }
+            }
+
+            if (count == 0) { /* no valid element found */
+                free(array);
+                return J2P_EXPT_NO_VALID_FOUND;
+            }
+
+            void** field_ptr = (void**)((void*)msg + field_desc->offset);
+            *field_ptr       = (void*)calloc(count, sizeof(ProtobufCBinaryData*));
+            if (NULL == (*field_ptr)) {
+                printf("Memory allocation failed\n");
+                exit(EXIT_FAILURE);
+            }
+
+            memcpy((*field_ptr), array, count * sizeof(ProtobufCBinaryData*));
+            *(size_t*)((void*)msg + field_desc->quantifier_offset) = count;
+
+            free(array);
+            if (count == length) {
+                return J2P_EXPT_SUCCESS;
+            } else {
+                return J2P_EXPT_PARTIAL_FAIL;
+            }
+        } else {
+            return J2P_EXPT_EMPTY_ARRAY;
+        }
+    } else {
+        if (is_oneof) {
+            (*(int32_t*)((void*)msg + field_desc->quantifier_offset)) = field_desc->id;
+        }
+        ProtobufCBinaryData* field_ptr = (void*)msg + field_desc->offset;
+        return cvt_single_message(root, item, field_ptr, msg_cvt, field_desc->descriptor);
     }
 }

@@ -38,13 +38,15 @@ j2p_expt_t cvt_single_string(const cJSON* const item, char** const field);
 
 j2p_expt_t cvt_single_bytes(const cJSON* const item, ProtobufCBinaryData* const field, j2p_file_t mode);
 
-j2p_expt_t cvt_single_message(const cJSON* const item, char** const field, obj_msg_convertor obj_cvt, const ProtobufCMessageDescriptor* const msg_desc);
+j2p_expt_t cvt_single_message(const cJSON* const root, const cJSON* const item, void** const field, obj_msg_convertor obj_cvt, const ProtobufCMessageDescriptor* const msg_desc);
 
 bool default_string_bool_convertor(const char* const str);
 
 int default_string_bool_convertor_v2(const ProtobufCFieldDescriptor* const field_desc, const char* const str);
 
 int default_string_enum_convertor(const ProtobufCEnumDescriptor* const enum_desc, const char* const str);
+
+j2p_expt_t default_obj_msg_convertor(const cJSON* const root, const cJSON* const item, ProtobufCMessage* const msg);
 
 int int_range_lookup(unsigned n_ranges, const ProtobufCIntRange* ranges, int value);
 
