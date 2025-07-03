@@ -607,12 +607,12 @@ cvt_bytes(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, con
 
     if (is_repeated) {
         if (cJSON_GetArraySize(item) > 0) {
-            uint64_t                    count      = 0;
-            const cJSON*                element    = NULL;
-            const cJSON*                json_array = item;
-            const uint64_t              length     = cJSON_GetArraySize(json_array);
-            j2p_expt_t                  rtn        = J2P_EXPT_SUCCESS;
-            ProtobufCBinaryData** const array      = (ProtobufCBinaryData**)calloc(length, sizeof(ProtobufCBinaryData*));
+            uint64_t                   count      = 0;
+            const cJSON*               element    = NULL;
+            const cJSON*               json_array = item;
+            const uint64_t             length     = cJSON_GetArraySize(json_array);
+            j2p_expt_t                 rtn        = J2P_EXPT_SUCCESS;
+            ProtobufCBinaryData* const array      = (ProtobufCBinaryData*)calloc(length, sizeof(ProtobufCBinaryData));
             if (NULL == array) {
                 printf("Memory allocation failed\n");
                 exit(EXIT_FAILURE);
@@ -646,10 +646,11 @@ cvt_bytes(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, con
             *(size_t*)((void*)msg + field_desc->quantifier_offset) = count;
 
             free(array);
-            if (count == length)
+            if (count == length) {
                 return J2P_EXPT_SUCCESS;
-            else
+            } else {
                 return J2P_EXPT_PARTIAL_FAIL;
+            }
         } else {
             return J2P_EXPT_EMPTY_ARRAY;
         }
@@ -657,7 +658,7 @@ cvt_bytes(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, con
         if (is_oneof) {
             (*(int32_t*)((void*)msg + field_desc->quantifier_offset)) = field_desc->id;
         }
-        ProtobufCBinaryData** field_ptr = (void*)msg + field_desc->offset;
+        ProtobufCBinaryData* field_ptr = (void*)msg + field_desc->offset;
         return cvt_single_bytes(item, field_ptr, mode);
     }
 }

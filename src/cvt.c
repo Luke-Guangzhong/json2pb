@@ -382,9 +382,9 @@ util_cvt_hex_to_bytes(const char* const hex_str, uint8_t** const bytes, size_t* 
     char* token  = strtok(buffer, " ");
     char* endptr = NULL;
     while (token != NULL) {
-        errno        = 0;
-        uint8_t byte = (uint8_t)strtoul(token, &endptr, 16);
-        if (errno != 0 || *endptr != '\0') {
+        errno              = 0;
+        unsigned long byte = strtoul(token, &endptr, 16);
+        if (errno != 0 || *endptr != '\0' || byte > UINT8_MAX) {
             break;
         }
         b_data[b_index++] = byte;
@@ -455,7 +455,7 @@ util_cvt_file_to_bytes(const char* const file_path, uint8_t** const bytes, size_
 }
 
 j2p_expt_t
-cvt_single_bytes(const cJSON* const item, ProtobufCBinaryData** const field, j2p_file_t mode)
+cvt_single_bytes(const cJSON* const item, ProtobufCBinaryData* const field, j2p_file_t mode)
 {
     assert(NULL != item);
     assert(NULL != field);
@@ -484,7 +484,8 @@ cvt_single_bytes(const cJSON* const item, ProtobufCBinaryData** const field, j2p
     }
 
     if (rtn == J2P_EXPT_SUCCESS) {
-        *field = b_data;
+        field->data = b_data->data;
+        field->len  = b_data->len;
     } else {
         free(b_data->data);
         free(b_data);
