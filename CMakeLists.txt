@@ -33,7 +33,7 @@ externalproject_add(
     external-cjson
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/third-party/cJSON
     GIT_REPOSITORY git@gitee.com:third_party_2/cJSON.git
-    GIT_TAG v1.7.18
+    GIT_TAG "7ddfc39f52851e880d75751f7e02820f3c9ed638"
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}
                -DENABLE_CJSON_TEST=ON
                -DBUILD_SHARED_AND_STATIC_LIBS=ON

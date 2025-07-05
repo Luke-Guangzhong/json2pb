@@ -12,7 +12,7 @@ externalproject_add(
     external-cimplog
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/third-party/cimplog
     GIT_REPOSITORY git@gitee.com:third_party_2/cimplog.git
-    GIT_TAG "1.0.1"
+    GIT_TAG "49b84f1462c2ce9e8249f94c9492b5f3e2269b02"
     CMAKE_ARGS
                -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}
                -DBUILD_TESTING=OFF

@@ -4,8 +4,22 @@ set -euo pipefail
 IFS=$'\n\t'
 
 # === 配置部分 ===
-WORK_DIR="/Users/luguangzhong/Project/json2pb"
-IGNORE_LIST=("build" "bin" "doc" ".vscode" "script" "template" "tmp" "cmake-build-debug")  # 只忽略 WORK_DIR/下的一级目录
+# 获取脚本绝对路径的通用写法
+SOURCE="${BASH_SOURCE[0]}"
+# 若脚本是被符号链接调用，这里把 SOURCE 追到真实路径
+while [ -h "$SOURCE" ]; do
+  DIR="$(cd -P "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)"
+  SOURCE="$(readlink "$SOURCE")"
+  # 如果 readlink 返回的是相对路径，就相对于链接所在目录去解析
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+# 最终的脚本目录
+SCRIPT_DIR="$(cd -P "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)"
+  
+echo "脚本所在目录：$SCRIPT_DIR"
+
+WORK_DIR="$SCRIPT_DIR/.."
+IGNORE_LIST=("build" "bin" "doc" ".vscode" "script" "template" "tmp")  # 只忽略 WORK_DIR/下的一级目录
 
 # === 工作开始 ===
 cd "$WORK_DIR" || {
