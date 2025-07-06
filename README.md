@@ -7,18 +7,18 @@
 2. **转换类型**
 
 | Protobuf 类型                   | 可接受的 JSON 类型       |
-| ----------------------------- | ------------------ |
-| `double`                      | `number`, `string` |
-| `float`                       | `number`, `string` |
-| `int32`, `sint32`, `sfixed32` | `number`, `string` |
-| `int64`, `sint64`, `sfixed64` | `number`, `string` |
-| `uint32`, `fixed32`           | `number`, `string` |
-| `uint64`, `fixed64`           | `number`, `string` |
-| `string`                      | `string`           |
-| `bool`                        | `number`, `string` |
-| `bytes`                       | `string`           |
-| `message`                     | `object`           |
-| `enum`                        | `number`, `string` |
+| ----------------------------- | -------------------------- |
+| `double`                      | `number`, `string`         |
+| `float`                       | `number`, `string`         |
+| `int32`, `sint32`, `sfixed32` | `number`, `string`         |
+| `int64`, `sint64`, `sfixed64` | `number`, `string`         |
+| `uint32`, `fixed32`           | `number`, `string`         |
+| `uint64`, `fixed64`           | `number`, `string`         |
+| `string`                      | `string`                   |
+| `bool`                        | `number`, `string`, `bool` |
+| `bytes`                       | `string`                   |
+| `message`                     | `object`                   |
+| `enum`                        | `number`, `string`         |
 
 **注意：** 我们使用 `strtoxxx` 函数将字符串转换为整数和浮点数类型。
 

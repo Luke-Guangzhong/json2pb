@@ -1,6 +1,16 @@
+/**
+ * @file utils.c
+ * @author 陆光中 (luke_guangzhong@petalmail.com)
+ * @brief
+ * @version 0.1
+ * @date 2025-07-01
+ *
+ * @copyright Copyright (c) 2025
+ *
+ */
 #include <string.h>
 
-#include "cjson2pb-c.h"
+#include <protobuf-c/protobuf-c.h>
 
 int
 int_range_lookup(unsigned n_ranges, const ProtobufCIntRange* ranges, int value)
@@ -45,17 +55,20 @@ protobuf_c_enum_descriptor_get_value_by_name_case_insensitive(const ProtobufCEnu
     while (count > 1) {
         unsigned mid = start + count / 2;
         int      rv  = strcasecmp(desc->values_by_name[mid].name, name);
-        if (rv == 0)
+        if (rv == 0) {
             return desc->values + desc->values_by_name[mid].index;
-        else if (rv < 0) {
+        } else if (rv < 0) {
             count = start + count - (mid + 1);
             start = mid + 1;
-        } else
+        } else {
             count = mid - start;
+        }
     }
-    if (count == 0)
+    if (count == 0) {
         return NULL;
-    if (strcasecmp(desc->values_by_name[start].name, name) == 0)
+    }
+    if (strcasecmp(desc->values_by_name[start].name, name) == 0) {
         return desc->values + desc->values_by_name[start].index;
+    }
     return NULL;
 }
