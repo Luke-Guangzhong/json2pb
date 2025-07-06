@@ -60,7 +60,7 @@ test_cvt_json_object_to_single_message(void)
         "field\":\"test\",\"f_int64\":\"\",\"f_sint64\":\"\",\"f_sfixed64\":\"\",\"f_repeated_int64\":\"\",\"f_repeated_sint64\":\"\",\"f_repeated_sfixed64\":\"\",\"f_double\":"
         "\"\",\"f_repeated_double\":\"\",\"f_float\":\"\",\"f_repeated_float\":\"\",\"f_uint32\":\"\",\"f_fixed32\":\"\",\"f_repeated_uint32\":\"\",\"f_repeated_fixed32\":\"\","
         "\"f_uint64\":\"\",\"f_fixed64\":\"\",\"f_repeated_uint64\":\"\",\"f_repeated_fixed64\":\"\",\"f_bool\":\"\",\"f_repeated_bool\":\"\",\"f_string\":\"\",\"f_repeated_"
-        "string\":\"\",\"f_bytes\":\"\",\"f_repeated_bytes\":\"\",\"f_enum\":\"\",\"f_repeated_enum\":\"\",\"f_message_in_test_message\":\"\"}";
+        "string\":\"\",\"f_bytes\":\"\",\"f_repeated_bytes\":\"\",\"f_enum\":\"\",\"f_repeated_enum\":\"\"}";
     cJSON* json_obj = cJSON_Parse(json_str);
     CU_ASSERT_PTR_NOT_NULL_FATAL(json_obj);
 

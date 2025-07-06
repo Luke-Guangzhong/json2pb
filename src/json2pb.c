@@ -694,12 +694,12 @@ cvt_message(const cJSON* const                    root,
 
     if (is_repeated) {
         if (cJSON_GetArraySize(item) > 0) {
-            uint64_t       count      = 0;
-            const cJSON*   element    = NULL;
-            const cJSON*   json_array = item;
-            const uint64_t length     = cJSON_GetArraySize(json_array);
-            j2p_expt_t     rtn        = J2P_EXPT_SUCCESS;
-            void** const   array      = (void**)calloc(length, elem_size);
+            uint64_t                 count      = 0;
+            const cJSON*             element    = NULL;
+            const cJSON*             json_array = item;
+            const uint64_t           length     = cJSON_GetArraySize(json_array);
+            j2p_expt_t               rtn        = J2P_EXPT_SUCCESS;
+            ProtobufCMessage** const array      = (ProtobufCMessage**)calloc(length, elem_size);
             if (NULL == array) {
                 printf("Memory allocation failed\n");
                 exit(EXIT_FAILURE);
@@ -722,8 +722,8 @@ cvt_message(const cJSON* const                    root,
                 return J2P_EXPT_NO_VALID_FOUND;
             }
 
-            void** field_ptr = (void**)((void*)msg + field_desc->offset);
-            *field_ptr       = (void*)calloc(count, sizeof(ProtobufCMessage*));
+            ProtobufCMessage*** field_ptr = (ProtobufCMessage***)((void*)msg + field_desc->offset);
+            *field_ptr                    = (ProtobufCMessage**)calloc(count, sizeof(ProtobufCMessage*));
             if (NULL == (*field_ptr)) {
                 printf("Memory allocation failed\n");
                 exit(EXIT_FAILURE);

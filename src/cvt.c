@@ -506,6 +506,10 @@ cvt_single_message(const cJSON* const root, const cJSON* const item, ProtobufCMe
         obj_cvt = default_obj_msg_convertor;
     }
 
+    if (!cJSON_IsObject(item)) {
+        return J2P_EXPT_UNACCEPTABLE_JSON_TYPE;
+    }
+
     ProtobufCMessage* msg_buffer = (ProtobufCMessage*)calloc(1, msg_desc->sizeof_message);
     if (NULL == msg_buffer) {
         printf("Memory allocation failed\n");
@@ -516,11 +520,7 @@ cvt_single_message(const cJSON* const root, const cJSON* const item, ProtobufCMe
 
     j2p_expt_t rtn = obj_cvt(root, item, msg_buffer);
 
-    if (rtn == J2P_EXPT_SUCCESS) {
-        *field = msg_buffer;
-    } else {
-        protobuf_c_message_free_unpacked(msg_buffer, NULL);
-    }
+    *field = msg_buffer;
 
     return rtn;
 }
