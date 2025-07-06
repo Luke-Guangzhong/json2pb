@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.18)
 
 project(
     json2pb-convertor
-    VERSION 0.0.1
+    VERSION 0.0.2
     LANGUAGES C)
 
 set(CMAKE_C_STANDARD 17)
