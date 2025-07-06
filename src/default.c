@@ -8,8 +8,12 @@
  * @copyright Copyright (c) 2025
  *
  */
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
+#include "cjson/cJSON_Utils.h"
 #include "internal.h"
 
 bool
@@ -50,8 +54,8 @@ default_obj_msg_convertor(const cJSON* const root, const cJSON* const item, Prot
     j2p_expt_t rtn = J2P_EXPT_SUCCESS;
 
     for (int i = 0; i < msg->descriptor->n_fields; i++) {
-        ProtobufCFieldDescriptor* field_desc = msg->descriptor->fields + i;
-        rtn                                  = cvt_json_2_pb_field(root, cJSON_GetObjectItem(item, field_desc->name), msg, field_desc->name, NULL, NULL, J2P_FILE_BASE64_STR, NULL);
+        const ProtobufCFieldDescriptor* field_desc = msg->descriptor->fields + i;
+        rtn = cvt_json_2_pb_field(root, cJSON_GetObjectItem(item, field_desc->name), msg, field_desc->name, NULL, NULL, J2P_FILE_BASE64_STR, NULL);
         if (rtn != J2P_EXPT_SUCCESS) {
             char* path = cJSONUtils_FindPointerFromObjectTo(root, cJSON_GetObjectItem(item, field_desc->name));
             printf("[EXCEPTION]: %s %s\n", path, j2p_expt_msg_list[rtn].desc);

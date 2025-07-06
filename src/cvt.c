@@ -495,7 +495,7 @@ cvt_single_bytes(const cJSON* const item, ProtobufCBinaryData* const field, j2p_
 }
 
 j2p_expt_t
-cvt_single_message(const cJSON* const root, const cJSON* const item, void** const field, obj_msg_convertor obj_cvt, const ProtobufCMessageDescriptor* const msg_desc)
+cvt_single_message(const cJSON* const root, const cJSON* const item, ProtobufCMessage** const field, obj_msg_convertor obj_cvt, const ProtobufCMessageDescriptor* const msg_desc)
 {
     assert(NULL != root);
     assert(NULL != item);

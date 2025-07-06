@@ -49,6 +49,13 @@ static j2p_expt_t cvt_enum(const cJSON* const root, ProtobufCMessage* msg, const
 
 static j2p_expt_t cvt_bytes(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, const ProtobufCFieldDescriptor* field_desc, j2p_file_t mode);
 
+static j2p_expt_t cvt_message(const cJSON* const                    root,
+                              ProtobufCMessage* const               msg,
+                              const cJSON* const                    item,
+                              const ProtobufCFieldDescriptor* const field_desc,
+                              const size_t                          elem_size,
+                              obj_msg_convertor                     msg_cvt);
+
 /******************************************************************************/
 /*                              Global Variable                               */
 /******************************************************************************/
@@ -178,7 +185,7 @@ cvt_json_2_pb_field(const cJSON*                root,
         rtn = cvt_numeric(root, msg, item, field_desc, sizeof(char*), (single_field_cvt_func)cvt_single_string);
         break;
     case PROTOBUF_C_TYPE_MESSAGE:
-        rtn = cvt_message(root, msg, item, field_desc, sizeof(void*), msg_cvt);
+        rtn = cvt_message(root, msg, item, field_desc, sizeof(ProtobufCMessage*), msg_cvt);
         break;
     case PROTOBUF_C_TYPE_BYTES:
         rtn = cvt_bytes(root, msg, item, field_desc, file_type);
@@ -664,7 +671,7 @@ cvt_bytes(const cJSON* const root, ProtobufCMessage* msg, const cJSON* item, con
     }
 }
 
-j2p_expt_t
+static j2p_expt_t
 cvt_message(const cJSON* const                    root,
             ProtobufCMessage* const               msg,
             const cJSON* const                    item,
@@ -716,13 +723,13 @@ cvt_message(const cJSON* const                    root,
             }
 
             void** field_ptr = (void**)((void*)msg + field_desc->offset);
-            *field_ptr       = (void*)calloc(count, sizeof(ProtobufCBinaryData*));
+            *field_ptr       = (void*)calloc(count, sizeof(ProtobufCMessage*));
             if (NULL == (*field_ptr)) {
                 printf("Memory allocation failed\n");
                 exit(EXIT_FAILURE);
             }
 
-            memcpy((*field_ptr), array, count * sizeof(ProtobufCBinaryData*));
+            memcpy((*field_ptr), array, count * sizeof(ProtobufCMessage*));
             *(size_t*)((void*)msg + field_desc->quantifier_offset) = count;
 
             free(array);
@@ -738,7 +745,7 @@ cvt_message(const cJSON* const                    root,
         if (is_oneof) {
             (*(int32_t*)((void*)msg + field_desc->quantifier_offset)) = field_desc->id;
         }
-        ProtobufCBinaryData* field_ptr = (void*)msg + field_desc->offset;
+        ProtobufCMessage** field_ptr = (void*)msg + field_desc->offset;
         return cvt_single_message(root, item, field_ptr, msg_cvt, field_desc->descriptor);
     }
 }
