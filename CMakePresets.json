@@ -1,0 +1,68 @@
+{
+    "version": 10,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 31,
+        "patch": 0
+    },
+    "$comment": "An example CMakePresets.json file",
+    "configurePresets": [
+        {
+            "name": "macOS_default_configure",
+            "displayName": "Default Config for macOS",
+            "description": "Default build using Unix Makefiles generator",
+            "generator": "Unix Makefiles",
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "CMAKE_EXPORT_COMPILE_COMMANDS": {
+                    "type": "BOOL",
+                    "value": "ON"
+                }
+            }
+        },
+        {
+            "name": "macOS_test_configure",
+            "displayName": "Default Config for macOS with ctest",
+            "description": "Default build using Unix Makefiles generator",
+            "generator": "Unix Makefiles",
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "CMAKE_EXPORT_COMPILE_COMMANDS": {
+                    "type": "BOOL",
+                    "value": "ON"
+                },
+                "ENABLE_TEST": {
+                    "type": "BOOL",
+                    "value": "ON"
+                }
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "macOS_default_build",
+            "configurePreset": "macOS_default_configure"
+        },
+        {
+            "name": "macOS_test_build",
+            "configurePreset": "macOS_test_configure"
+        }
+    ],
+    "testPresets": [],
+    "packagePresets": [],
+    "workflowPresets": [
+        {
+            "name": "macOS_default",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "macOS_default_configure"
+                },
+                {
+                    "type": "build",
+                    "name": "macOS_default_build"
+                }
+            ]
+        }
+    ]
+}

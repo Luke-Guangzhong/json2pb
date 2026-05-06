@@ -1,0 +1,11 @@
+# clang-tidy 配置文件
+# 用于静态代码分析，只检查最重要的潜在 bug
+
+InheritParentConfig: false
+
+# 只启用 bug 检查，禁用大部分风格警告
+Checks: '-*,bugprone-*,clang-analyzer-*'
+
+WarningsAsErrors: ''
+HeaderFilterRegex: '.*'
+FormatStyle: file
