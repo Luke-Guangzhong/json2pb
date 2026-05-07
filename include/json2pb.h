@@ -14,6 +14,8 @@
 #include <protobuf-c/protobuf-c.h>
 #include <stdbool.h>
 
+#define LIB_API __attribute__((visibility("default")))
+
 /******************************************************************************/
 /*                              Type Definitions                              */
 /******************************************************************************/
@@ -90,20 +92,23 @@ typedef j2p_expt_t (
 /*                                 Definitions                                */
 /******************************************************************************/
 
-j2p_expt_t cvt_json_2_pb_field_v2(const cJSON* root, const cJSON* item, ProtobufCMessage* const msg, const char* const field_name, const j2p_add_cvt add_cvt);
+LIB_API j2p_expt_t cvt_json_2_pb_field_v2(const cJSON* root, const cJSON* item, ProtobufCMessage* const msg, const char* const field_name, const j2p_add_cvt add_cvt);
 
 /******************************************************************************/
 /*                                 Interfaces                                 */
 /******************************************************************************/
 
-j2p_expt_t cvt_json_2_pb_number(const cJSON* const root, const cJSON* const item, ProtobufCMessage* const msg, const char* const field_name);
+LIB_API j2p_expt_t cvt_json_2_pb_number(const cJSON* const root, const cJSON* const item, ProtobufCMessage* const msg, const char* const field_name);
 
-j2p_expt_t cvt_json_2_pb_bool(const cJSON* const root, const cJSON* const item, ProtobufCMessage* const msg, const char* const field_name, string_bool_convertor str_bool_cvt_func);
+LIB_API j2p_expt_t
+cvt_json_2_pb_bool(const cJSON* const root, const cJSON* const item, ProtobufCMessage* const msg, const char* const field_name, string_bool_convertor str_bool_cvt_func);
 
-j2p_expt_t cvt_json_2_pb_enum(const cJSON* const root, const cJSON* const item, ProtobufCMessage* const msg, const char* const field_name, string_enum_convertor str_enum_cvt_func);
+LIB_API j2p_expt_t
+cvt_json_2_pb_enum(const cJSON* const root, const cJSON* const item, ProtobufCMessage* const msg, const char* const field_name, string_enum_convertor str_enum_cvt_func);
 
-j2p_expt_t cvt_json_2_pb_string(const cJSON* const root, const cJSON* const item, ProtobufCMessage* const msg, const char* const field_name);
+LIB_API j2p_expt_t cvt_json_2_pb_string(const cJSON* const root, const cJSON* const item, ProtobufCMessage* const msg, const char* const field_name);
 
-j2p_expt_t cvt_json_2_pb_bytes(const cJSON* const root, const cJSON* const item, ProtobufCMessage* const msg, const char* const field_name, const j2p_file_t file_type);
+LIB_API j2p_expt_t cvt_json_2_pb_bytes(const cJSON* const root, const cJSON* const item, ProtobufCMessage* const msg, const char* const field_name, const j2p_file_t file_type);
 
-j2p_expt_t cvt_json_2_pb_message(const cJSON* const root, const cJSON* const item, ProtobufCMessage* const msg, const char* const field_name, obj_msg_convertor msg_cvt_func);
+LIB_API j2p_expt_t
+cvt_json_2_pb_message(const cJSON* const root, const cJSON* const item, ProtobufCMessage* const msg, const char* const field_name, obj_msg_convertor msg_cvt_func);

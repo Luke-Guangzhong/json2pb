@@ -80,7 +80,9 @@ set_target_properties(
     PROPERTIES POSITION_INDEPENDENT_CODE ON
                OUTPUT_NAME "json2pb"
                VERSION ${PROJECT_VERSION}
-               PUBLIC_HEADER include/json2pb.h)
+               PUBLIC_HEADER include/json2pb.h
+               C_VISIBILITY_PRESET hidden
+               VISIBILITY_INLINES_HIDDEN YES)
 target_include_directories(libjson2pb_shared PUBLIC include ${CMAKE_CURRENT_BINARY_DIR}/include)
 target_link_libraries(
     libjson2pb_shared
