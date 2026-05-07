@@ -71,8 +71,7 @@ static j2p_expt_t cvt_field(const cJSON* const              root,
 /******************************************************************************/
 
 j2p_expt_t
-cvt_json_2_pb_field_v2(const cJSON* root, const cJSON* item, ProtobufCMessage* const msg, const char* const field_name, const j2p_add_cvt add_cvt)
-{
+cvt_json_2_pb_field_v2(const cJSON* root, const cJSON* item, ProtobufCMessage* const msg, const char* const field_name, const j2p_add_cvt add_cvt) {
     if (NULL == root || NULL == msg || NULL == item || NULL == field_name) {
         return J2P_EXPT_INVALID_ARG;
     }
@@ -176,8 +175,7 @@ cvt_field(const cJSON* const              root,
           const ProtobufCFieldDescriptor* field_desc,
           const size_t                    elem_size,
           single_field_cvt_func_v2        single_cvt,
-          j2p_add_cvt                     add_cvt)
-{
+          j2p_add_cvt                     add_cvt) {
     assert(msg != NULL);
     assert(field_desc != NULL);
     assert(item != NULL);
@@ -203,8 +201,7 @@ cvt_field(const cJSON* const              root,
                 exit(EXIT_FAILURE);
             }
 
-            cJSON_ArrayForEach(element, json_array)
-            {
+            cJSON_ArrayForEach(element, json_array) {
                 rtn = single_cvt(root, element, array + (count * elem_size), field_desc, add_cvt);
                 if (rtn != EXIT_SUCCESS) {
                     char* path = cJSONUtils_FindPointerFromObjectTo(root, element);

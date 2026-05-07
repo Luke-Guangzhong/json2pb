@@ -16,23 +16,20 @@
 #include <string.h>
 
 bool
-default_string_bool_convertor(const char* const str)
-{
+default_string_bool_convertor(const char* const str) {
     assert(NULL != str);
     return 0 == strncmp("true", str, 4);
 }
 
 int
-default_string_bool_convertor_v2(const ProtobufCFieldDescriptor* const field_desc, const char* const str)
-{
+default_string_bool_convertor_v2(const ProtobufCFieldDescriptor* const field_desc, const char* const str) {
     assert(NULL != str);
     (void)field_desc;
     return 0 == strncmp("true", str, 4);
 }
 
 int
-default_string_enum_convertor(const ProtobufCEnumDescriptor* const enum_desc, const char* const str)
-{
+default_string_enum_convertor(const ProtobufCEnumDescriptor* const enum_desc, const char* const str) {
     assert(NULL != enum_desc);
     assert(NULL != str);
     const ProtobufCEnumValue* enum_value = protobuf_c_enum_descriptor_get_value_by_name(enum_desc, str);
@@ -43,8 +40,7 @@ default_string_enum_convertor(const ProtobufCEnumDescriptor* const enum_desc, co
 }
 
 j2p_expt_t
-default_obj_msg_convertor(const cJSON* const root, const cJSON* const item, ProtobufCMessage* const msg)
-{
+default_obj_msg_convertor(const cJSON* const root, const cJSON* const item, ProtobufCMessage* const msg) {
     assert(NULL != root);
     assert(NULL != item);
     assert(NULL != msg);

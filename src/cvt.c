@@ -22,8 +22,7 @@ const double MAX_EXACT = 0x1.0p53;
 const double MIN_EXACT = -0x1.0p53;
 
 j2p_expt_t
-cvt_single_int32_t(const cJSON* const item, int32_t* const field)
-{
+cvt_single_int32_t(const cJSON* const item, int32_t* const field) {
     assert(NULL != item);
     assert(NULL != field);
 
@@ -56,8 +55,7 @@ cvt_single_int32_t(const cJSON* const item, int32_t* const field)
 }
 
 j2p_expt_t
-cvt_single_int64_t(const cJSON* const item, int64_t* const field)
-{
+cvt_single_int64_t(const cJSON* const item, int64_t* const field) {
     assert(NULL != item);
     assert(NULL != field);
 
@@ -94,8 +92,7 @@ cvt_single_int64_t(const cJSON* const item, int64_t* const field)
 }
 
 j2p_expt_t
-cvt_single_uint32_t(const cJSON* const item, uint32_t* const field)
-{
+cvt_single_uint32_t(const cJSON* const item, uint32_t* const field) {
     assert(NULL != item);
     assert(NULL != field);
 
@@ -133,8 +130,7 @@ cvt_single_uint32_t(const cJSON* const item, uint32_t* const field)
 }
 
 j2p_expt_t
-cvt_single_uint64_t(const cJSON* const item, uint64_t* const field)
-{
+cvt_single_uint64_t(const cJSON* const item, uint64_t* const field) {
     assert(NULL != item);
     assert(NULL != field);
 
@@ -175,8 +171,7 @@ cvt_single_uint64_t(const cJSON* const item, uint64_t* const field)
 }
 
 j2p_expt_t
-cvt_single_float(const cJSON* const item, float* const field)
-{
+cvt_single_float(const cJSON* const item, float* const field) {
     assert(NULL != item);
     assert(NULL != field);
 
@@ -226,8 +221,7 @@ cvt_single_float(const cJSON* const item, float* const field)
 }
 
 j2p_expt_t
-cvt_single_double(const cJSON* const item, double* const field)
-{
+cvt_single_double(const cJSON* const item, double* const field) {
     assert(NULL != item);
     assert(NULL != field);
 
@@ -266,8 +260,7 @@ cvt_single_double(const cJSON* const item, double* const field)
 }
 
 j2p_expt_t
-cvt_single_bool(const cJSON* const item, bool* const field, string_bool_convertor str_bool_cvt)
-{
+cvt_single_bool(const cJSON* const item, bool* const field, string_bool_convertor str_bool_cvt) {
     assert(NULL != item);
     assert(NULL != field);
 
@@ -289,8 +282,7 @@ cvt_single_bool(const cJSON* const item, bool* const field, string_bool_converto
 }
 
 j2p_expt_t
-cvt_single_enum(const cJSON* const item, int* const field, string_enum_convertor str_enum_cvt, const ProtobufCEnumDescriptor* const enum_desc)
-{
+cvt_single_enum(const cJSON* const item, int* const field, string_enum_convertor str_enum_cvt, const ProtobufCEnumDescriptor* const enum_desc) {
     assert(NULL != item);
     assert(NULL != field);
 
@@ -322,8 +314,7 @@ cvt_single_enum(const cJSON* const item, int* const field, string_enum_convertor
 }
 
 j2p_expt_t
-cvt_single_string(const cJSON* const item, char** const field)
-{
+cvt_single_string(const cJSON* const item, char** const field) {
     assert(NULL != item);
     assert(NULL != field);
 
@@ -338,8 +329,7 @@ cvt_single_string(const cJSON* const item, char** const field)
 }
 
 j2p_expt_t
-cvt_single_bytes(const cJSON* const item, ProtobufCBinaryData* const field, j2p_file_t mode)
-{
+cvt_single_bytes(const cJSON* const item, ProtobufCBinaryData* const field, j2p_file_t mode) {
     assert(NULL != item);
     assert(NULL != field);
 
@@ -383,8 +373,7 @@ cvt_single_bytes(const cJSON* const item, ProtobufCBinaryData* const field, j2p_
 }
 
 j2p_expt_t
-cvt_single_message(const cJSON* const root, const cJSON* const item, ProtobufCMessage** const field, obj_msg_convertor obj_cvt, const ProtobufCMessageDescriptor* const msg_desc)
-{
+cvt_single_message(const cJSON* const root, const cJSON* const item, ProtobufCMessage** const field, obj_msg_convertor obj_cvt, const ProtobufCMessageDescriptor* const msg_desc) {
     assert(NULL != root);
     assert(NULL != item);
     assert(NULL != field);
@@ -414,8 +403,7 @@ cvt_single_message(const cJSON* const root, const cJSON* const item, ProtobufCMe
 }
 
 j2p_expt_t
-cvt_single_int32_t_v2(const cJSON* const root, const cJSON* const item, int32_t* const field, const ProtobufCFieldDescriptor* const field_desc, const j2p_add_cvt add_cvt_func)
-{
+cvt_single_int32_t_v2(const cJSON* const root, const cJSON* const item, int32_t* const field, const ProtobufCFieldDescriptor* const field_desc, const j2p_add_cvt add_cvt_func) {
     (void)field_desc;
     (void)add_cvt_func;
     (void)root;
@@ -423,8 +411,7 @@ cvt_single_int32_t_v2(const cJSON* const root, const cJSON* const item, int32_t*
 }
 
 j2p_expt_t
-cvt_single_int64_t_v2(const cJSON* const root, const cJSON* const item, int64_t* const field, const ProtobufCFieldDescriptor* const field_desc, const j2p_add_cvt add_cvt_func)
-{
+cvt_single_int64_t_v2(const cJSON* const root, const cJSON* const item, int64_t* const field, const ProtobufCFieldDescriptor* const field_desc, const j2p_add_cvt add_cvt_func) {
     (void)field_desc;
     (void)add_cvt_func;
     (void)root;
@@ -432,8 +419,7 @@ cvt_single_int64_t_v2(const cJSON* const root, const cJSON* const item, int64_t*
 }
 
 j2p_expt_t
-cvt_single_uint32_t_v2(const cJSON* const root, const cJSON* const item, uint32_t* const field, const ProtobufCFieldDescriptor* const field_desc, const j2p_add_cvt add_cvt_func)
-{
+cvt_single_uint32_t_v2(const cJSON* const root, const cJSON* const item, uint32_t* const field, const ProtobufCFieldDescriptor* const field_desc, const j2p_add_cvt add_cvt_func) {
     (void)field_desc;
     (void)add_cvt_func;
     (void)root;
@@ -441,8 +427,7 @@ cvt_single_uint32_t_v2(const cJSON* const root, const cJSON* const item, uint32_
 }
 
 j2p_expt_t
-cvt_single_uint64_t_v2(const cJSON* const root, const cJSON* const item, uint64_t* const field, const ProtobufCFieldDescriptor* const field_desc, const j2p_add_cvt add_cvt_func)
-{
+cvt_single_uint64_t_v2(const cJSON* const root, const cJSON* const item, uint64_t* const field, const ProtobufCFieldDescriptor* const field_desc, const j2p_add_cvt add_cvt_func) {
     (void)field_desc;
     (void)add_cvt_func;
     (void)root;
@@ -450,8 +435,7 @@ cvt_single_uint64_t_v2(const cJSON* const root, const cJSON* const item, uint64_
 }
 
 j2p_expt_t
-cvt_single_float_v2(const cJSON* const root, const cJSON* const item, float* const field, const ProtobufCFieldDescriptor* const field_desc, const j2p_add_cvt add_cvt_func)
-{
+cvt_single_float_v2(const cJSON* const root, const cJSON* const item, float* const field, const ProtobufCFieldDescriptor* const field_desc, const j2p_add_cvt add_cvt_func) {
     (void)field_desc;
     (void)add_cvt_func;
     (void)root;
@@ -459,8 +443,7 @@ cvt_single_float_v2(const cJSON* const root, const cJSON* const item, float* con
 }
 
 j2p_expt_t
-cvt_single_double_v2(const cJSON* const root, const cJSON* const item, double* const field, const ProtobufCFieldDescriptor* const field_desc, const j2p_add_cvt add_cvt_func)
-{
+cvt_single_double_v2(const cJSON* const root, const cJSON* const item, double* const field, const ProtobufCFieldDescriptor* const field_desc, const j2p_add_cvt add_cvt_func) {
     (void)field_desc;
     (void)add_cvt_func;
     (void)root;
@@ -468,23 +451,20 @@ cvt_single_double_v2(const cJSON* const root, const cJSON* const item, double* c
 }
 
 j2p_expt_t
-cvt_single_bool_v2(const cJSON* const root, const cJSON* const item, bool* const field, const ProtobufCFieldDescriptor* const field_desc, const j2p_add_cvt add_cvt_func)
-{
+cvt_single_bool_v2(const cJSON* const root, const cJSON* const item, bool* const field, const ProtobufCFieldDescriptor* const field_desc, const j2p_add_cvt add_cvt_func) {
     (void)field_desc;
     (void)root;
     return cvt_single_bool(item, field, add_cvt_func.bool_cvt);
 }
 
 j2p_expt_t
-cvt_single_enum_v2(const cJSON* const root, const cJSON* const item, int* const field, const ProtobufCFieldDescriptor* const field_desc, const j2p_add_cvt add_cvt_func)
-{
+cvt_single_enum_v2(const cJSON* const root, const cJSON* const item, int* const field, const ProtobufCFieldDescriptor* const field_desc, const j2p_add_cvt add_cvt_func) {
     (void)root;
     return cvt_single_enum(item, (int*)field, add_cvt_func.enum_cvt, field_desc->descriptor);
 }
 
 j2p_expt_t
-cvt_single_string_v2(const cJSON* const root, const cJSON* const item, char** const field, const ProtobufCFieldDescriptor* const field_desc, const j2p_add_cvt add_cvt_func)
-{
+cvt_single_string_v2(const cJSON* const root, const cJSON* const item, char** const field, const ProtobufCFieldDescriptor* const field_desc, const j2p_add_cvt add_cvt_func) {
     (void)field_desc;
     (void)add_cvt_func;
     (void)root;
@@ -496,8 +476,7 @@ cvt_single_bytes_v2(const cJSON* const                    root,
                     const cJSON* const                    item,
                     ProtobufCBinaryData* const            field,
                     const ProtobufCFieldDescriptor* const field_desc,
-                    const j2p_add_cvt                     add_cvt_func)
-{
+                    const j2p_add_cvt                     add_cvt_func) {
     (void)field_desc;
     (void)root;
     return cvt_single_bytes(item, field, add_cvt_func.file_type);
@@ -508,8 +487,7 @@ cvt_single_message_v2(const cJSON* const                    root,
                       const cJSON* const                    item,
                       ProtobufCMessage** const              field,
                       const ProtobufCFieldDescriptor* const field_desc,
-                      const j2p_add_cvt                     add_cvt_func)
-{
+                      const j2p_add_cvt                     add_cvt_func) {
 
     return cvt_single_message(root, item, field, add_cvt_func.msg_cvt, field_desc->descriptor);
 }

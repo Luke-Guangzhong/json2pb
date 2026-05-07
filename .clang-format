@@ -25,7 +25,7 @@ AlignArrayOfStructures: Left
 ColumnLimit: 180
 DerivePointerAlignment: false
 PointerAlignment: Left
-BreakBeforeBraces: Linux
+BreakBeforeBraces: Attach
 SeparateDefinitionBlocks: Always
 AllowShortEnumsOnASingleLine: false
 AlwaysBreakAfterReturnType: TopLevelDefinitions

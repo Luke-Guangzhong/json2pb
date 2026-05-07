@@ -17,8 +17,7 @@
 #include <string.h>
 
 int
-int_range_lookup(unsigned n_ranges, const ProtobufCIntRange* ranges, int value)
-{
+int_range_lookup(unsigned n_ranges, const ProtobufCIntRange* ranges, int value) {
     if (n_ranges == 0)
         return -1;
 
@@ -48,8 +47,7 @@ int_range_lookup(unsigned n_ranges, const ProtobufCIntRange* ranges, int value)
 }
 
 const ProtobufCEnumValue*
-protobuf_c_enum_descriptor_get_value_by_name(const ProtobufCEnumDescriptor* desc, const char* name)
-{
+protobuf_c_enum_descriptor_get_value_by_name(const ProtobufCEnumDescriptor* desc, const char* name) {
     if (desc == NULL || desc->values_by_name == NULL)
         return NULL;
 
@@ -75,8 +73,7 @@ protobuf_c_enum_descriptor_get_value_by_name(const ProtobufCEnumDescriptor* desc
 }
 
 j2p_expt_t
-util_cvt_hex_to_bytes(const char* const hex_str, uint8_t** const bytes, size_t* const bytes_len)
-{
+util_cvt_hex_to_bytes(const char* const hex_str, uint8_t** const bytes, size_t* const bytes_len) {
 
     assert(hex_str != NULL && bytes != NULL && bytes_len != NULL);
 
@@ -124,8 +121,7 @@ util_cvt_hex_to_bytes(const char* const hex_str, uint8_t** const bytes, size_t* 
 }
 
 j2p_expt_t
-util_cvt_base64_to_bytes(const char* const base64_str, uint8_t** const bytes, size_t* const bytes_len)
-{
+util_cvt_base64_to_bytes(const char* const base64_str, uint8_t** const bytes, size_t* const bytes_len) {
     assert(base64_str != NULL && bytes != NULL && bytes_len != NULL);
 
     size_t input_len = strlen(base64_str);
@@ -138,8 +134,7 @@ util_cvt_base64_to_bytes(const char* const base64_str, uint8_t** const bytes, si
 }
 
 j2p_expt_t
-util_cvt_file_to_bytes(const char* const file_path, uint8_t** const bytes, size_t* const bytes_len)
-{
+util_cvt_file_to_bytes(const char* const file_path, uint8_t** const bytes, size_t* const bytes_len) {
     assert(file_path != NULL && bytes != NULL && bytes_len != NULL);
 
     FILE* fp = fopen(file_path, "rb");
