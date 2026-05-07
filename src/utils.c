@@ -8,16 +8,13 @@
  * @copyright Copyright (c) 2025
  *
  */
+#include "json2pb.h"
+#include "trower-base64/base64.h"
 #include <errno.h>
+#include <protobuf-c/protobuf-c.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <protobuf-c/protobuf-c.h>
-
-#include "json2pb.h"
-
-#include "trower-base64/base64.h"
 
 int
 int_range_lookup(unsigned n_ranges, const ProtobufCIntRange* ranges, int value)

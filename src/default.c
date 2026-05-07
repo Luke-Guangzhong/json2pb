@@ -8,13 +8,12 @@
  * @copyright Copyright (c) 2025
  *
  */
+#include "cjson/cJSON_Utils.h"
+#include "internal.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "cjson/cJSON_Utils.h"
-#include "internal.h"
 
 bool
 default_string_bool_convertor(const char* const str)

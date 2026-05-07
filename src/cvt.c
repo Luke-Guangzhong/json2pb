@@ -8,6 +8,8 @@
  * @copyright Copyright (c) 2025
  *
  */
+#include "internal.h"
+#include "json2pb.h"
 #include <errno.h>
 #include <float.h>
 #include <math.h>
@@ -15,10 +17,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "json2pb.h"
-
-#include "internal.h"
 
 const double MAX_EXACT = 0x1.0p53;
 const double MIN_EXACT = -0x1.0p53;

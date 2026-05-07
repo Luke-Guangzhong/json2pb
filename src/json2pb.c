@@ -9,17 +9,16 @@
  *
  */
 
+#include "json2pb.h"
+#include "cjson/cJSON.h"
+#include "cjson/cJSON_Utils.h"
+#include "internal.h"
 #include <assert.h>
 #include <protobuf-c/protobuf-c.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "cjson/cJSON.h"
-#include "cjson/cJSON_Utils.h"
-#include "internal.h"
-#include "json2pb.h"
 
 /******************************************************************************/
 /*                              Global Variable                               */
