@@ -9,12 +9,12 @@
  *
  */
 
-#include <float.h>
-#include <trower-base64/base64.h>
-#include <unistd.h>
 #include "json2pb.h"
 #include "test.pb-c.h"
 #include "utils.h"
+#include <float.h>
+#include <trower-base64/base64.h>
+#include <unistd.h>
 
 /******************************************************************************/
 /*                                Declarations                                */

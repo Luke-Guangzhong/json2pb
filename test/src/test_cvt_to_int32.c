@@ -8,10 +8,10 @@
  * @copyright Copyright (c) 2025
  *
  */
-#include <unistd.h>
 #include "json2pb.h"
 #include "test.pb-c.h"
 #include "utils.h"
+#include <unistd.h>
 
 /******************************************************************************/
 /*                                Declarations                                */
