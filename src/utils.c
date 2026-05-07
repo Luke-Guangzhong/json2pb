@@ -48,7 +48,7 @@ int_range_lookup(unsigned n_ranges, const ProtobufCIntRange* ranges, int value)
 }
 
 const ProtobufCEnumValue*
-protobuf_c_enum_descriptor_get_value_by_name_case_insensitive(const ProtobufCEnumDescriptor* desc, const char* name)
+protobuf_c_enum_descriptor_get_value_by_name(const ProtobufCEnumDescriptor* desc, const char* name)
 {
     if (desc == NULL || desc->values_by_name == NULL)
         return NULL;
@@ -58,22 +58,19 @@ protobuf_c_enum_descriptor_get_value_by_name_case_insensitive(const ProtobufCEnu
 
     while (count > 1) {
         unsigned mid = start + count / 2;
-        int      rv  = strcasecmp(desc->values_by_name[mid].name, name);
-        if (rv == 0) {
+        int      rv  = strcmp(desc->values_by_name[mid].name, name);
+        if (rv == 0)
             return desc->values + desc->values_by_name[mid].index;
-        } else if (rv < 0) {
+        else if (rv < 0) {
             count = start + count - (mid + 1);
             start = mid + 1;
-        } else {
+        } else
             count = mid - start;
-        }
     }
-    if (count == 0) {
+    if (count == 0)
         return NULL;
-    }
-    if (strcasecmp(desc->values_by_name[start].name, name) == 0) {
+    if (strcmp(desc->values_by_name[start].name, name) == 0)
         return desc->values + desc->values_by_name[start].index;
-    }
     return NULL;
 }
 

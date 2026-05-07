@@ -35,7 +35,7 @@ default_string_enum_convertor(const ProtobufCEnumDescriptor* const enum_desc, co
 {
     assert(NULL != enum_desc);
     assert(NULL != str);
-    const ProtobufCEnumValue* enum_value = protobuf_c_enum_descriptor_get_value_by_name_case_insensitive(enum_desc, str);
+    const ProtobufCEnumValue* enum_value = protobuf_c_enum_descriptor_get_value_by_name(enum_desc, str);
     if (NULL == enum_value) {
         return -1;
     }

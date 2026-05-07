@@ -94,7 +94,7 @@ j2p_expt_t default_obj_msg_convertor(const cJSON* const root, const cJSON* const
 
 int int_range_lookup(unsigned n_ranges, const ProtobufCIntRange* ranges, int value);
 
-const ProtobufCEnumValue* protobuf_c_enum_descriptor_get_value_by_name_case_insensitive(const ProtobufCEnumDescriptor* desc, const char* name);
+const ProtobufCEnumValue* protobuf_c_enum_descriptor_get_value_by_name(const ProtobufCEnumDescriptor* desc, const char* name);
 
 j2p_expt_t util_cvt_hex_to_bytes(const char* const hex_str, uint8_t** const bytes, size_t* const bytes_len);
 
