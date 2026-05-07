@@ -11,7 +11,6 @@
 
 #include <stdbool.h>
 #include <unistd.h>
-
 #include "json2pb.h"
 #include "test.pb-c.h"
 #include "utils.h"
@@ -64,8 +63,7 @@ CU_SuiteInfo suites[] = {
 /******************************************************************************/
 
 void
-test_cvt_json_number_to_single_enum(void)
-{
+test_cvt_json_number_to_single_enum(void) {
     cJSON_AddNumberToObject(root, enum_field_name, ENUM__ENUM_2);
 
     j2p_expt_t e = cvt_json_2_pb_enum(root, cJSON_GetObjectItem(root, enum_field_name), (ProtobufCMessage*)msg, enum_field_name, NULL);
@@ -74,8 +72,7 @@ test_cvt_json_number_to_single_enum(void)
 }
 
 void
-test_cvt_json_string_to_single_enum(void)
-{
+test_cvt_json_string_to_single_enum(void) {
     const char* value = "ENUM_3";
 
     cJSON_AddStringToObject(root, enum_field_name, value);
@@ -86,8 +83,7 @@ test_cvt_json_string_to_single_enum(void)
 }
 
 void
-test_cvt_json_number_to_oneof_enum(void)
-{
+test_cvt_json_number_to_oneof_enum(void) {
     cJSON_AddNumberToObject(root, "oneof_enum", ENUM__ENUM_2);
 
     j2p_expt_t                      e          = cvt_json_2_pb_enum(root, cJSON_GetObjectItem(root, "oneof_enum"), (ProtobufCMessage*)msg, "oneof_enum", NULL);
@@ -99,8 +95,7 @@ test_cvt_json_number_to_oneof_enum(void)
 }
 
 void
-test_cvt_invalid_json_number_to_single_enum(void)
-{
+test_cvt_invalid_json_number_to_single_enum(void) {
     cJSON_AddNumberToObject(root, enum_field_name, 9);
 
     j2p_expt_t e = cvt_json_2_pb_enum(root, cJSON_GetObjectItem(root, enum_field_name), (ProtobufCMessage*)msg, enum_field_name, NULL);
@@ -109,8 +104,7 @@ test_cvt_invalid_json_number_to_single_enum(void)
 }
 
 void
-test_cvt_invalid_json_string_to_single_enum(void)
-{
+test_cvt_invalid_json_string_to_single_enum(void) {
     const char* value = "ENUM_9";
 
     cJSON_AddStringToObject(root, enum_field_name, value);
@@ -121,8 +115,7 @@ test_cvt_invalid_json_string_to_single_enum(void)
 }
 
 void
-test_cvt_json_bool_to_single_enum(void)
-{
+test_cvt_json_bool_to_single_enum(void) {
     cJSON_AddBoolToObject(root, enum_field_name, cJSON_True);
 
     j2p_expt_t e = cvt_json_2_pb_enum(root, cJSON_GetObjectItem(root, enum_field_name), (ProtobufCMessage*)msg, enum_field_name, NULL);
@@ -131,8 +124,7 @@ test_cvt_json_bool_to_single_enum(void)
 }
 
 void
-test_cvt_json_array_to_single_enum(void)
-{
+test_cvt_json_array_to_single_enum(void) {
     cJSON_AddArrayToObject(root, enum_field_name);
 
     j2p_expt_t e = cvt_json_2_pb_enum(root, cJSON_GetObjectItem(root, enum_field_name), (ProtobufCMessage*)msg, enum_field_name, NULL);
@@ -141,8 +133,7 @@ test_cvt_json_array_to_single_enum(void)
 }
 
 void
-test_cvt_json_object_to_single_enum(void)
-{
+test_cvt_json_object_to_single_enum(void) {
     cJSON_AddObjectToObject(root, enum_field_name);
 
     j2p_expt_t e = cvt_json_2_pb_enum(root, cJSON_GetObjectItem(root, enum_field_name), (ProtobufCMessage*)msg, enum_field_name, NULL);
@@ -155,8 +146,7 @@ test_cvt_json_object_to_single_enum(void)
 /******************************************************************************/
 
 int
-main(int argc, char const* argv[])
-{
+main(int argc, char const* argv[]) {
     init_file_name(__FILE__);
     unsigned  rv    = 1;
     CU_pSuite suite = NULL;

@@ -10,17 +10,15 @@
  */
 #pragma once
 
+#include "json2pb.h"
+#include "test.pb-c.h"
+#include <CUnit/Basic.h>
+#include <CUnit/TestDB.h>
 #include <errno.h>
 #include <libgen.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <sys/stat.h>
-
-#include <CUnit/Basic.h>
-#include <CUnit/TestDB.h>
-
-#include "json2pb.h"
-#include "test.pb-c.h"
 
 #ifndef PATH_MAX
 #define PATH_MAX 4096
@@ -59,8 +57,7 @@ static char current_file_name[512];
 
 /* 把测试用例名转换成文件名安全的格式，比如把空格和特殊字符换成下划线 */
 static void
-sanitize_name(const char* in, char* out, size_t out_sz)
-{
+sanitize_name(const char* in, char* out, size_t out_sz) {
     size_t j = 0;
     for (size_t i = 0; in[i] != '\0' && j + 1 < out_sz; ++i) {
         char c = in[i];
@@ -74,8 +71,7 @@ sanitize_name(const char* in, char* out, size_t out_sz)
 }
 
 void
-setup_successful_conversion(void)
-{
+setup_successful_conversion(void) {
     msg = (TestMessage*)calloc(1, sizeof(TestMessage));
     if (NULL == msg) {
         exit(EXIT_FAILURE);
@@ -92,8 +88,7 @@ setup_successful_conversion(void)
 }
 
 void
-setup_redirect_stdout(void)
-{
+setup_redirect_stdout(void) {
     CU_pTest current = CU_get_current_test();
     if (!current || !current->pName) {
         exit(EXIT_FAILURE);
@@ -142,8 +137,7 @@ setup_redirect_stdout(void)
 }
 
 void
-teardown_successful_conversion(void)
-{
+teardown_successful_conversion(void) {
     cJSON_Delete(root);
     test_message__free_unpacked(msg, NULL);
     msg  = NULL;
@@ -155,8 +149,7 @@ teardown_successful_conversion(void)
 }
 
 void
-teardown_redirect_stdout(void)
-{
+teardown_redirect_stdout(void) {
     fflush(stdout);
     if (saved_stdout_fd >= 0) {
         dup2(saved_stdout_fd, fileno(stdout));
@@ -166,8 +159,7 @@ teardown_redirect_stdout(void)
 }
 
 int
-init_sutie_name(void)
-{
+init_sutie_name(void) {
     CU_pSuite current = CU_get_current_suite();
     if (!current || !current->pName) {
         exit(EXIT_FAILURE);
@@ -186,15 +178,13 @@ init_sutie_name(void)
 }
 
 int
-cleanup_sutie_name(void)
-{
+cleanup_sutie_name(void) {
     current_sutie_path[0] = '\0';
     return 0;
 }
 
 void
-init_file_name(const char* file_path)
-{
+init_file_name(const char* file_path) {
     char current_file_path[PATH_MAX] = {};
 
     snprintf(current_file_path, sizeof(current_file_path), "%s", file_path);

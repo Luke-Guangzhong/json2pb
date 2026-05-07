@@ -8,11 +8,10 @@
  * @copyright Copyright (c) 2025
  *
  */
-#include <unistd.h>
-
 #include "json2pb.h"
 #include "test.pb-c.h"
 #include "utils.h"
+#include <unistd.h>
 
 /******************************************************************************/
 /*                                Declarations                                */
@@ -50,8 +49,7 @@ CU_SuiteInfo suites[] = {
 /******************************************************************************/
 
 void
-test_cvt_json_object_to_single_message(void)
-{
+test_cvt_json_object_to_single_message(void) {
     const char* json_str = "{\"f_int32\":123,\"f_sint32\":\"0x4A0\",\"f_sfixed32\":\"0123\","
                            "\"f_repeated_int32\":[1234567890,\"1234567890\",\"0x4a0\",\"0110\",123.45],"
                            "\"f_repeated_sint32\":[1234567890,\"1234567890\",\"0x4a0\",\"0110\",123.45],"
@@ -74,8 +72,7 @@ test_cvt_json_object_to_single_message(void)
 }
 
 void
-test_cvt_json_object_to_oneof_message(void)
-{
+test_cvt_json_object_to_oneof_message(void) {
     const char* json_str = "{\"f_int32\":456,\"f_sint32\":789}";
     cJSON*      json_obj = cJSON_Parse(json_str);
     CU_ASSERT_PTR_NOT_NULL_FATAL(json_obj);
@@ -96,8 +93,7 @@ test_cvt_json_object_to_oneof_message(void)
 /******************************************************************************/
 
 int
-main(int argc, char const* argv[])
-{
+main(int argc, char const* argv[]) {
     init_file_name(__FILE__);
     unsigned  rv    = 1;
     CU_pSuite suite = NULL;

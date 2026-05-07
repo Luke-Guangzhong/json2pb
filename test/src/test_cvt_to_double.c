@@ -9,12 +9,11 @@
  *
  */
 
-#include <float.h>
-#include <unistd.h>
-
 #include "json2pb.h"
 #include "test.pb-c.h"
 #include "utils.h"
+#include <float.h>
+#include <unistd.h>
 
 /******************************************************************************/
 /*                                Declarations                                */
@@ -86,8 +85,7 @@ CU_SuiteInfo suites[] = {
 /******************************************************************************/
 
 void
-test_cvt_json_number_to_single_double(void)
-{
+test_cvt_json_number_to_single_double(void) {
     double value = 0.5f;
 
     cJSON_AddNumberToObject(root, double_field_name, value);
@@ -98,8 +96,7 @@ test_cvt_json_number_to_single_double(void)
 }
 
 void
-test_cvt_json_decimal_string_to_single_double(void)
-{
+test_cvt_json_decimal_string_to_single_double(void) {
     const char* value = "0.5";
 
     cJSON_AddStringToObject(root, double_field_name, value);
@@ -110,8 +107,7 @@ test_cvt_json_decimal_string_to_single_double(void)
 }
 
 void
-test_cvt_json_number_to_oneof_double(void)
-{
+test_cvt_json_number_to_oneof_double(void) {
     float oneof_double_value = 0.5f;
     cJSON_AddNumberToObject(root, "oneof_double", oneof_double_value);
 
@@ -124,8 +120,7 @@ test_cvt_json_number_to_oneof_double(void)
 }
 
 void
-test_cvt_json_str_overflow_double(void)
-{
+test_cvt_json_str_overflow_double(void) {
     const char* value = "9.999999e999";
 
     cJSON_AddStringToObject(root, double_field_name, value);
@@ -136,8 +131,7 @@ test_cvt_json_str_overflow_double(void)
 }
 
 void
-test_cvt_json_nan_to_double(void)
-{
+test_cvt_json_nan_to_double(void) {
     cJSON_AddNumberToObject(root, double_field_name, NAN);
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, double_field_name), (ProtobufCMessage*)msg, double_field_name);
@@ -146,8 +140,7 @@ test_cvt_json_nan_to_double(void)
 }
 
 void
-test_cvt_json_inf_to_double(void)
-{
+test_cvt_json_inf_to_double(void) {
     cJSON_AddNumberToObject(root, double_field_name, INFINITY);
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, double_field_name), (ProtobufCMessage*)msg, double_field_name);
@@ -156,8 +149,7 @@ test_cvt_json_inf_to_double(void)
 }
 
 void
-test_cvt_json_str_nan_to_double(void)
-{
+test_cvt_json_str_nan_to_double(void) {
     cJSON_AddStringToObject(root, double_field_name, "nan");
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, double_field_name), (ProtobufCMessage*)msg, double_field_name);
@@ -166,8 +158,7 @@ test_cvt_json_str_nan_to_double(void)
 }
 
 void
-test_cvt_json_str_inf_to_double(void)
-{
+test_cvt_json_str_inf_to_double(void) {
     cJSON_AddStringToObject(root, double_field_name, "inf");
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, double_field_name), (ProtobufCMessage*)msg, double_field_name);
@@ -176,8 +167,7 @@ test_cvt_json_str_inf_to_double(void)
 }
 
 void
-test_cvt_json_bool_to_double(void)
-{
+test_cvt_json_bool_to_double(void) {
     cJSON_AddBoolToObject(root, double_field_name, cJSON_True);
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, double_field_name), (ProtobufCMessage*)msg, double_field_name);
@@ -186,8 +176,7 @@ test_cvt_json_bool_to_double(void)
 }
 
 void
-test_cvt_json_array_to_double(void)
-{
+test_cvt_json_array_to_double(void) {
     cJSON_AddArrayToObject(root, double_field_name);
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, double_field_name), (ProtobufCMessage*)msg, double_field_name);
@@ -196,8 +185,7 @@ test_cvt_json_array_to_double(void)
 }
 
 void
-test_cvt_json_object_to_double(void)
-{
+test_cvt_json_object_to_double(void) {
     cJSON_AddObjectToObject(root, double_field_name);
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, double_field_name), (ProtobufCMessage*)msg, double_field_name);
@@ -206,8 +194,7 @@ test_cvt_json_object_to_double(void)
 }
 
 void
-test_cvt_json_array_to_repeated_double(void)
-{
+test_cvt_json_array_to_repeated_double(void) {
     const char*  value          = "[123.0, \"0.5\"]";
     const double expect_array[] = {123.0, 0.5};
     const size_t expect_length  = sizeof(expect_array) / sizeof(double);
@@ -222,8 +209,7 @@ test_cvt_json_array_to_repeated_double(void)
 }
 
 void
-test_cvt_json_array_to_repeated_double_partly_failed(void)
-{
+test_cvt_json_array_to_repeated_double_partly_failed(void) {
     const char*  value          = "[123.0, \"0.5\",\"invalid number string\"]";
     const double expect_array[] = {123.0, 0.5};
     const size_t expect_length  = sizeof(expect_array) / sizeof(double);
@@ -238,8 +224,7 @@ test_cvt_json_array_to_repeated_double_partly_failed(void)
 }
 
 void
-test_cvt_json_array_to_repeated_double_all_failed(void)
-{
+test_cvt_json_array_to_repeated_double_all_failed(void) {
     const char* value = "[\"invalid number string\"]";
 
     cJSON* array_value = cJSON_Parse(value);
@@ -252,8 +237,7 @@ test_cvt_json_array_to_repeated_double_all_failed(void)
 }
 
 void
-test_cvt_json_array_to_repeated_double_empty(void)
-{
+test_cvt_json_array_to_repeated_double_empty(void) {
     const char* value = "[]";
 
     cJSON* array_value = cJSON_Parse(value);
@@ -270,8 +254,7 @@ test_cvt_json_array_to_repeated_double_empty(void)
 /******************************************************************************/
 
 int
-main(int argc, char const* argv[])
-{
+main(int argc, char const* argv[]) {
     init_file_name(__FILE__);
     unsigned  rv    = 1;
     CU_pSuite suite = NULL;

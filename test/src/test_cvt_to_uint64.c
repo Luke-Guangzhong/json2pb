@@ -9,11 +9,10 @@
  *
  */
 
-#include <unistd.h>
-
 #include "json2pb.h"
 #include "test.pb-c.h"
 #include "utils.h"
+#include <unistd.h>
 
 /******************************************************************************/
 /*                                Declarations                                */
@@ -117,8 +116,7 @@ CU_SuiteInfo suites[] = {
 /******************************************************************************/
 
 void
-test_cvt_json_number_to_single_uint64(void)
-{
+test_cvt_json_number_to_single_uint64(void) {
     uint64_t value = 1234567890;
 
     cJSON_AddNumberToObject(root, uint64_field_name, value);
@@ -129,8 +127,7 @@ test_cvt_json_number_to_single_uint64(void)
 }
 
 void
-test_cvt_json_decimal_string_to_single_uint64(void)
-{
+test_cvt_json_decimal_string_to_single_uint64(void) {
     const char* value = "1234567890";
 
     cJSON_AddStringToObject(root, uint64_field_name, value);
@@ -141,8 +138,7 @@ test_cvt_json_decimal_string_to_single_uint64(void)
 }
 
 void
-test_cvt_json_hex_string_to_single_uint64(void)
-{
+test_cvt_json_hex_string_to_single_uint64(void) {
     const char* value = "0x4a0";
 
     cJSON_AddStringToObject(root, uint64_field_name, value);
@@ -154,8 +150,7 @@ test_cvt_json_hex_string_to_single_uint64(void)
 
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
 void
-test_cvt_json_binary_string_to_single_uint64(void)
-{
+test_cvt_json_binary_string_to_single_uint64(void) {
     const char* value = "0b110";
 
     cJSON_AddStringToObject(root, uint64_field_name, value);
@@ -167,8 +162,7 @@ test_cvt_json_binary_string_to_single_uint64(void)
 #endif
 
 void
-test_cvt_json_octal_string_to_single_uint64(void)
-{
+test_cvt_json_octal_string_to_single_uint64(void) {
     const char* value = "0110";
 
     cJSON_AddStringToObject(root, uint64_field_name, value);
@@ -179,8 +173,7 @@ test_cvt_json_octal_string_to_single_uint64(void)
 }
 
 void
-test_cvt_json_number_to_oneof_uint64(void)
-{
+test_cvt_json_number_to_oneof_uint64(void) {
     uint64_t oneof_uint64_value = 123456789;
     cJSON_AddNumberToObject(root, "oneof_uint64", oneof_uint64_value);
 
@@ -193,8 +186,7 @@ test_cvt_json_number_to_oneof_uint64(void)
 }
 
 void
-test_cvt_json_bool_to_uint64(void)
-{
+test_cvt_json_bool_to_uint64(void) {
     cJSON_AddTrueToObject(root, uint64_field_name);
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, uint64_field_name), (ProtobufCMessage*)msg, uint64_field_name);
@@ -203,8 +195,7 @@ test_cvt_json_bool_to_uint64(void)
 }
 
 void
-test_cvt_json_array_to_uint64(void)
-{
+test_cvt_json_array_to_uint64(void) {
     cJSON_AddArrayToObject(root, uint64_field_name);
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, uint64_field_name), (ProtobufCMessage*)msg, uint64_field_name);
@@ -213,8 +204,7 @@ test_cvt_json_array_to_uint64(void)
 }
 
 void
-test_cvt_json_object_to_uint64(void)
-{
+test_cvt_json_object_to_uint64(void) {
     cJSON_AddObjectToObject(root, uint64_field_name);
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, uint64_field_name), (ProtobufCMessage*)msg, uint64_field_name);
@@ -223,8 +213,7 @@ test_cvt_json_object_to_uint64(void)
 }
 
 void
-test_cvt_json_number_overflow_uint64(void)
-{
+test_cvt_json_number_overflow_uint64(void) {
     double value = 1.0e+100;
 
     cJSON_AddNumberToObject(root, uint64_field_name, value);
@@ -235,8 +224,7 @@ test_cvt_json_number_overflow_uint64(void)
 }
 
 void
-test_cvt_json_number_underflow_uint64(void)
-{
+test_cvt_json_number_underflow_uint64(void) {
     double value = -1;
 
     cJSON_AddNumberToObject(root, uint64_field_name, value);
@@ -247,8 +235,7 @@ test_cvt_json_number_underflow_uint64(void)
 }
 
 void
-test_cvt_json_str_overflow_uint64(void)
-{
+test_cvt_json_str_overflow_uint64(void) {
     const char* value = "18446744073709551616";
 
     cJSON_AddStringToObject(root, uint64_field_name, value);
@@ -259,8 +246,7 @@ test_cvt_json_str_overflow_uint64(void)
 }
 
 void
-test_cvt_json_str_underflow_uint64(void)
-{
+test_cvt_json_str_underflow_uint64(void) {
     const char* value = "-10";
 
     cJSON_AddStringToObject(root, uint64_field_name, value);
@@ -271,8 +257,7 @@ test_cvt_json_str_underflow_uint64(void)
 }
 
 void
-test_cvt_json_number_max_uint64(void)
-{
+test_cvt_json_number_max_uint64(void) {
     uint64_t value = 0x1.0p53;
 
     cJSON_AddNumberToObject(root, uint64_field_name, value);
@@ -283,8 +268,7 @@ test_cvt_json_number_max_uint64(void)
 }
 
 void
-test_cvt_json_number_min_uint64(void)
-{
+test_cvt_json_number_min_uint64(void) {
     uint64_t value = 0;
 
     cJSON_AddNumberToObject(root, uint64_field_name, value);
@@ -295,8 +279,7 @@ test_cvt_json_number_min_uint64(void)
 }
 
 void
-test_cvt_json_str_max_uint64(void)
-{
+test_cvt_json_str_max_uint64(void) {
     const char* value = "18446744073709551615";
 
     cJSON_AddStringToObject(root, uint64_field_name, value);
@@ -307,8 +290,7 @@ test_cvt_json_str_max_uint64(void)
 }
 
 void
-test_cvt_json_str_min_uint64(void)
-{
+test_cvt_json_str_min_uint64(void) {
     const char* value = "0";
 
     cJSON_AddStringToObject(root, uint64_field_name, value);
@@ -319,8 +301,7 @@ test_cvt_json_str_min_uint64(void)
 }
 
 void
-test_cvt_json_inf_to_uint64(void)
-{
+test_cvt_json_inf_to_uint64(void) {
     cJSON_AddNumberToObject(root, uint64_field_name, INFINITY);
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, uint64_field_name), (ProtobufCMessage*)msg, uint64_field_name);
@@ -329,8 +310,7 @@ test_cvt_json_inf_to_uint64(void)
 }
 
 void
-test_cvt_json_nan_to_uint64(void)
-{
+test_cvt_json_nan_to_uint64(void) {
     cJSON_AddNumberToObject(root, uint64_field_name, NAN);
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, uint64_field_name), (ProtobufCMessage*)msg, uint64_field_name);
@@ -339,8 +319,7 @@ test_cvt_json_nan_to_uint64(void)
 }
 
 void
-test_cvt_json_array_to_repeated_uint64(void)
-{
+test_cvt_json_array_to_repeated_uint64(void) {
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
     const char*    value          = "[1234567890, \"1234567890\",\"0x4a0\",\"0b110\",\"0110\",123.45]";
     const uint64_t expect_array[] = {1234567890, 1234567890, 0x4a0, 0b110, 0110, 123};
@@ -360,8 +339,7 @@ test_cvt_json_array_to_repeated_uint64(void)
 }
 
 void
-test_cvt_json_array_to_repeated_uint64_partly_failed(void)
-{
+test_cvt_json_array_to_repeated_uint64_partly_failed(void) {
     const char*    value          = "[1234567890, \"0x4a0\",\"0110\",\"invalid number string\",\"0x10000000000000000\"]";
     const uint64_t expect_array[] = {1234567890, 0x4a0, 0110};
     const size_t   expect_length  = sizeof(expect_array) / sizeof(uint64_t);
@@ -376,8 +354,7 @@ test_cvt_json_array_to_repeated_uint64_partly_failed(void)
 }
 
 void
-test_cvt_json_array_to_repeated_uint64_all_failed(void)
-{
+test_cvt_json_array_to_repeated_uint64_all_failed(void) {
     const char* value = "[\"invalid number string\",\"0x10000000000000000\"]";
 
     cJSON* array_value = cJSON_Parse(value);
@@ -390,8 +367,7 @@ test_cvt_json_array_to_repeated_uint64_all_failed(void)
 }
 
 void
-test_cvt_json_array_to_repeated_uint64_empty(void)
-{
+test_cvt_json_array_to_repeated_uint64_empty(void) {
     const char* value = "[]";
 
     cJSON* array_value = cJSON_Parse(value);
@@ -404,8 +380,7 @@ test_cvt_json_array_to_repeated_uint64_empty(void)
 }
 
 void
-test_cvt_json_number_to_fixed64(void)
-{
+test_cvt_json_number_to_fixed64(void) {
     uint64_t value = 0x4a0;
 
     cJSON_AddNumberToObject(root, fixed64_field_name, value);
@@ -416,8 +391,7 @@ test_cvt_json_number_to_fixed64(void)
 }
 
 void
-test_cvt_json_array_to_repeated_fixed64(void)
-{
+test_cvt_json_array_to_repeated_fixed64(void) {
     const char* value          = "[123,\"123\",\"0x4a0\",\"0110\"]";
     uint64_t    expect_array[] = {123, 123, 0x4a0, 0110};
     size_t      expect_length  = sizeof(expect_array) / sizeof(uint64_t);
@@ -437,8 +411,7 @@ test_cvt_json_array_to_repeated_fixed64(void)
 /******************************************************************************/
 
 int
-main(int argc, char const* argv[])
-{
+main(int argc, char const* argv[]) {
 
     init_file_name(__FILE__);
     unsigned  rv    = 1;

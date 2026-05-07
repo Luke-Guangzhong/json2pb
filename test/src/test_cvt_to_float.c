@@ -8,12 +8,11 @@
  * @copyright Copyright (c) 2025
  *
  */
-#include <float.h>
-#include <unistd.h>
-
 #include "json2pb.h"
 #include "test.pb-c.h"
 #include "utils.h"
+#include <float.h>
+#include <unistd.h>
 
 /******************************************************************************/
 /*                                Declarations                                */
@@ -97,8 +96,7 @@ CU_SuiteInfo suites[] = {
 /******************************************************************************/
 
 void
-test_cvt_json_number_to_single_float(void)
-{
+test_cvt_json_number_to_single_float(void) {
     float value = 0.5f;
 
     cJSON_AddNumberToObject(root, float_field_name, value);
@@ -109,8 +107,7 @@ test_cvt_json_number_to_single_float(void)
 }
 
 void
-test_cvt_json_decimal_string_to_single_float(void)
-{
+test_cvt_json_decimal_string_to_single_float(void) {
     const char* value = "0.5";
 
     cJSON_AddStringToObject(root, float_field_name, value);
@@ -121,8 +118,7 @@ test_cvt_json_decimal_string_to_single_float(void)
 }
 
 void
-test_cvt_json_number_to_oneof_float(void)
-{
+test_cvt_json_number_to_oneof_float(void) {
     float oneof_float_value = 0.5f;
     cJSON_AddNumberToObject(root, "oneof_float", oneof_float_value);
 
@@ -135,8 +131,7 @@ test_cvt_json_number_to_oneof_float(void)
 }
 
 void
-test_cvt_json_number_overflow_float(void)
-{
+test_cvt_json_number_overflow_float(void) {
     double value = 1e40;
 
     cJSON_AddNumberToObject(root, float_field_name, value);
@@ -147,8 +142,7 @@ test_cvt_json_number_overflow_float(void)
 }
 
 void
-test_cvt_json_number_underflow_float(void)
-{
+test_cvt_json_number_underflow_float(void) {
     double value = 1e-50;
 
     cJSON_AddNumberToObject(root, float_field_name, value);
@@ -159,8 +153,7 @@ test_cvt_json_number_underflow_float(void)
 }
 
 void
-test_cvt_json_str_overflow_float(void)
-{
+test_cvt_json_str_overflow_float(void) {
     const char* value = "3.5e38";
 
     cJSON_AddStringToObject(root, float_field_name, value);
@@ -171,8 +164,7 @@ test_cvt_json_str_overflow_float(void)
 }
 
 void
-test_cvt_json_str_underflow_float(void)
-{
+test_cvt_json_str_underflow_float(void) {
     const char* value = "1.0e-46";
 
     cJSON_AddStringToObject(root, float_field_name, value);
@@ -183,8 +175,7 @@ test_cvt_json_str_underflow_float(void)
 }
 
 void
-test_cvt_json_number_max_float(void)
-{
+test_cvt_json_number_max_float(void) {
     double value = (double)FLT_MAX;
 
     cJSON_AddNumberToObject(root, float_field_name, value);
@@ -195,8 +186,7 @@ test_cvt_json_number_max_float(void)
 }
 
 void
-test_cvt_json_number_min_float(void)
-{
+test_cvt_json_number_min_float(void) {
     double value = (double)FLT_TRUE_MIN;
 
     cJSON_AddNumberToObject(root, float_field_name, value);
@@ -207,8 +197,7 @@ test_cvt_json_number_min_float(void)
 }
 
 void
-test_cvt_json_nan_to_float(void)
-{
+test_cvt_json_nan_to_float(void) {
     cJSON_AddNumberToObject(root, float_field_name, NAN);
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, float_field_name), (ProtobufCMessage*)msg, float_field_name);
@@ -217,8 +206,7 @@ test_cvt_json_nan_to_float(void)
 }
 
 void
-test_cvt_json_inf_to_float(void)
-{
+test_cvt_json_inf_to_float(void) {
     cJSON_AddNumberToObject(root, float_field_name, INFINITY);
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, float_field_name), (ProtobufCMessage*)msg, float_field_name);
@@ -227,8 +215,7 @@ test_cvt_json_inf_to_float(void)
 }
 
 void
-test_cvt_json_str_nan_to_float(void)
-{
+test_cvt_json_str_nan_to_float(void) {
     cJSON_AddStringToObject(root, float_field_name, "nan");
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, float_field_name), (ProtobufCMessage*)msg, float_field_name);
@@ -237,8 +224,7 @@ test_cvt_json_str_nan_to_float(void)
 }
 
 void
-test_cvt_json_str_inf_to_float(void)
-{
+test_cvt_json_str_inf_to_float(void) {
     cJSON_AddStringToObject(root, float_field_name, "inf");
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, float_field_name), (ProtobufCMessage*)msg, float_field_name);
@@ -247,8 +233,7 @@ test_cvt_json_str_inf_to_float(void)
 }
 
 void
-test_cvt_json_not_exact_to_float(void)
-{
+test_cvt_json_not_exact_to_float(void) {
     double value = 1.23456789012345;
 
     cJSON_AddNumberToObject(root, float_field_name, value);
@@ -259,8 +244,7 @@ test_cvt_json_not_exact_to_float(void)
 }
 
 void
-test_cvt_json_bool_to_float(void)
-{
+test_cvt_json_bool_to_float(void) {
     cJSON_AddBoolToObject(root, float_field_name, cJSON_True);
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, float_field_name), (ProtobufCMessage*)msg, float_field_name);
@@ -269,8 +253,7 @@ test_cvt_json_bool_to_float(void)
 }
 
 void
-test_cvt_json_array_to_float(void)
-{
+test_cvt_json_array_to_float(void) {
     cJSON_AddArrayToObject(root, float_field_name);
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, float_field_name), (ProtobufCMessage*)msg, float_field_name);
@@ -279,8 +262,7 @@ test_cvt_json_array_to_float(void)
 }
 
 void
-test_cvt_json_object_to_float(void)
-{
+test_cvt_json_object_to_float(void) {
     cJSON_AddObjectToObject(root, float_field_name);
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, float_field_name), (ProtobufCMessage*)msg, float_field_name);
@@ -289,8 +271,7 @@ test_cvt_json_object_to_float(void)
 }
 
 void
-test_cvt_json_array_to_repeated_float(void)
-{
+test_cvt_json_array_to_repeated_float(void) {
     const char*  value          = "[123.0, \"0.5\"]";
     const float  expect_array[] = {123.0, 0.5};
     const size_t expect_length  = sizeof(expect_array) / sizeof(float);
@@ -305,8 +286,7 @@ test_cvt_json_array_to_repeated_float(void)
 }
 
 void
-test_cvt_json_array_to_repeated_float_partly_failed(void)
-{
+test_cvt_json_array_to_repeated_float_partly_failed(void) {
     const char*  value          = "[123.0, \"0.5\",\"invalid number string\"]";
     const float  expect_array[] = {123.0, 0.5};
     const size_t expect_length  = sizeof(expect_array) / sizeof(float);
@@ -321,8 +301,7 @@ test_cvt_json_array_to_repeated_float_partly_failed(void)
 }
 
 void
-test_cvt_json_array_to_repeated_float_all_failed(void)
-{
+test_cvt_json_array_to_repeated_float_all_failed(void) {
     const char* value = "[\"invalid number string\"]";
 
     cJSON* array_value = cJSON_Parse(value);
@@ -335,8 +314,7 @@ test_cvt_json_array_to_repeated_float_all_failed(void)
 }
 
 void
-test_cvt_json_array_to_repeated_float_empty(void)
-{
+test_cvt_json_array_to_repeated_float_empty(void) {
     const char* value = "[]";
 
     cJSON* array_value = cJSON_Parse(value);
@@ -353,8 +331,7 @@ test_cvt_json_array_to_repeated_float_empty(void)
 /******************************************************************************/
 
 int
-main(int argc, char const* argv[])
-{
+main(int argc, char const* argv[]) {
     init_file_name(__FILE__);
     unsigned  rv    = 1;
     CU_pSuite suite = NULL;

@@ -9,11 +9,10 @@
  *
  */
 
-#include <unistd.h>
-
 #include "json2pb.h"
 #include "test.pb-c.h"
 #include "utils.h"
+#include <unistd.h>
 
 /******************************************************************************/
 /*                                Declarations                                */
@@ -115,8 +114,7 @@ CU_SuiteInfo suites[] = {
 /******************************************************************************/
 
 void
-test_cvt_json_number_to_single_uint32(void)
-{
+test_cvt_json_number_to_single_uint32(void) {
     uint32_t value = 1234567890;
 
     cJSON_AddNumberToObject(root, uint32_field_name, value);
@@ -127,8 +125,7 @@ test_cvt_json_number_to_single_uint32(void)
 }
 
 void
-test_cvt_json_decimal_string_to_single_uint32(void)
-{
+test_cvt_json_decimal_string_to_single_uint32(void) {
     const char* value = "1234567890";
 
     cJSON_AddStringToObject(root, uint32_field_name, value);
@@ -139,8 +136,7 @@ test_cvt_json_decimal_string_to_single_uint32(void)
 }
 
 void
-test_cvt_json_hex_string_to_single_uint32(void)
-{
+test_cvt_json_hex_string_to_single_uint32(void) {
     const char* value = "0x4a0";
 
     cJSON_AddStringToObject(root, uint32_field_name, value);
@@ -152,8 +148,7 @@ test_cvt_json_hex_string_to_single_uint32(void)
 
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
 void
-test_cvt_json_binary_string_to_single_uint32(void)
-{
+test_cvt_json_binary_string_to_single_uint32(void) {
     const char* value = "0b110";
 
     cJSON_AddStringToObject(root, uint32_field_name, value);
@@ -165,8 +160,7 @@ test_cvt_json_binary_string_to_single_uint32(void)
 #endif
 
 void
-test_cvt_json_octal_string_to_single_uint32(void)
-{
+test_cvt_json_octal_string_to_single_uint32(void) {
     const char* value = "0110";
 
     cJSON_AddStringToObject(root, uint32_field_name, value);
@@ -177,8 +171,7 @@ test_cvt_json_octal_string_to_single_uint32(void)
 }
 
 void
-test_cvt_json_number_to_oneof_uint32(void)
-{
+test_cvt_json_number_to_oneof_uint32(void) {
     uint32_t oneof_uint32_value = 123456789;
     cJSON_AddNumberToObject(root, "oneof_uint32", oneof_uint32_value);
 
@@ -191,8 +184,7 @@ test_cvt_json_number_to_oneof_uint32(void)
 }
 
 void
-test_cvt_json_bool_to_uint32(void)
-{
+test_cvt_json_bool_to_uint32(void) {
     cJSON_AddTrueToObject(root, uint32_field_name);
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, uint32_field_name), (ProtobufCMessage*)msg, uint32_field_name);
@@ -201,8 +193,7 @@ test_cvt_json_bool_to_uint32(void)
 }
 
 void
-test_cvt_json_array_to_uint32(void)
-{
+test_cvt_json_array_to_uint32(void) {
     cJSON_AddArrayToObject(root, uint32_field_name);
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, uint32_field_name), (ProtobufCMessage*)msg, uint32_field_name);
@@ -211,8 +202,7 @@ test_cvt_json_array_to_uint32(void)
 }
 
 void
-test_cvt_json_object_to_uint32(void)
-{
+test_cvt_json_object_to_uint32(void) {
     cJSON_AddObjectToObject(root, uint32_field_name);
 
     j2p_expt_t e = cvt_json_2_pb_number(root, cJSON_GetObjectItem(root, uint32_field_name), (ProtobufCMessage*)msg, uint32_field_name);
@@ -221,8 +211,7 @@ test_cvt_json_object_to_uint32(void)
 }
 
 void
-test_cvt_json_number_overflow_uint32(void)
-{
+test_cvt_json_number_overflow_uint32(void) {
     uint64_t value = (uint64_t)UINT32_MAX + 1;
 
     cJSON_AddNumberToObject(root, uint32_field_name, value);
@@ -233,8 +222,7 @@ test_cvt_json_number_overflow_uint32(void)
 }
 
 void
-test_cvt_json_number_underflow_uint32(void)
-{
+test_cvt_json_number_underflow_uint32(void) {
     int64_t value = (int64_t)-1;
 
     cJSON_AddNumberToObject(root, uint32_field_name, value);
@@ -245,8 +233,7 @@ test_cvt_json_number_underflow_uint32(void)
 }
 
 void
-test_cvt_json_str_overflow_uint32(void)
-{
+test_cvt_json_str_overflow_uint32(void) {
     const char* value = "4294967296";
 
     cJSON_AddStringToObject(root, uint32_field_name, value);
@@ -257,8 +244,7 @@ test_cvt_json_str_overflow_uint32(void)
 }
 
 void
-test_cvt_json_str_underflow_uint32(void)
-{
+test_cvt_json_str_underflow_uint32(void) {
     const char* value = "-1";
 
     cJSON_AddStringToObject(root, uint32_field_name, value);
@@ -269,8 +255,7 @@ test_cvt_json_str_underflow_uint32(void)
 }
 
 void
-test_cvt_json_number_max_uint32(void)
-{
+test_cvt_json_number_max_uint32(void) {
     uint32_t value = UINT32_MAX;
 
     cJSON_AddNumberToObject(root, uint32_field_name, value);
@@ -281,8 +266,7 @@ test_cvt_json_number_max_uint32(void)
 }
 
 void
-test_cvt_json_number_min_uint32(void)
-{
+test_cvt_json_number_min_uint32(void) {
     uint32_t value = 0;
 
     cJSON_AddNumberToObject(root, uint32_field_name, value);
@@ -293,8 +277,7 @@ test_cvt_json_number_min_uint32(void)
 }
 
 void
-test_cvt_json_str_max_uint32(void)
-{
+test_cvt_json_str_max_uint32(void) {
     const char* value = "4294967295";
 
     cJSON_AddStringToObject(root, uint32_field_name, value);
@@ -305,8 +288,7 @@ test_cvt_json_str_max_uint32(void)
 }
 
 void
-test_cvt_json_str_min_uint32(void)
-{
+test_cvt_json_str_min_uint32(void) {
     const char* value = "0";
 
     cJSON_AddStringToObject(root, uint32_field_name, value);
@@ -317,8 +299,7 @@ test_cvt_json_str_min_uint32(void)
 }
 
 void
-test_cvt_json_str_overflow_ulong(void)
-{
+test_cvt_json_str_overflow_ulong(void) {
     const char* value = "0x800000000000000000";
 
     cJSON_AddStringToObject(root, uint32_field_name, value);
@@ -329,8 +310,7 @@ test_cvt_json_str_overflow_ulong(void)
 }
 
 void
-test_cvt_json_array_to_repeated_uint32(void)
-{
+test_cvt_json_array_to_repeated_uint32(void) {
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
     const char*    value          = "[1234567890, \"1234567890\",\"0x4a0\",\"0b110\",\"0110\",123.45]";
     const uint32_t expect_array[] = {1234567890, 1234567890, 0x4a0, 0b110, 0110, 123};
@@ -350,8 +330,7 @@ test_cvt_json_array_to_repeated_uint32(void)
 }
 
 void
-test_cvt_json_array_to_repeated_uint32_partly_failed(void)
-{
+test_cvt_json_array_to_repeated_uint32_partly_failed(void) {
     const char*    value          = "[1234567890, \"0x4a0\",\"0110\",\"invalid number string\",\"0x100000000\"]";
     const uint32_t expect_array[] = {1234567890, 0x4a0, 0110};
     const size_t   expect_length  = sizeof(expect_array) / sizeof(uint32_t);
@@ -366,8 +345,7 @@ test_cvt_json_array_to_repeated_uint32_partly_failed(void)
 }
 
 void
-test_cvt_json_array_to_repeated_uint32_all_failed(void)
-{
+test_cvt_json_array_to_repeated_uint32_all_failed(void) {
     const char* value = "[\"invalid number string\",\"0x100000000\"]";
 
     cJSON* array_value = cJSON_Parse(value);
@@ -380,8 +358,7 @@ test_cvt_json_array_to_repeated_uint32_all_failed(void)
 }
 
 void
-test_cvt_json_array_to_repeated_uint32_empty(void)
-{
+test_cvt_json_array_to_repeated_uint32_empty(void) {
     const char* value = "[]";
 
     cJSON* array_value = cJSON_Parse(value);
@@ -394,8 +371,7 @@ test_cvt_json_array_to_repeated_uint32_empty(void)
 }
 
 void
-test_cvt_json_number_to_fixed32(void)
-{
+test_cvt_json_number_to_fixed32(void) {
     uint32_t value = 0x4a0;
 
     cJSON_AddNumberToObject(root, fixed32_field_name, value);
@@ -406,8 +382,7 @@ test_cvt_json_number_to_fixed32(void)
 }
 
 void
-test_cvt_json_array_to_repeated_fixed32(void)
-{
+test_cvt_json_array_to_repeated_fixed32(void) {
     const char* value          = "[123,\"123\",\"0x4a0\",\"0110\"]";
     uint32_t    expect_array[] = {123, 123, 0x4a0, 0110};
     size_t      expect_length  = sizeof(expect_array) / sizeof(uint32_t);
@@ -427,8 +402,7 @@ test_cvt_json_array_to_repeated_fixed32(void)
 /******************************************************************************/
 
 int
-main(int argc, char const* argv[])
-{
+main(int argc, char const* argv[]) {
 
     init_file_name(__FILE__);
     unsigned  rv    = 1;

@@ -12,7 +12,6 @@
 #include <float.h>
 #include <trower-base64/base64.h>
 #include <unistd.h>
-
 #include "json2pb.h"
 #include "test.pb-c.h"
 #include "utils.h"
@@ -81,8 +80,7 @@ CU_SuiteInfo suites[] = {
 /******************************************************************************/
 
 void
-test_cvt_json_hex_string_to_single_bytes(void)
-{
+test_cvt_json_hex_string_to_single_bytes(void) {
     cJSON_AddStringToObject(root, bytes_field_name, "01 10 11 04");
     uint8_t      expected_bytes[] = {0x01, 0x10, 0x11, 0x04};
     const size_t expected_size    = sizeof(expected_bytes) / sizeof(expected_bytes[0]);
@@ -94,8 +92,7 @@ test_cvt_json_hex_string_to_single_bytes(void)
 }
 
 void
-test_cvt_json_base64_string_to_single_bytes(void)
-{
+test_cvt_json_base64_string_to_single_bytes(void) {
     uint8_t      expected_bytes[] = {0x01, 0x10, 0x11, 0x04};
     const size_t expected_size    = sizeof(expected_bytes) / sizeof(expected_bytes[0]);
 
@@ -112,8 +109,7 @@ test_cvt_json_base64_string_to_single_bytes(void)
 }
 
 void
-test_cvt_json_filepath_string_to_single_bytes(void)
-{
+test_cvt_json_filepath_string_to_single_bytes(void) {
     uint8_t      expected_bytes[] = {0x01, 0x10, 0x11, 0x04};
     const size_t expected_size    = sizeof(expected_bytes) / sizeof(expected_bytes[0]);
 
@@ -135,8 +131,7 @@ test_cvt_json_filepath_string_to_single_bytes(void)
 }
 
 void
-test_cvt_json_base64_string_to_oneof_bytes(void)
-{
+test_cvt_json_base64_string_to_oneof_bytes(void) {
     uint8_t      expected_bytes[] = {0x01, 0x10, 0x11, 0x04};
     const size_t expected_size    = sizeof(expected_bytes) / sizeof(expected_bytes[0]);
 
@@ -156,8 +151,7 @@ test_cvt_json_base64_string_to_oneof_bytes(void)
 }
 
 void
-test_cvt_invalid_hex_string_to_single_bytes(void)
-{
+test_cvt_invalid_hex_string_to_single_bytes(void) {
     cJSON_AddStringToObject(root, bytes_field_name, "01 10 11 3 4");
 
     j2p_expt_t e = cvt_json_2_pb_bytes(root, cJSON_GetObjectItem(root, bytes_field_name), (ProtobufCMessage*)msg, bytes_field_name, J2P_FILE_HEX_STR);
@@ -167,8 +161,7 @@ test_cvt_invalid_hex_string_to_single_bytes(void)
 }
 
 void
-test_cvt_invalid_base64_string_to_single_bytes(void)
-{
+test_cvt_invalid_base64_string_to_single_bytes(void) {
     uint8_t      expected_bytes[] = {0x01, 0x10, 0x11, 0x04};
     const size_t expected_size    = sizeof(expected_bytes) / sizeof(expected_bytes[0]);
 
@@ -185,8 +178,7 @@ test_cvt_invalid_base64_string_to_single_bytes(void)
 }
 
 void
-test_cvt_invalid_filepath_string_to_single_bytes(void)
-{
+test_cvt_invalid_filepath_string_to_single_bytes(void) {
     cJSON_AddStringToObject(root, bytes_field_name, "test_does_not_exit.bin");
 
     j2p_expt_t e = cvt_json_2_pb_bytes(root, cJSON_GetObjectItem(root, bytes_field_name), (ProtobufCMessage*)msg, bytes_field_name, J2P_FILE_PATH_STR);
@@ -196,8 +188,7 @@ test_cvt_invalid_filepath_string_to_single_bytes(void)
 }
 
 void
-test_cvt_invalid_type_to_single_bytes(void)
-{
+test_cvt_invalid_type_to_single_bytes(void) {
     uint8_t      expected_bytes[] = {0x01, 0x10, 0x11, 0x04};
     const size_t expected_size    = sizeof(expected_bytes) / sizeof(expected_bytes[0]);
 
@@ -214,8 +205,7 @@ test_cvt_invalid_type_to_single_bytes(void)
 }
 
 void
-test_cvt_json_number_to_single_bytes(void)
-{
+test_cvt_json_number_to_single_bytes(void) {
     cJSON_AddNumberToObject(root, bytes_field_name, 1);
 
     j2p_expt_t e = cvt_json_2_pb_bytes(root, cJSON_GetObjectItem(root, bytes_field_name), (ProtobufCMessage*)msg, bytes_field_name, 15);
@@ -225,8 +215,7 @@ test_cvt_json_number_to_single_bytes(void)
 }
 
 void
-test_cvt_json_object_to_single_bytes(void)
-{
+test_cvt_json_object_to_single_bytes(void) {
     cJSON_AddObjectToObject(root, bytes_field_name);
 
     j2p_expt_t e = cvt_json_2_pb_bytes(root, cJSON_GetObjectItem(root, bytes_field_name), (ProtobufCMessage*)msg, bytes_field_name, 15);
@@ -236,8 +225,7 @@ test_cvt_json_object_to_single_bytes(void)
 }
 
 void
-test_cvt_json_array_to_single_bytes(void)
-{
+test_cvt_json_array_to_single_bytes(void) {
     cJSON_AddArrayToObject(root, bytes_field_name);
 
     j2p_expt_t e = cvt_json_2_pb_bytes(root, cJSON_GetObjectItem(root, bytes_field_name), (ProtobufCMessage*)msg, bytes_field_name, 15);
@@ -247,8 +235,7 @@ test_cvt_json_array_to_single_bytes(void)
 }
 
 void
-test_cvt_json_bool_to_single_bytes(void)
-{
+test_cvt_json_bool_to_single_bytes(void) {
     cJSON_AddTrueToObject(root, bytes_field_name);
 
     j2p_expt_t e = cvt_json_2_pb_bytes(root, cJSON_GetObjectItem(root, bytes_field_name), (ProtobufCMessage*)msg, bytes_field_name, 15);
@@ -262,8 +249,7 @@ test_cvt_json_bool_to_single_bytes(void)
 /******************************************************************************/
 
 int
-main(int argc, char const* argv[])
-{
+main(int argc, char const* argv[]) {
     init_file_name(__FILE__);
     unsigned  rv    = 1;
     CU_pSuite suite = NULL;

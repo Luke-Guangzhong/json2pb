@@ -9,12 +9,11 @@
  *
  */
 
-#include <stdbool.h>
-#include <unistd.h>
-
 #include "json2pb.h"
 #include "test.pb-c.h"
 #include "utils.h"
+#include <stdbool.h>
+#include <unistd.h>
 
 /******************************************************************************/
 /*                                Declarations                                */
@@ -54,8 +53,7 @@ CU_SuiteInfo suites[] = {
 /******************************************************************************/
 
 void
-test_cvt_json_bool_to_single_bool(void)
-{
+test_cvt_json_bool_to_single_bool(void) {
     cJSON_AddTrueToObject(root, bool_field_name);
 
     j2p_expt_t e = cvt_json_2_pb_bool(root, cJSON_GetObjectItem(root, bool_field_name), (ProtobufCMessage*)msg, bool_field_name, NULL);
@@ -64,8 +62,7 @@ test_cvt_json_bool_to_single_bool(void)
 }
 
 void
-test_cvt_json_string_to_single_bool(void)
-{
+test_cvt_json_string_to_single_bool(void) {
     const char* value = "true";
 
     cJSON_AddStringToObject(root, bool_field_name, value);
@@ -76,8 +73,7 @@ test_cvt_json_string_to_single_bool(void)
 }
 
 void
-test_cvt_json_bool_to_oneof_bool(void)
-{
+test_cvt_json_bool_to_oneof_bool(void) {
     cJSON_AddTrueToObject(root, "oneof_bool");
 
     j2p_expt_t                      e          = cvt_json_2_pb_bool(root, cJSON_GetObjectItem(root, "oneof_bool"), (ProtobufCMessage*)msg, "oneof_bool", NULL);
@@ -89,8 +85,7 @@ test_cvt_json_bool_to_oneof_bool(void)
 }
 
 void
-test_cvt_json_number_to_single_bool(void)
-{
+test_cvt_json_number_to_single_bool(void) {
     cJSON_AddNumberToObject(root, bool_field_name, 1);
 
     j2p_expt_t e = cvt_json_2_pb_bool(root, cJSON_GetObjectItem(root, bool_field_name), (ProtobufCMessage*)msg, bool_field_name, NULL);
@@ -107,8 +102,7 @@ test_cvt_json_number_to_single_bool(void)
 }
 
 void
-test_cvt_json_array_to_bool(void)
-{
+test_cvt_json_array_to_bool(void) {
     cJSON_AddArrayToObject(root, bool_field_name);
 
     j2p_expt_t e = cvt_json_2_pb_bool(root, cJSON_GetObjectItem(root, bool_field_name), (ProtobufCMessage*)msg, bool_field_name, NULL);
@@ -117,8 +111,7 @@ test_cvt_json_array_to_bool(void)
 }
 
 void
-test_cvt_json_object_to_bool(void)
-{
+test_cvt_json_object_to_bool(void) {
     cJSON_AddObjectToObject(root, bool_field_name);
 
     j2p_expt_t e = cvt_json_2_pb_bool(root, cJSON_GetObjectItem(root, bool_field_name), (ProtobufCMessage*)msg, bool_field_name, NULL);
@@ -131,8 +124,7 @@ test_cvt_json_object_to_bool(void)
 /******************************************************************************/
 
 int
-main(int argc, char const* argv[])
-{
+main(int argc, char const* argv[]) {
     init_file_name(__FILE__);
     unsigned  rv    = 1;
     CU_pSuite suite = NULL;

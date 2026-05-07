@@ -9,10 +9,9 @@
  *
  */
 
-#include <unistd.h>
-
 #include "json2pb.h"
 #include "utils.h"
+#include <unistd.h>
 
 /******************************************************************************/
 /*                                Declarations                                */
@@ -82,8 +81,7 @@ CU_SuiteInfo suites[] = {
 /******************************************************************************/
 
 void
-test_cvt_json_to_deprecated_field(void)
-{
+test_cvt_json_to_deprecated_field(void) {
     int32_t deprecated_value = 123456789;
     cJSON_AddNumberToObject(root, "deprecated_field", deprecated_value);
 
@@ -93,8 +91,7 @@ test_cvt_json_to_deprecated_field(void)
 }
 
 void
-test_cvt_json_to_already_setted_oneof_field(void)
-{
+test_cvt_json_to_already_setted_oneof_field(void) {
     int32_t oneof_int32_value = 123456789;
     cJSON_AddNumberToObject(root, "oneof_int32", oneof_int32_value);
 
@@ -115,8 +112,7 @@ test_cvt_json_to_already_setted_oneof_field(void)
 }
 
 void
-test_reject_null_root(void)
-{
+test_reject_null_root(void) {
     cJSON_AddNumberToObject(root, "f_int32", 123456789);
 
     j2p_expt_t e = cvt_json_2_pb_field_v2(NULL, cJSON_GetObjectItem(root, "f_int32"), (ProtobufCMessage*)msg, "f_int32", (j2p_add_cvt){.bool_cvt = NULL});
@@ -125,16 +121,14 @@ test_reject_null_root(void)
 }
 
 void
-test_reject_null_item(void)
-{
+test_reject_null_item(void) {
     j2p_expt_t e = cvt_json_2_pb_field_v2(root, cJSON_GetObjectItem(root, "f_int32"), (ProtobufCMessage*)msg, "f_int32", (j2p_add_cvt){.bool_cvt = NULL});
     CU_ASSERT_EQUAL(e, J2P_EXPT_INVALID_ARG);
     CU_ASSERT_EQUAL(msg->f_int32, 0);
 }
 
 void
-test_reject_null_msg(void)
-{
+test_reject_null_msg(void) {
     cJSON_AddNumberToObject(root, "f_int32", 123456789);
 
     j2p_expt_t e = cvt_json_2_pb_field_v2(root, cJSON_GetObjectItem(root, "f_int32"), NULL, "f_int32", (j2p_add_cvt){.bool_cvt = NULL});
@@ -143,8 +137,7 @@ test_reject_null_msg(void)
 }
 
 void
-test_reject_null_field_name(void)
-{
+test_reject_null_field_name(void) {
     cJSON_AddNumberToObject(root, "f_int32", 123456789);
 
     j2p_expt_t e = cvt_json_2_pb_field_v2(root, cJSON_GetObjectItem(root, "f_int32"), (ProtobufCMessage*)msg, NULL, (j2p_add_cvt){.bool_cvt = NULL});
@@ -153,8 +146,7 @@ test_reject_null_field_name(void)
 }
 
 void
-test_reject_uninitialized_msg(void)
-{
+test_reject_uninitialized_msg(void) {
     test_message__free_unpacked(msg, NULL);
     msg = (TestMessage*)calloc(1, sizeof(TestMessage));
 
@@ -169,8 +161,7 @@ test_reject_uninitialized_msg(void)
 }
 
 void
-test_cvt_json_bool_to_repeated_field(void)
-{
+test_cvt_json_bool_to_repeated_field(void) {
     cJSON_AddBoolToObject(root, "f_repeated_int32", true);
 
     j2p_expt_t e = cvt_json_2_pb_field_v2(root, cJSON_GetObjectItem(root, "f_repeated_int32"), (ProtobufCMessage*)msg, "f_repeated_int32", (j2p_add_cvt){.bool_cvt = NULL});
@@ -180,8 +171,7 @@ test_cvt_json_bool_to_repeated_field(void)
 }
 
 void
-test_cvt_json_number_to_repeated_field(void)
-{
+test_cvt_json_number_to_repeated_field(void) {
     cJSON_AddNumberToObject(root, "f_repeated_int32", 12345);
 
     j2p_expt_t e = cvt_json_2_pb_field_v2(root, cJSON_GetObjectItem(root, "f_repeated_int32"), (ProtobufCMessage*)msg, "f_repeated_int32", (j2p_add_cvt){.bool_cvt = NULL});
@@ -191,8 +181,7 @@ test_cvt_json_number_to_repeated_field(void)
 }
 
 void
-test_cvt_json_string_to_repeated_field(void)
-{
+test_cvt_json_string_to_repeated_field(void) {
     cJSON_AddStringToObject(root, "f_repeated_int32", "test string");
 
     j2p_expt_t e = cvt_json_2_pb_field_v2(root, cJSON_GetObjectItem(root, "f_repeated_int32"), (ProtobufCMessage*)msg, "f_repeated_int32", (j2p_add_cvt){.bool_cvt = NULL});
@@ -202,8 +191,7 @@ test_cvt_json_string_to_repeated_field(void)
 }
 
 void
-test_cvt_json_object_to_repeated_field(void)
-{
+test_cvt_json_object_to_repeated_field(void) {
     cJSON_AddObjectToObject(root, "f_repeated_int32");
 
     j2p_expt_t e = cvt_json_2_pb_field_v2(root, cJSON_GetObjectItem(root, "f_repeated_int32"), (ProtobufCMessage*)msg, "f_repeated_int32", (j2p_add_cvt){.bool_cvt = NULL});
@@ -213,8 +201,7 @@ test_cvt_json_object_to_repeated_field(void)
 }
 
 void
-test_reject_json_null(void)
-{
+test_reject_json_null(void) {
     cJSON_AddNullToObject(root, "f_int32");
 
     j2p_expt_t e = cvt_json_2_pb_field_v2(root, cJSON_GetObjectItem(root, "f_int32"), (ProtobufCMessage*)msg, "f_int32", (j2p_add_cvt){.bool_cvt = NULL});
@@ -223,8 +210,7 @@ test_reject_json_null(void)
 }
 
 void
-test_reject_unknown_field(void)
-{
+test_reject_unknown_field(void) {
     cJSON_AddNumberToObject(root, "unknown_field", 12345);
 
     j2p_expt_t e = cvt_json_2_pb_field_v2(root, cJSON_GetObjectItem(root, "unknown_field"), (ProtobufCMessage*)msg, "unknown_field", (j2p_add_cvt){.bool_cvt = NULL});
@@ -232,8 +218,7 @@ test_reject_unknown_field(void)
 }
 
 void
-test_reject_unknown_item(void)
-{
+test_reject_unknown_item(void) {
     cJSON* another_root = cJSON_CreateObject();
 
     cJSON_AddNumberToObject(another_root, "f_int32", 12345);
@@ -251,8 +236,7 @@ test_reject_unknown_item(void)
 /******************************************************************************/
 
 int
-main(int argc, char const* argv[])
-{
+main(int argc, char const* argv[]) {
     char current_source_file_path[PATH_MAX] = __FILE__;
     init_file_name(__FILE__);
     unsigned  rv    = 1;

@@ -9,12 +9,11 @@
  *
  */
 
-#include <stdbool.h>
-#include <unistd.h>
-
 #include "json2pb.h"
 #include "test.pb-c.h"
 #include "utils.h"
+#include <stdbool.h>
+#include <unistd.h>
 
 /******************************************************************************/
 /*                                Declarations                                */
@@ -76,8 +75,7 @@ CU_SuiteInfo suites[] = {
 /******************************************************************************/
 
 void
-test_cvt_json_string_to_single_string(void)
-{
+test_cvt_json_string_to_single_string(void) {
     cJSON_AddStringToObject(root, string_field_name, "Test String");
 
     j2p_expt_t e = cvt_json_2_pb_string(root, cJSON_GetObjectItem(root, string_field_name), (ProtobufCMessage*)msg, string_field_name);
@@ -86,8 +84,7 @@ test_cvt_json_string_to_single_string(void)
 }
 
 void
-test_cvt_json_string_to_oneof_string(void)
-{
+test_cvt_json_string_to_oneof_string(void) {
     cJSON_AddStringToObject(root, "oneof_string", "Test String");
 
     j2p_expt_t                      e          = cvt_json_2_pb_string(root, cJSON_GetObjectItem(root, "oneof_string"), (ProtobufCMessage*)msg, "oneof_string");
@@ -99,8 +96,7 @@ test_cvt_json_string_to_oneof_string(void)
 }
 
 void
-test_cvt_json_object_to_single_string(void)
-{
+test_cvt_json_object_to_single_string(void) {
     cJSON_AddObjectToObject(root, string_field_name);
 
     j2p_expt_t e = cvt_json_2_pb_string(root, cJSON_GetObjectItem(root, string_field_name), (ProtobufCMessage*)msg, string_field_name);
@@ -109,8 +105,7 @@ test_cvt_json_object_to_single_string(void)
 }
 
 void
-test_cvt_json_array_to_single_string(void)
-{
+test_cvt_json_array_to_single_string(void) {
     cJSON_AddArrayToObject(root, string_field_name);
 
     j2p_expt_t e = cvt_json_2_pb_string(root, cJSON_GetObjectItem(root, string_field_name), (ProtobufCMessage*)msg, string_field_name);
@@ -119,8 +114,7 @@ test_cvt_json_array_to_single_string(void)
 }
 
 void
-test_cvt_json_number_to_single_string(void)
-{
+test_cvt_json_number_to_single_string(void) {
     cJSON_AddNumberToObject(root, string_field_name, 123);
 
     j2p_expt_t e = cvt_json_2_pb_string(root, cJSON_GetObjectItem(root, string_field_name), (ProtobufCMessage*)msg, string_field_name);
@@ -129,8 +123,7 @@ test_cvt_json_number_to_single_string(void)
 }
 
 void
-test_cvt_json_bool_to_single_string(void)
-{
+test_cvt_json_bool_to_single_string(void) {
     cJSON_AddBoolToObject(root, string_field_name, cJSON_True);
 
     j2p_expt_t e = cvt_json_2_pb_string(root, cJSON_GetObjectItem(root, string_field_name), (ProtobufCMessage*)msg, string_field_name);
@@ -139,8 +132,7 @@ test_cvt_json_bool_to_single_string(void)
 }
 
 void
-test_cvt_json_array_to_repeated_string(void)
-{
+test_cvt_json_array_to_repeated_string(void) {
     const char*  value          = "[\"test string 1\", \"test string 2\"]";
     const char*  expect_array[] = {"test string 1", "test string 2"};
     const size_t expect_length  = sizeof(expect_array) / sizeof(char*);
@@ -157,8 +149,7 @@ test_cvt_json_array_to_repeated_string(void)
 }
 
 void
-test_cvt_json_array_to_repeated_string_partly_failed(void)
-{
+test_cvt_json_array_to_repeated_string_partly_failed(void) {
     const char*  value          = "[\"test string 1\", \"test string 2\",1234]";
     const char*  expect_array[] = {"test string 1", "test string 2"};
     const size_t expect_length  = sizeof(expect_array) / sizeof(char*);
@@ -175,8 +166,7 @@ test_cvt_json_array_to_repeated_string_partly_failed(void)
 }
 
 void
-test_cvt_json_array_to_repeated_string_all_failed(void)
-{
+test_cvt_json_array_to_repeated_string_all_failed(void) {
     const char* value = "[1234]";
 
     cJSON* array_value = cJSON_Parse(value);
@@ -189,8 +179,7 @@ test_cvt_json_array_to_repeated_string_all_failed(void)
 }
 
 void
-test_cvt_json_array_to_repeated_string_empty(void)
-{
+test_cvt_json_array_to_repeated_string_empty(void) {
     cJSON_AddArrayToObject(root, repeated_string_field_name);
 
     j2p_expt_t e = cvt_json_2_pb_string(root, cJSON_GetObjectItem(root, repeated_string_field_name), (ProtobufCMessage*)msg, repeated_string_field_name);
@@ -204,8 +193,7 @@ test_cvt_json_array_to_repeated_string_empty(void)
 /******************************************************************************/
 
 int
-main(int argc, char const* argv[])
-{
+main(int argc, char const* argv[]) {
     init_file_name(__FILE__);
     unsigned  rv    = 1;
     CU_pSuite suite = NULL;
